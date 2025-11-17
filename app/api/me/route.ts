@@ -29,6 +29,8 @@ export async function GET(req: Request) {
       id: user.id,
       name: user.name,
       avatarUrl: user.avatarUrl || null,
+      bio: user.bio,
+      phone: user.phone,
     })
   } catch {
     return NextResponse.json({ auth: false })

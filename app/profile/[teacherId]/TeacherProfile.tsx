@@ -6,17 +6,11 @@ import { User } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-
-interface TeacherData {
-  auth: boolean
-  id: string
-  name?: string
-  avatarUrl?: string | null
-}
+import { ITeacherDB } from '../../../interfaces/teachers'
 
 export default function TeacherProfile({ teacherId }: { teacherId: string }) {
   const router = useRouter()
-  const [teacher, setTeacher] = useState<TeacherData | null>(null)
+  const [teacher, setTeacher] = useState<ITeacherDB | null>(null)
 
   useEffect(() => {
     fetch('/api/me')
@@ -80,11 +74,11 @@ export default function TeacherProfile({ teacherId }: { teacherId: string }) {
 
       <CardHeader className='pt-20 text-center'>
         <CardTitle className='text-3xl font-bold'>{name || 'أستاذنا العزيز'}</CardTitle>
-        <p className='text-lg text-muted-foreground mt-2'>معلم متميز ✨</p>
       </CardHeader>
 
       <CardContent className='text-center pb-10'>
-        <p className='text-base text-muted-foreground leading-relaxed'>مرحباً بعودتك يا مستر 🤍</p>
+        <p className='text-lg text-muted-foreground mt-2'>{teacher.bio}</p>
+        <p className='text-lg text-muted-foreground mt-2'>{teacher.phone}</p>
       </CardContent>
     </Card>
   )

@@ -21,9 +21,11 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { LoaderIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { addTeacherAction } from '../../actions/Teacher/addTeacher'
+import { Textarea } from '../../components/ui/textarea'
 import { useEdgeStore } from '../../lib/edgestore'
 import { ITeacher, teacherSchema } from '../../validation/teacherSchema'
 
@@ -37,6 +39,8 @@ export default function AddTeacherForm() {
       name: '',
       email: '',
       password: '',
+      bio: '',
+      phone: '',
     },
   })
 
@@ -48,16 +52,15 @@ export default function AddTeacherForm() {
         avatarUrl = res.url
       }
 
-      const { name, email, password } = data
+      const { name, email, password, phone, bio } = data
       form.reset()
-      await addTeacherAction({ name, email, password, avatarUrl })
+      await addTeacherAction({ name, email, password, avatarUrl, phone, bio })
       toast.success('Teacher added successfully!')
     } catch (err) {
       console.error(err)
       toast.error('Failed to add teacher')
     }
   }
-
   return (
     <Card className='w-full sm:max-w-md'>
       <CardHeader>
@@ -76,7 +79,7 @@ export default function AddTeacherForm() {
                 <FormItem>
                   <FormLabel>الاسم</FormLabel>
                   <FormControl>
-                    <Input placeholder='أحمد شوقي' {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -91,7 +94,7 @@ export default function AddTeacherForm() {
                 <FormItem>
                   <FormLabel>الإيميل</FormLabel>
                   <FormControl>
-                    <Input type='email' placeholder='ahmed@example.com' {...field} />
+                    <Input type='email' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -106,7 +109,35 @@ export default function AddTeacherForm() {
                 <FormItem>
                   <FormLabel>الباسورد</FormLabel>
                   <FormControl>
-                    <Input type='password' placeholder='••••••••' {...field} />
+                    <Input type='password' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='phone'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>رقم الموبايل</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='bio'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>نبذة عن المدرس </FormLabel>
+                  <FormControl>
+                    <Textarea {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -130,8 +161,13 @@ export default function AddTeacherForm() {
         <Button type='button' variant='outline' onClick={() => form.reset()}>
           مسح
         </Button>
-        <Button type='submit' form='form-add-teacher'>
-          إرسال
+        <Button
+          type='submit'
+          form='form-add-teacher'
+          disabled={form.formState.isSubmitting || form.formState.isLoading}
+          className=' relative'
+        >
+          {form.formState.isSubmitting ? <LoaderIcon className='animate-spin' /> : 'إضافة'}
         </Button>
       </CardFooter>
     </Card>

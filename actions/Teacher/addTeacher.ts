@@ -9,7 +9,7 @@ interface ITeacherDB extends ITeacher {
 }
 
 export const addTeacherAction = async (teacher: ITeacherDB) => {
-  const { email, name, password, avatarUrl } = teacher
+  const { email, name, password, avatarUrl, phone, bio } = teacher
   const hashedPassword = await bcrypt.hash(password, 10)
   await Prisma.teacher.create({
     data: {
@@ -17,6 +17,8 @@ export const addTeacherAction = async (teacher: ITeacherDB) => {
       name,
       password: hashedPassword,
       avatarUrl,
+      phone,
+      bio,
     },
   })
   revalidatePath('/add-todo')
