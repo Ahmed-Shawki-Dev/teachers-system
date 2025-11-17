@@ -1,4 +1,10 @@
+import TeacherProfile from './TeacherProfile'
+
 export default async function Page({ params }: { params: Promise<{ teacherId: string }> }) {
   const { teacherId } = await params
-  return <div>البوست: {teacherId}</div>
+  return (
+    <section className='h-screen w-full flex justify-center items-center'>
+      <TeacherProfile teacherId={teacherId} />
+    </section>
+  )
 }

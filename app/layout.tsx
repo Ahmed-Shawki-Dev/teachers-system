@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Cairo, JetBrains_Mono } from 'next/font/google'
+import Navbar from '../components/header/Header'
 import { ThemeProvider } from '../components/theme-provider'
 import { Toaster } from '../components/ui/sonner'
 import { EdgeStoreProvider } from '../lib/edgestore'
@@ -35,7 +36,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <EdgeStoreProvider>{children}</EdgeStoreProvider>
+          <EdgeStoreProvider>
+            <Navbar />
+            {children}
+          </EdgeStoreProvider>
 
           <Toaster position='top-center' richColors />
         </ThemeProvider>

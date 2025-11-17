@@ -45,7 +45,6 @@ export default function AddTeacherForm() {
       let avatarUrl = ''
       if (file) {
         const res = await edgestore.publicFiles.upload({ file })
-
         avatarUrl = res.url
       }
 

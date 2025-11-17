@@ -1,21 +1,43 @@
-import jwt from 'jsonwebtoken'
+import { jwtVerify } from 'jose'
 import { NextRequest, NextResponse } from 'next/server'
 
-export function middleware(req: NextRequest) {
+const JWT_SECRET = process.env.JWT_SECRET!
+
+export async function middleware(req: NextRequest) {
   const token = req.cookies.get('token')?.value
+  const { pathname } = req.nextUrl
 
-  if (!token) {
-    return NextResponse.redirect(new URL('/login', req.url))
+  let isAuthed = false
+  let responseForInvalidToken: NextResponse | null = null
+
+  if (token) {
+    try {
+      const secret = new TextEncoder().encode(JWT_SECRET)
+      await jwtVerify(token, secret)
+      isAuthed = true
+    } catch (error) {
+      console.error('Middleware Verification Error:', error)
+      isAuthed = false
+      responseForInvalidToken = NextResponse.redirect(new URL('/login', req.url))
+      responseForInvalidToken.cookies.delete({ name: 'token', path: '/' })
+    }
   }
 
-  try {
-    jwt.verify(token, process.env.JWT_SECRET!)
-    return NextResponse.next() 
-  } catch (error) {
-    return NextResponse.redirect(new URL('/login', req.url))
+  if (pathname === '/login') {
+    if (isAuthed) {
+      return NextResponse.redirect(new URL('/', req.url))
+    }
+
+    return responseForInvalidToken ?? NextResponse.next()
   }
+
+  if (!isAuthed) {
+    return responseForInvalidToken ?? NextResponse.redirect(new URL('/login', req.url))
+  }
+
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/', '/teacher-profile/:path*', '/dashboard/:path*'],
+  matcher: ['/', '/teacher-profile/:path*', '/dashboard/:path*', '/login','/logout'],
 }

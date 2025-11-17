@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
+import { SignJWT } from 'jose'
 import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '../../../lib/prisma'
-import jwt from 'jsonwebtoken'
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json()
@@ -12,9 +12,11 @@ export async function POST(req: NextRequest) {
   const isValid = await bcrypt.compare(password, user.password)
   if (!isValid) return NextResponse.json({ error: 'الباسورد غلط' }, { status: 401 })
 
-  const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET!, {
-    expiresIn: '72h',
-  })
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+  const token = await new SignJWT({ userId: user.id, email: user.email })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('72h')
+    .sign(secret)
 
   const response = NextResponse.json({ message: 'أهلا يا أستاذ❤️' })
 

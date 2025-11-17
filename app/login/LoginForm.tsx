@@ -38,6 +38,7 @@ const LoginForm = () => {
       if (!res.ok) throw new Error('خطأ في تسجيل الدخول')
       toast.success('أحلى تحية لأحلى أستاذ❤️')
       router.push('/')
+      window.location.reload()
     } catch (error) {
       toast.error('الإيميل أو الباسورد غلط')
     }
