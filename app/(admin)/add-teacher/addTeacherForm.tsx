@@ -24,10 +24,10 @@ import { Input } from '@/components/ui/input'
 import { LoaderIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { addTeacherAction } from '../../actions/Teacher/addTeacher'
-import { Textarea } from '../../components/ui/textarea'
-import { useEdgeStore } from '../../lib/edgestore'
-import { ITeacher, teacherSchema } from '../../validation/teacherSchema'
+import { addTeacherAction } from '../../../actions/Teacher/addTeacher'
+import { Textarea } from '../../../components/ui/textarea'
+import { useEdgeStore } from '../../../lib/edgestore'
+import { ITeacher, teacherSchema } from '../../../validation/teacherSchema'
 
 export default function AddTeacherForm() {
   const { edgestore } = useEdgeStore()

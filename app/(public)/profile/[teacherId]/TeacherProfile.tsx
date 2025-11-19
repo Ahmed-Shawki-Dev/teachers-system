@@ -5,24 +5,11 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { User } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { ITeacherDB } from '../../../interfaces/teachers'
+import { useTeacherStore } from '../../../../store/useAuthStore'
 
 export default function TeacherProfile({ teacherId }: { teacherId: string }) {
   const router = useRouter()
-  const [teacher, setTeacher] = useState<ITeacherDB | null>(null)
-
-  useEffect(() => {
-    fetch('/api/me')
-      .then((r) => r.json())
-      .then((data) => {
-        if (!data.auth || data.id !== teacherId) {
-          router.replace('/')
-          return
-        }
-        setTeacher(data)
-      })
-  }, [teacherId, router])
+  const { teacher } = useTeacherStore()
 
   if (!teacher) {
     return (
@@ -47,7 +34,12 @@ export default function TeacherProfile({ teacherId }: { teacherId: string }) {
     )
   }
 
-  const { name, avatarUrl } = teacher
+  if (teacher.id !== teacherId) {
+    router.replace('/')
+    return null
+  }
+
+  const { name, avatarUrl, bio, phone } = teacher
 
   return (
     <Card className='w-full max-w-sm overflow-hidden border-0 shadow-xl'>
@@ -77,8 +69,8 @@ export default function TeacherProfile({ teacherId }: { teacherId: string }) {
       </CardHeader>
 
       <CardContent className='text-center pb-10'>
-        <p className='text-lg text-muted-foreground mt-2'>{teacher.bio}</p>
-        <p className='text-lg text-muted-foreground mt-2'>{teacher.phone}</p>
+        <p className='text-lg text-muted-foreground mt-2'>{bio}</p>
+        <p className='text-lg text-muted-foreground mt-2'>{phone}</p>
       </CardContent>
     </Card>
   )

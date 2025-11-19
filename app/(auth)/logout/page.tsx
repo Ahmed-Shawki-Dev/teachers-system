@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import LogoutButton from '../../components/header/LogoutButton'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -12,6 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { LogOut, ArrowRight } from 'lucide-react'
+import LogoutButton from '../../../components/header/LogoutButton'
 
 const LogoutPage = () => {
   return (

@@ -13,8 +13,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Card, CardContent, CardHeader } from '../../components/ui/card'
-import { ILogin, LoginSchema } from '../../validation/loginSchema'
+import { ILogin, LoginSchema } from '../../../validation/loginSchema'
+import { Card, CardContent, CardHeader } from '../../../components/ui/card'
 
 const LoginForm = () => {
   const router = useRouter()

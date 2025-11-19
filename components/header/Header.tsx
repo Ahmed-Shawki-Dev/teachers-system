@@ -4,29 +4,42 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { LogIn } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { getTeacherByTokenAction } from '../../actions/Teacher/getTeacherByToken'
+import { useTeacherStore } from '../../store/useAuthStore'
 import { ModeToggle } from '../toggle-theme'
 import { Button } from '../ui/button'
 import UserMenu from './UserMenu'
 
 const Navbar = () => {
   const router = useRouter()
-  const [userId, setUserId] = useState<string | null>(null)
+  const { teacher, setTeacher } = useTeacherStore()
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const checkAuth = async () => {
+useEffect(() => {
+  const checkTeacher = async () => {
+    if (!teacher) {
       try {
-        const res = await fetch('/api/me')
-        const data = await res.json()
-        setUserId(data.auth ? data.id : null)
+        const data = await getTeacherByTokenAction()
+        if (data) {
+          setTeacher({
+            ...data,
+            bio: data.bio ?? undefined,
+            phone: data.phone ?? undefined,
+            avatarUrl: data.avatarUrl ?? undefined,
+          })
+        } else {
+          setTeacher(null)
+        }
       } catch {
-        setUserId(null)
-      } finally {
-        setLoading(false)
+        setTeacher(null)
       }
     }
-    checkAuth()
-  }, [])
+    setLoading(false)
+  }
+
+  checkTeacher()
+}, [teacher, setTeacher])
+
 
   return (
     <nav className='w-full flex justify-between items-center p-4 border-b bg-background'>
@@ -38,7 +51,7 @@ const Navbar = () => {
         <ModeToggle />
         {loading ? (
           <Skeleton className='h-10 w-10 rounded-full' />
-        ) : userId ? (
+        ) : teacher?.id ? (
           <UserMenu />
         ) : (
           <Button size={'icon'} onClick={() => router.push('/login')}>
