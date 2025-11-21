@@ -36,7 +36,13 @@ import {
 import { IGroupDB } from '../../../../interfaces/groups'
 import { IStudent, studentSchema } from '../../../../validation/studentSchema'
 
-export default function UpdateStudentModal({ studentId }: { studentId: string }) {
+export default function UpdateStudentModal({
+  studentId,
+  initialData,
+}: {
+  studentId: string
+  initialData: IStudent
+}) {
   const [groups, setGroups] = useState<IGroupDB[]>([])
   const [hasFetched, setHasFetched] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -44,9 +50,9 @@ export default function UpdateStudentModal({ studentId }: { studentId: string })
   const form = useForm<IStudent>({
     resolver: zodResolver(studentSchema),
     defaultValues: {
-      name: '',
-      parentPhone: '',
-      groupId: '',
+      name: initialData.name,
+      parentPhone: initialData.parentPhone,
+      groupId: initialData.groupId,
     },
   })
 

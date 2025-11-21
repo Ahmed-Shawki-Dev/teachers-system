@@ -1,6 +1,7 @@
 // actions/Student/addStudentAndEnroll.ts
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { Prisma } from '../../lib/prisma'
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
 
@@ -36,6 +37,7 @@ export async function addStudentAndEnrollAction(data: {
       },
     })
 
+    revalidatePath('/dashboard/students')
     return student
   })
 }

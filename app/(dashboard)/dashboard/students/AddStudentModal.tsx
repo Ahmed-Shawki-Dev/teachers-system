@@ -15,6 +15,7 @@ import { Loader, PlusCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { addStudentAndEnrollAction } from '../../../../actions/Enrollment/addStudentToGroup'
 import { getAllGroupsAction } from '../../../../actions/Group/getGroups'
 import {
   Form,
@@ -61,7 +62,7 @@ export default function AddStudentModal() {
   async function onSubmit(data: IStudent) {
     try {
       setLoading(true)
-      // await addStudentAndEnrollAction()
+      await addStudentAndEnrollAction(data)
       toast.success('Student added successfully!')
       form.reset()
       setOpen(false)

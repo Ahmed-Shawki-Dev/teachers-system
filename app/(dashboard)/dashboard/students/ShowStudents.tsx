@@ -9,6 +9,7 @@ import {
 import { getAllStudentsAction } from '../../../../actions/Student/getStudents'
 import RemoveStudent from './RemoveStudent'
 import UpdateStudentModal from './UpdateStudentModal'
+
 async function ShowStudents() {
   const students = await getAllStudentsAction()
   return (
@@ -26,7 +27,9 @@ async function ShowStudents() {
 
           <TableBody>
             {students.map((student) => {
-              const currentGroup = student.enrollments[0]?.group
+              const enrollment = student.enrollments[0]
+              const currentGroup = enrollment?.group
+              const currentGroupId = enrollment?.groupId || ''
 
               return (
                 <TableRow key={student.id}>
@@ -37,7 +40,14 @@ async function ShowStudents() {
                   </TableCell>
                   <TableCell>
                     <div className='flex gap-2 justify-center'>
-                      <UpdateStudentModal studentId={student.id} />
+                      <UpdateStudentModal
+                        studentId={student.id}
+                        initialData={{
+                          name: student.name,
+                          parentPhone: student.parentPhone,
+                          groupId: currentGroupId,
+                        }}
+                      />
                       <RemoveStudent studentId={student.id} />
                     </div>
                   </TableCell>

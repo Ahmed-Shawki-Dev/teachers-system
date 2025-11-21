@@ -1,7 +1,8 @@
 // actions/Student/updateStudentAndEnroll.ts
 'use server'
-import { Prisma } from "../../lib/prisma"
-import { getTeacherByTokenAction } from "../Teacher/getTeacherByToken"
+import { revalidatePath } from 'next/cache'
+import { Prisma } from '../../lib/prisma'
+import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
 
 export async function updateStudentAndEnrollAction(
   studentId: string,
@@ -57,7 +58,7 @@ export async function updateStudentAndEnrollAction(
         groupId: data.groupId,
       },
     })
-
+    revalidatePath('/dashboard/students')
     return updatedStudent
   })
 }
