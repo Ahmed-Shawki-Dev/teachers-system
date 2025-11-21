@@ -22,18 +22,45 @@ model Teacher {
   updatedAt DateTime @updatedAt
 
   students Student[] 
+  groups   Group[]
 }
 
 model Student {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   name          String
   parentPhone   String   @unique             
-  parentName    String?                       
-  gender        String?  
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   teacherId String  @db.ObjectId
   teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  enrollments Enrollment[]
+}
+
+model Group {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String @unique
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  teacherId String  @db.ObjectId
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  studentId  String @db.ObjectId
+  groupId    String @db.ObjectId
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  group   Group   @relation(fields: [groupId],   references: [id],   onDelete: Cascade)
+
+  @@unique([studentId, groupId])
+  @@index([groupId])
+  @@index([studentId])
 }

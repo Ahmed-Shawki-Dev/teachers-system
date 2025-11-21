@@ -9,9 +9,7 @@ export const studentSchema = z.object({
     .regex(/^01[0125][0-9]{8}$/, 'رقم ولي الأمر لازم يكون مصري صحيح (مثل: 01012345678)')
     .length(11, 'الرقم لازم يكون 11 رقم بالظبط'),
 
-  parentName: z.string().min(2, 'اسم ولي الأمر لازم يكون على الأقل حرفين'),
-
-  gender: z.enum(['ذكر', '', 'أنثى']),
+  groupId: z.string(),
 })
 
 export type IStudent = z.infer<typeof studentSchema>

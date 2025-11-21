@@ -11,10 +11,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader, PlusCircle } from 'lucide-react'
+import { Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { updateStudentAndEnrollAction } from '../../../../actions/Enrollment/updateStudentToGroup'
 import { getAllGroupsAction } from '../../../../actions/Group/getGroups'
 import {
   Form,
@@ -35,7 +36,7 @@ import {
 import { IGroupDB } from '../../../../interfaces/groups'
 import { IStudent, studentSchema } from '../../../../validation/studentSchema'
 
-export default function AddStudentModal() {
+export default function UpdateStudentModal({ studentId }: { studentId: string }) {
   const [groups, setGroups] = useState<IGroupDB[]>([])
   const [hasFetched, setHasFetched] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -61,8 +62,8 @@ export default function AddStudentModal() {
   async function onSubmit(data: IStudent) {
     try {
       setLoading(true)
-      // await addStudentAndEnrollAction()
-      toast.success('Student added successfully!')
+      await updateStudentAndEnrollAction(studentId, data)
+      toast.success('تم تعديل الطالب بنجاح')
       form.reset()
       setOpen(false)
     } catch (error) {
@@ -76,19 +77,14 @@ export default function AddStudentModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Form {...form}>
-        <form id='form-add-student' onSubmit={form.handleSubmit(onSubmit)}>
+        <form id={`form-update-student-${studentId}`} onSubmit={form.handleSubmit(onSubmit)}>
           <DialogTrigger asChild>
-            <Button variant={'outline'} size={'lg'}>
-              <PlusCircle />
-              أضف طالب
-            </Button>
+            <Button variant={'outline'}>تعديل</Button>
           </DialogTrigger>
           <DialogContent className='sm:max-w-[425px] '>
             <DialogHeader>
-              <DialogTitle className='text-center'>إضافة طالب</DialogTitle>
-              <DialogDescription className='text-center'>
-                قم بإضافة طالب جديد الى السيستم
-              </DialogDescription>
+              <DialogTitle className='text-center'>تعديل الطالب</DialogTitle>
+              <DialogDescription className='text-center'>قم بتعديل بيانات الطالب</DialogDescription>
             </DialogHeader>
             <div className='space-y-5'>
               <FormField
@@ -148,13 +144,13 @@ export default function AddStudentModal() {
               <DialogClose asChild>
                 <Button variant='outline'>إلغاء</Button>
               </DialogClose>
-              <Button type='submit' form='form-add-student' disabled={loading}>
+              <Button type='submit' form={`form-update-student-${studentId}`} disabled={loading}>
                 {loading ? (
                   <span className='animate-spin'>
                     <Loader />
                   </span>
                 ) : (
-                  'إضافة'
+                  'تعديل الطالب'
                 )}
               </Button>
             </DialogFooter>

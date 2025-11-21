@@ -37,7 +37,6 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <EdgeStoreProvider>
-            <Navbar />
             {children}
           </EdgeStoreProvider>
 

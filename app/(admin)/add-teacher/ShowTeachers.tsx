@@ -1,4 +1,4 @@
-import { getAllTeachersAction } from '../../actions/Teacher/getTeachers'
+import { getAllTeachersAction } from '../../../actions/Teacher/getTeachers'
 import TeacherCard from './TeacherCard'
 
 const ShowTeachers = async () => {

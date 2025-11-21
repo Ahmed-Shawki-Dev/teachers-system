@@ -1,9 +1,10 @@
 'use client'
 import { X } from 'lucide-react'
-import { removeTeacherAction } from '../../actions/Teacher/removeTeacher'
-import { Card, CardHeader } from '../../components/ui/card'
-import { ITeacherDB } from '../../interfaces/teachers'
+
 import Image from 'next/image'
+import { Card, CardHeader } from '../../../components/ui/card'
+import { ITeacherDB } from '../../../interfaces/teachers'
+import { removeTeacherAction } from '../../../actions/Teacher/removeTeacher'
 
 const TeacherCard = ({ name, id,avatarUrl }: Partial<ITeacherDB>) => {
   return (

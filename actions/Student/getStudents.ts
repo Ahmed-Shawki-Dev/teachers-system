@@ -1,22 +1,30 @@
 'use server'
 import { Prisma } from '../../lib/prisma'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
-
-const JWT_SECRET = process.env.JWT_SECRET!
+import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
 
 export const getAllStudentsAction = async () => {
-  const cookieStore = cookies()
-  const token = (await cookieStore).get('token')?.value
-  if (!token) throw new Error('Not authenticated')
+  const teacher = await getTeacherByTokenAction()
+  if (!teacher) throw new Error('غير مسجل الدخول')
 
-  const secret = new TextEncoder().encode(JWT_SECRET)
-  const { payload } = await jwtVerify(token, secret)
-  const teacherId = payload.userId as string
-  if (!teacherId) throw new Error('Invalid token')
-
+  // جيب كل الطلاب مع آخر جروب هما فيه (الجروب النشط)
   return await Prisma.student.findMany({
-    where: { teacherId },
+    where: { teacherId: teacher.id },
+    include: {
+      enrollments: {
+        where: {
+          // لو عايز بس الجروبات النشطة
+          // status: "ACTIVE"
+        },
+        include: {
+          group: {
+            select: {
+              name: true,
+            },
+          },
+        },
+        take: 1,
+      },
+    },
     orderBy: { createdAt: 'desc' },
   })
 }

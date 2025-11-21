@@ -12,10 +12,10 @@ import {
 } from '@/components/ui/dialog'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader, PlusCircle } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { getAllGroupsAction } from '../../../../actions/Group/getGroups'
+import { addGroupAction } from '../../../../actions/Group/addGroup'
 import {
   Form,
   FormControl,
@@ -24,7 +24,6 @@ import {
   FormLabel,
   FormMessage,
 } from '../../../../components/ui/form'
-import { Input } from '../../../../components/ui/input'
 import {
   Select,
   SelectContent,
@@ -32,37 +31,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../components/ui/select'
-import { IGroupDB } from '../../../../interfaces/groups'
-import { IStudent, studentSchema } from '../../../../validation/studentSchema'
+import { grades } from '../../../../data/grades'
+import { groupSchema, IGroup } from '../../../../validation/groupSchema'
 
-export default function AddStudentModal() {
-  const [groups, setGroups] = useState<IGroupDB[]>([])
-  const [hasFetched, setHasFetched] = useState(false)
+export default function AddGroupModal() {
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
-  const form = useForm<IStudent>({
-    resolver: zodResolver(studentSchema),
+  const form = useForm<IGroup>({
+    resolver: zodResolver(groupSchema),
     defaultValues: {
       name: '',
-      parentPhone: '',
-      groupId: '',
     },
   })
 
-  useEffect(() => {
-    if (open && !hasFetched) {
-      getAllGroupsAction().then((data) => {
-        setGroups(data)
-        setHasFetched(true)
-      })
-    }
-  }, [open, hasFetched])
-
-  async function onSubmit(data: IStudent) {
+  async function onSubmit(data: IGroup) {
     try {
       setLoading(true)
-      // await addStudentAndEnrollAction()
-      toast.success('Student added successfully!')
+      await addGroupAction(data)
+      toast.success('Group added successfully!')
       form.reset()
       setOpen(false)
     } catch (error) {
@@ -76,51 +62,24 @@ export default function AddStudentModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Form {...form}>
-        <form id='form-add-student' onSubmit={form.handleSubmit(onSubmit)}>
+        <form id='form-add-group' onSubmit={form.handleSubmit(onSubmit)}>
           <DialogTrigger asChild>
             <Button variant={'outline'} size={'lg'}>
               <PlusCircle />
-              أضف طالب
+              أضف مجموعة
             </Button>
           </DialogTrigger>
           <DialogContent className='sm:max-w-[425px] '>
             <DialogHeader>
-              <DialogTitle className='text-center'>إضافة طالب</DialogTitle>
+              <DialogTitle className='text-center'>إضافة مجموعة</DialogTitle>
               <DialogDescription className='text-center'>
-                قم بإضافة طالب جديد الى السيستم
+                قم بإضافة مجموعة جديد الى السيستم
               </DialogDescription>
             </DialogHeader>
             <div className='space-y-5'>
               <FormField
                 control={form.control}
                 name='name'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>الاسم</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='parentPhone'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>رقم ولي الأمر</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='groupId'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>الصف الدراسي</FormLabel>
@@ -131,9 +90,16 @@ export default function AddStudentModal() {
                         </SelectTrigger>
 
                         <SelectContent className='max-h-60 overflow-auto'>
-                          {groups.map((group) => (
-                            <div key={group.name} className='py-2'>
-                              <SelectItem value={group.id}>{group.name}</SelectItem>
+                          {grades.map((group) => (
+                            <div key={group.label} className='py-2'>
+                              <div className='px-3 text-sm font-semibold text-muted-foreground'>
+                                {group.label}
+                              </div>
+                              {group.options.map((option) => (
+                                <SelectItem key={option} value={option}>
+                                  {option}
+                                </SelectItem>
+                              ))}
                             </div>
                           ))}
                         </SelectContent>
@@ -148,7 +114,7 @@ export default function AddStudentModal() {
               <DialogClose asChild>
                 <Button variant='outline'>إلغاء</Button>
               </DialogClose>
-              <Button type='submit' form='form-add-student' disabled={loading}>
+              <Button type='submit' form='form-add-group' disabled={loading}>
                 {loading ? (
                   <span className='animate-spin'>
                     <Loader />

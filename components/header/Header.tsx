@@ -15,34 +15,33 @@ const Navbar = () => {
   const { teacher, setTeacher } = useTeacherStore()
   const [loading, setLoading] = useState(true)
 
-useEffect(() => {
-  const checkTeacher = async () => {
-    if (!teacher) {
-      try {
-        const data = await getTeacherByTokenAction()
-        if (data) {
-          setTeacher({
-            ...data,
-            bio: data.bio ?? undefined,
-            phone: data.phone ?? undefined,
-            avatarUrl: data.avatarUrl ?? undefined,
-          })
-        } else {
+  useEffect(() => {
+    const checkTeacher = async () => {
+      if (!teacher) {
+        try {
+          const data = await getTeacherByTokenAction()
+          if (data) {
+            setTeacher({
+              ...data,
+              bio: data.bio ?? undefined,
+              phone: data.phone ?? undefined,
+              avatarUrl: data.avatarUrl ?? undefined,
+            })
+          } else {
+            setTeacher(null)
+          }
+        } catch {
           setTeacher(null)
         }
-      } catch {
-        setTeacher(null)
       }
+      setLoading(false)
     }
-    setLoading(false)
-  }
 
-  checkTeacher()
-}, [teacher, setTeacher])
-
+    checkTeacher()
+  }, [teacher, setTeacher])
 
   return (
-    <nav className='w-full flex justify-between items-center p-4 border-b bg-background'>
+    <nav className=' w-full flex justify-between items-center p-4 border-b bg-background '>
       <div className='font-bold cursor-pointer select-none' onClick={() => router.push('/')}>
         لوجو
       </div>
