@@ -13,7 +13,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader } from 'lucide-react'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { updateGroupAction } from '../../../../actions/Group/updateGroup'
 import {
@@ -31,8 +31,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../components/ui/select'
+import { daysOfWeek } from '../../../../data/days'
 import { grades } from '../../../../data/grades'
-import { groupSchema, IGroup } from '../../../../validation/groupSchema'
+import { times } from '../../../../data/times'
+import { DayOfWeek, groupSchema, IGroup } from '../../../../validation/groupSchema'
 
 export default function UpdateGroupModal({ groupId }: { groupId: string }) {
   const [loading, setLoading] = useState(false)
@@ -41,7 +43,13 @@ export default function UpdateGroupModal({ groupId }: { groupId: string }) {
     resolver: zodResolver(groupSchema),
     defaultValues: {
       name: '',
+      schedule: [],
     },
+  })
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'schedule',
   })
 
   async function onSubmit(data: IGroup) {
@@ -66,7 +74,7 @@ export default function UpdateGroupModal({ groupId }: { groupId: string }) {
           <DialogTrigger asChild>
             <Button variant={'outline'}>تعديل</Button>
           </DialogTrigger>
-          <DialogContent className='sm:max-w-[425px] '>
+          <DialogContent className='sm:max-w-[500px] '>
             <DialogHeader>
               <DialogTitle className='text-center'>تعديل الطالب</DialogTitle>
               <DialogDescription className='text-center'>قم بتعديل بيانات الطالب</DialogDescription>
@@ -105,6 +113,80 @@ export default function UpdateGroupModal({ groupId }: { groupId: string }) {
                 )}
               />
             </div>
+
+            {fields.map((field, index) => (
+              <div key={field.id} className='flex gap-2 items-center'>
+                <FormField
+                  control={form.control}
+                  name={`schedule.${index}.dayOfWeek`}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder='اختر اليوم' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {daysOfWeek.map((d) => (
+                          <SelectItem key={d.value} value={d.value}>
+                            {d.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`schedule.${index}.startTime`}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder='وقت البداية' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {times.map((t) => (
+                          <SelectItem key={t.value} value={t.value}>
+                            {t.label} 
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`schedule.${index}.endTime`}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder='وقت النهاية' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {times.map((t) => (
+                          <SelectItem key={t.value} value={t.value}>
+                            {t.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+
+                <Button type='button' onClick={() => remove(index)}>
+                  حذف
+                </Button>
+              </div>
+            ))}
+
+            <Button
+              type='button'
+              onClick={() => append({ dayOfWeek: '' as DayOfWeek, startTime: '', endTime: '' })}
+              className='w-fit'
+            >
+              أضف ميعاد
+            </Button>
+
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant='outline'>إلغاء</Button>

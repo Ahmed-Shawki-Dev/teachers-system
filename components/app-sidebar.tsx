@@ -1,3 +1,4 @@
+'use client'
 import { Clock10, Home, PersonStandingIcon, Settings } from 'lucide-react'
 
 import {
@@ -10,6 +11,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 // Menu items.
 const items = [
@@ -30,26 +33,34 @@ const items = [
   },
   {
     title: 'الإعدادات',
-    url: '/settings',
+    url: '/dashboard/settings',
     icon: Settings,
   },
 ]
 
 export function AppSidebar() {
+  const pathname = usePathname()
+  const isActive = (path: string) => pathname === path
+
   return (
-    <Sidebar side='right' >
+    <Sidebar side='right'>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>لوحة التحكم</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem
+                  key={item.title}
+                  className={
+                    isActive(item.url) ? 'bg-sidebar-ring rounded-md ' : 'text-muted-foreground'
+                  }
+                >
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

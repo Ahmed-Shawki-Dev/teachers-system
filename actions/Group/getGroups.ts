@@ -8,6 +8,9 @@ export const getAllGroupsAction = async () => {
   if (!teacher) throw new Error('Invalid token')
 
   return await Prisma.group.findMany({
+    include: {
+      schedule: true,
+    },
     where: { teacherId: teacher.id },
     orderBy: { createdAt: 'desc' },
   })

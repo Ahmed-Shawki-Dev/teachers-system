@@ -9,6 +9,7 @@ import { useTeacherStore } from '../../store/useAuthStore'
 import { ModeToggle } from '../toggle-theme'
 import { Button } from '../ui/button'
 import UserMenu from './UserMenu'
+import Image from 'next/image'
 
 const Navbar = () => {
   const router = useRouter()
@@ -43,7 +44,7 @@ const Navbar = () => {
   return (
     <nav className=' w-full flex justify-between items-center p-4 border-b bg-background '>
       <div className='font-bold cursor-pointer select-none' onClick={() => router.push('/')}>
-        لوجو
+        <Image src={'/logo.webp'} alt='logo' width={80} height={80}/>
       </div>
 
       <div className='flex items-center gap-4'>

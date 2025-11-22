@@ -1,5 +1,8 @@
 'use client'
 import { Button } from '@/components/ui/button'
+import { useFieldArray } from 'react-hook-form'
+import { daysOfWeek } from '../../../../data/days'
+
 import {
   Dialog,
   DialogClose,
@@ -32,20 +35,29 @@ import {
   SelectValue,
 } from '../../../../components/ui/select'
 import { grades } from '../../../../data/grades'
-import { groupSchema, IGroup } from '../../../../validation/groupSchema'
+import { times } from '../../../../data/times'
+import { DayOfWeek, groupSchema, IGroup } from '../../../../validation/groupSchema'
 
 export default function AddGroupModal() {
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
+
   const form = useForm<IGroup>({
     resolver: zodResolver(groupSchema),
     defaultValues: {
       name: '',
+      schedule: [],
     },
+  })
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'schedule',
   })
 
   async function onSubmit(data: IGroup) {
     try {
+      console.log(data)
       setLoading(true)
       await addGroupAction(data)
       toast.success('Group added successfully!')
@@ -69,7 +81,7 @@ export default function AddGroupModal() {
               أضف مجموعة
             </Button>
           </DialogTrigger>
-          <DialogContent className='sm:max-w-[425px] '>
+          <DialogContent className='sm:max-w-[500px] '>
             <DialogHeader>
               <DialogTitle className='text-center'>إضافة مجموعة</DialogTitle>
               <DialogDescription className='text-center'>
@@ -89,7 +101,7 @@ export default function AddGroupModal() {
                           <SelectValue placeholder='اختر الصف الدراسي' />
                         </SelectTrigger>
 
-                        <SelectContent className='max-h-60 overflow-auto'>
+                        <SelectContent className=' overflow-auto'>
                           {grades.map((group) => (
                             <div key={group.label} className='py-2'>
                               <div className='px-3 text-sm font-semibold text-muted-foreground'>
@@ -109,6 +121,78 @@ export default function AddGroupModal() {
                   </FormItem>
                 )}
               />
+
+              {fields.map((field, index) => (
+                <div key={field.id} className='flex gap-2 items-center'>
+                  <FormField
+                    control={form.control}
+                    name={`schedule.${index}.dayOfWeek`}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder='اختر اليوم' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {daysOfWeek.map((d) => (
+                            <SelectItem key={d.value} value={d.value}>
+                              {d.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`schedule.${index}.startTime`}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder='وقت البداية' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {times.map((t) => (
+                            <SelectItem key={t.value} value={t.value}>
+                              {t.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`schedule.${index}.endTime`}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder='وقت النهاية' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {times.map((t) => (
+                            <SelectItem key={t.value} value={t.value}>
+                              {t.label} 
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+
+                  <Button type='button' onClick={() => remove(index)}>
+                    حذف
+                  </Button>
+                </div>
+              ))}
+
+              <Button
+                type='button'
+                onClick={() => append({ dayOfWeek: '' as DayOfWeek, startTime: '', endTime: '' })}
+              >
+                أضف ميعاد
+              </Button>
             </div>
             <DialogFooter>
               <DialogClose asChild>

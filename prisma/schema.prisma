@@ -7,7 +7,15 @@ generator client{
   provider = "prisma-client-js"
 }
 
-
+enum DayOfWeek {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
 
 
 model Teacher {
@@ -39,6 +47,18 @@ model Student {
   enrollments Enrollment[]
 }
 
+model ClassSchedule{
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  dayOfWeek DayOfWeek
+  startTime String
+  endTime   String
+
+  groupId   String    @db.ObjectId
+  group     Group     @relation(fields: [groupId],references: [id],onDelete: Cascade)
+
+  @@unique([groupId, dayOfWeek, startTime])
+}
+
 model Group {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String @unique
@@ -50,6 +70,7 @@ model Group {
   teacher   Teacher @relation(fields: [teacherId], references: [id])
 
   enrollments Enrollment[]
+  schedule    ClassSchedule[]
 }
 
 model Enrollment {
@@ -64,3 +85,4 @@ model Enrollment {
   @@index([groupId])
   @@index([studentId])
 }
+

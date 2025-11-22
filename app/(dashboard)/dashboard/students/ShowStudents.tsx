@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Ban } from 'lucide-react'
 import { getAllStudentsAction } from '../../../../actions/Student/getStudents'
 import RemoveStudent from './RemoveStudent'
 import UpdateStudentModal from './UpdateStudentModal'
@@ -56,6 +57,12 @@ async function ShowStudents() {
             })}
           </TableBody>
         </Table>
+        {students.length === 0 && (
+          <div className='text-center py-10 text-muted-foreground flex flex-col justify-center items-center gap-2'>
+            <Ban />
+            <span>لا يوجد أي طلاب</span>
+          </div>
+        )}
       </div>
     </div>
   )

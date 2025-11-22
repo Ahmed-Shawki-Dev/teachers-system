@@ -8,15 +8,26 @@ export const updateGroupAction = async (id: string, data: IGroup) => {
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('غير مصرح لك')
 
-  const student = await Prisma.group.findUnique({ where: { id } })
-  if (!student) throw new Error('المجموعة غير موجود')
+  const group = await Prisma.group.findUnique({ where: { id } })
+  if (!group) throw new Error('المجموعة غير موجود')
 
-  if (student.teacherId !== teacher.id) throw new Error('غير مصرح لك بتعديل هذه المجموعة')
+  if (group.teacherId !== teacher.id) throw new Error('غير مصرح لك بتعديل هذه المجموعة')
+
+  await Prisma.classSchedule.deleteMany({
+    where: { groupId: id },
+  })
 
   await Prisma.group.update({
     where: { id },
     data: {
-      ...data,
+      name: data.name,
+      schedule: {
+        create: data?.schedule?.map((item) => ({
+          dayOfWeek: item.dayOfWeek,
+          startTime: item.startTime,
+          endTime: item.endTime,
+        })),
+      },
     },
   })
 
