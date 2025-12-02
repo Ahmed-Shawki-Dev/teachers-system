@@ -1,6 +1,5 @@
 datasource db {
 provider = "mongodb"
-url = env("DATABASE_URL")
 }
 
 generator client{
@@ -9,12 +8,18 @@ generator client{
 
 enum DayOfWeek {
   SUNDAY
-  MONDAY
+  MONDAY 
   TUESDAY
   WEDNESDAY
   THURSDAY
   FRIDAY
   SATURDAY
+}
+
+enum SessionStatus {
+  SCHEDULED 
+  COMPLETED 
+  CANCELED  
 }
 
 
@@ -54,35 +59,56 @@ model ClassSchedule{
   endTime   String
 
   groupId   String    @db.ObjectId
-  group     Group     @relation(fields: [groupId],references: [id],onDelete: Cascade)
+  group     Group     @relation(fields: [groupId], references: [id])
 
   @@unique([groupId, dayOfWeek, startTime])
 }
 
-model Group {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String @unique
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  teacherId String  @db.ObjectId
-  teacher   Teacher @relation(fields: [teacherId], references: [id])
-
-  enrollments Enrollment[]
-  schedule    ClassSchedule[]
-}
 
 model Enrollment {
   id         String @id @default(auto()) @map("_id") @db.ObjectId
   studentId  String @db.ObjectId
   groupId    String @db.ObjectId
 
-  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  group   Group   @relation(fields: [groupId],   references: [id],   onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id])
+  group   Group   @relation(fields: [groupId],   references: [id])
 
   @@unique([studentId, groupId])
   @@index([groupId])
   @@index([studentId])
 }
 
+
+
+model Group {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String @unique
+  price     Float    @default(0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+
+  teacherId String  @db.ObjectId
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  enrollments Enrollment[]
+  schedule    ClassSchedule[]
+  sessions Session[]
+}
+
+model Session {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  sessionDate DateTime      
+
+  status      SessionStatus @default(SCHEDULED)
+  note        String?       
+  
+  groupId     String        @db.ObjectId
+  group       Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([groupId])
+}

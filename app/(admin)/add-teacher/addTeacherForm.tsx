@@ -44,7 +44,7 @@ export default function AddTeacherForm() {
     },
   })
 
-  async function onSubmit(data: ITeacher) {
+  async function onSubmit(data: ITeacher) { 
     try {
       let avatarUrl = ''
       if (file) {

@@ -1,5 +1,11 @@
+import ChangePasswordForm from './ChangePasswordForm'
+
 const page = () => {
-  return <div>page</div>
+  return (
+    <div>
+      <ChangePasswordForm />
+    </div>
+  )
 }
 
 export default page
