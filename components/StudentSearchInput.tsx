@@ -5,7 +5,7 @@ import { Search } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 
-export default function SearchInput() {
+export default function StudentSearchInput() {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const { replace } = useRouter()
@@ -31,7 +31,7 @@ export default function SearchInput() {
         defaultValue={searchParams.get('query')?.toString()}
       />
       <span className='absolute left-2 top-2'>
-        <Search  width={20} height={20}/>
+        <Search width={20} height={20} />
       </span>
     </span>
   )

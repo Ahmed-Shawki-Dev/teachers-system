@@ -6,7 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <div className='flex flex-col w-full'>
+      <div className='flex flex-col w-full relative'>
         <Navbar />
         <SidebarTrigger className='absolute bottom-5 bg-accent rounded-full p-5 right-5 z-50' />
         <main className='flex-1 p-4'>{children}</main>

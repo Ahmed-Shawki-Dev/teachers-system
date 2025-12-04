@@ -18,7 +18,9 @@ type ShowStudentsProps = {
 }
 
 async function ShowStudents({ search, groupId, grade }: ShowStudentsProps) {
-const students = await getAllStudentsAction(search, groupId, grade)
+
+  const students = await getAllStudentsAction(search, groupId, grade)
+
   return (
     <div className='w-full px-4'>
       <div className='max-w-5xl w-full mx-auto overflow-x-auto rounded-lg border bg-background p-4'>
@@ -34,6 +36,7 @@ const students = await getAllStudentsAction(search, groupId, grade)
 
           <TableBody>
             {students.map((student) => {
+              // بنطلع اسم الجروب لو موجود
               const enrollment = student.enrollments[0]
               const currentGroup = enrollment?.group
               const currentGroupId = enrollment?.groupId || ''
@@ -43,7 +46,8 @@ const students = await getAllStudentsAction(search, groupId, grade)
                   <TableCell className='font-bold'>{student.name}</TableCell>
                   <TableCell>{student.parentPhone}</TableCell>
                   <TableCell className='text-primary font-semibold'>
-                    {currentGroup ? `${currentGroup.name} ` : 'بدون جروب'}
+
+                    {currentGroup ? currentGroup.name : 'بدون جروب'}
                   </TableCell>
                   <TableCell>
                     <div className='flex gap-2 justify-center'>
@@ -63,6 +67,7 @@ const students = await getAllStudentsAction(search, groupId, grade)
             })}
           </TableBody>
         </Table>
+
         {students.length === 0 && (
           <div className='text-center py-10 text-muted-foreground flex flex-col justify-center items-center gap-2'>
             <Ban />

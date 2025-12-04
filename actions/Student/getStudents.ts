@@ -1,4 +1,5 @@
 'use server'
+import { Prisma as PrismaClient } from '@prisma/client'
 import { Prisma } from '../../lib/prisma'
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
 
@@ -10,38 +11,34 @@ export const getAllStudentsAction = async (
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('غير مسجل الدخول')
 
-  return await Prisma.student.findMany({
-    where: {
-      teacherId: teacher.id,
+  const whereClause: PrismaClient.StudentWhereInput = {
+    teacherId: teacher.id,
+  }
 
-      // التعديل هنا: البحث بالاسم فقط (شيلنا الـ OR ورقم التليفون)
-      name: searchTerm ? { contains: searchTerm, mode: 'insensitive' } : undefined,
+  if (searchTerm) {
+    whereClause.name = { contains: searchTerm, mode: 'insensitive' }
+  }
 
-      enrollments: {
-        some: {
-          groupId: groupId && groupId !== 'all' ? groupId : undefined,
-          group:
-            grade && grade !== 'all'
-              ? {
-                  name: { contains: grade },
-                }
-              : undefined,
-        },
+  if ((groupId && groupId !== 'all') || (grade && grade !== 'all')) {
+    whereClause.enrollments = {
+      some: {
+        groupId: groupId && groupId !== 'all' ? groupId : undefined,
+        group: grade && grade !== 'all' ? { name: { contains: grade } } : undefined,
       },
-    },
+    }
+  }
 
+  return await Prisma.student.findMany({
+    where: whereClause,
     include: {
       enrollments: {
         include: {
-          group: {
-            select: {
-              name: true,
-            },
-          },
+          group: { select: { name: true } },
         },
         take: 1,
+        orderBy: { id: 'desc' },
       },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { id: 'desc' },
   })
 }

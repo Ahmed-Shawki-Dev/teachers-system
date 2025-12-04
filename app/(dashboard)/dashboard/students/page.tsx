@@ -1,6 +1,6 @@
 import AddStudentModal from './AddStudentModal'
-import SearchInput from './SearchInput'
 import ShowStudents from './ShowStudents'
+import StudentSearchInput from '../../../../components/StudentSearchInput'
 import StudentsFilter from './StudentsFilter'
 
 const StudentsPage = async ({
@@ -22,7 +22,7 @@ const StudentsPage = async ({
       </div>
 
       <div className='flex gap-4 flex-wrap justify-center bg-muted/20 p-4 rounded-lg'>
-        <SearchInput />
+        <StudentSearchInput />
         <StudentsFilter />
       </div>
 
