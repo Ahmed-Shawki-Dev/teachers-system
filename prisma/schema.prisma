@@ -1,5 +1,7 @@
 datasource db {
   provider = "mongodb"
+  url = env("DATABASE_URL")
+
 }
 
 generator client {
@@ -45,22 +47,6 @@ model Teacher {
   groups   Group[]
 }
 
-model Student {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  parentPhone String   @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  teacherId String  @db.ObjectId
-  teacher   Teacher @relation(fields: [teacherId], references: [id])
-
-  enrollments Enrollment[]
-  
-  // (تعديل الاسم) سجلات الحضور الخاصة بالطالب
-  attendances Attendance[] 
-}
-
 model ClassSchedule {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   dayOfWeek DayOfWeek
@@ -86,9 +72,27 @@ model Enrollment {
   @@index([studentId])
 }
 
+model Student {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+
+  parentPhone String   
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  teacherId String  @db.ObjectId
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  enrollments Enrollment[]
+  attendances Attendance[] 
+  
+  @@unique([name, parentPhone, teacherId])
+}
+
 model Group {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String   @unique
+  // 3. شيل @unique من هنا
+  name      String   
   price     Float    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -99,6 +103,9 @@ model Group {
   enrollments Enrollment[]
   schedule    ClassSchedule[]
   sessions    Session[]
+
+  // 4. ضيف السطر ده تحت: اسم المجموعة ميتكررش لنفس المدرس
+  @@unique([name, teacherId])
 }
 
 model Session {

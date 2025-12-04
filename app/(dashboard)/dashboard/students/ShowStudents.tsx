@@ -11,8 +11,14 @@ import { getAllStudentsAction } from '../../../../actions/Student/getStudents'
 import RemoveStudent from './RemoveStudent'
 import UpdateStudentModal from './UpdateStudentModal'
 
-async function ShowStudents() {
-  const students = await getAllStudentsAction()
+type ShowStudentsProps = {
+  search?: string
+  groupId?: string
+  grade?: string
+}
+
+async function ShowStudents({ search, groupId, grade }: ShowStudentsProps) {
+const students = await getAllStudentsAction(search, groupId, grade)
   return (
     <div className='w-full px-4'>
       <div className='max-w-5xl w-full mx-auto overflow-x-auto rounded-lg border bg-background p-4'>
