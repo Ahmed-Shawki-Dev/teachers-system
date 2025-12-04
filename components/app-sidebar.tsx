@@ -1,5 +1,5 @@
 'use client'
-import { Clock10, Home, PersonStandingIcon, Settings } from 'lucide-react'
+import { Calendar, Clock10, Home, PersonStandingIcon, Settings } from 'lucide-react'
 
 import {
   Sidebar,
@@ -20,6 +20,11 @@ const items = [
     title: 'الصفحة الرئيسية',
     url: '/dashboard',
     icon: Home,
+  },
+  {
+    title: 'الحصص',
+    url: '/dashboard/sessions',
+    icon: Calendar,
   },
   {
     title: 'الطلاب',

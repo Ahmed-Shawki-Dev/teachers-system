@@ -1,14 +1,15 @@
 datasource db {
-provider = "mongodb"
+  provider = "mongodb"
 }
 
-generator client{
-  provider = "prisma-client-js"
+generator client {
+  provider = "prisma-client-js"
 }
 
+// 1. Enums
 enum DayOfWeek {
   SUNDAY
-  MONDAY 
+  MONDAY
   TUESDAY
   WEDNESDAY
   THURSDAY
@@ -17,16 +18,22 @@ enum DayOfWeek {
 }
 
 enum SessionStatus {
-  SCHEDULED 
-  COMPLETED 
-  CANCELED  
+  SCHEDULED
+  COMPLETED
+  CANCELED
 }
 
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  EXCUSED
+}
 
+// 2. Models
 model Teacher {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId 
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
-  email     String  @unique
+  email     String   @unique
   password  String
   avatarUrl String?
   phone     String?
@@ -34,81 +41,101 @@ model Teacher {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  students Student[] 
+  students Student[]
   groups   Group[]
 }
 
 model Student {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  parentPhone   String   @unique             
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  parentPhone String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   teacherId String  @db.ObjectId
   teacher   Teacher @relation(fields: [teacherId], references: [id])
 
   enrollments Enrollment[]
+  
+  // (تعديل الاسم) سجلات الحضور الخاصة بالطالب
+  attendances Attendance[] 
 }
 
-model ClassSchedule{
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+model ClassSchedule {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   dayOfWeek DayOfWeek
   startTime String
   endTime   String
 
-  groupId   String    @db.ObjectId
-  group     Group     @relation(fields: [groupId], references: [id])
+  groupId String @db.ObjectId
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, dayOfWeek, startTime])
 }
 
-
-
 model Enrollment {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  studentId  String @db.ObjectId
-  groupId    String @db.ObjectId
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  studentId String @db.ObjectId
+  groupId   String @db.ObjectId
 
-  student Student @relation(fields: [studentId], references: [id])
-  group   Group   @relation(fields: [groupId],   references: [id])
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  group   Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, groupId])
   @@index([groupId])
   @@index([studentId])
 }
 
-
-
 model Group {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String @unique
+  name      String   @unique
   price     Float    @default(0)
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   teacherId String  @db.ObjectId
   teacher   Teacher @relation(fields: [teacherId], references: [id])
 
   enrollments Enrollment[]
   schedule    ClassSchedule[]
-  sessions Session[]
+  sessions    Session[]
 }
 
 model Session {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  sessionDate DateTime      
-
+  sessionDate DateTime
   status      SessionStatus @default(SCHEDULED)
-  note        String?       
-  
-  groupId     String        @db.ObjectId
-  group       Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  note        String?
+
+  groupId String @db.ObjectId
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  // (تعديل الاسم) سجلات الحضور في الحصة دي
+  attendances Attendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([groupId])
+}
+
+
+model Attendance {
+  id     String           @id @default(auto()) @map("_id") @db.ObjectId
+  status AttendanceStatus @default(ABSENT)
+  note   String?
+
+  sessionId String  @db.ObjectId
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  studentId String  @db.ObjectId
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // منع التكرار
+  @@unique([sessionId, studentId])
+  @@index([sessionId])
+  @@index([studentId])
 }

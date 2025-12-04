@@ -1,41 +1,49 @@
 'use server'
 
+import { Prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
-import { Prisma } from '../../lib/prisma'
-import { ISession, sessionSchema } from '../../validation/sessionSchema'
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
+import { SessionStatus } from '@prisma/client' // استوردنا الـ Enum
 
-export async function createSessionAction(data: ISession) {
-  // 1. نتأكد مين اللي بيعمل الحصة
+// ضفنا باراميتر جديد: status
+export const createSessionAction = async (
+  groupId: string,
+  dateString: string,
+  status: SessionStatus = 'SCHEDULED', // القيمة الافتراضية
+) => {
   const teacher = await getTeacherByTokenAction()
-  if (!teacher) throw new Error('غير مصرح لك (Not Authenticated)')
+  if (!teacher) throw new Error('غير مصرح لك')
 
-  // 2. نتأكد إن البيانات صح
-  const validation = sessionSchema.safeParse(data)
-  if (!validation.success) {
-    throw new Error(validation.error.issues[0].message)
+  const sessionDate = new Date(dateString)
+  const startOfDay = new Date(sessionDate)
+  startOfDay.setHours(0, 0, 0, 0)
+  const endOfDay = new Date(sessionDate)
+  endOfDay.setHours(23, 59, 59, 999)
+
+  // 1. التحقق
+  const existingSession = await Prisma.session.findFirst({
+    where: {
+      groupId,
+      sessionDate: { gte: startOfDay, lte: endOfDay },
+    },
+  })
+
+  if (existingSession) {
+    return { success: false, message: 'تم اتخاذ إجراء لهذه الحصة مسبقاً' }
   }
 
-  // 3. نتأكد إن الجروب ده بتاع المدرس
-  const group = await Prisma.group.findFirst({
-    where: {
-      id: data.groupId,
-      teacherId: teacher.id,
-    },
-  })
-
-  if (!group) throw new Error('المجموعة غير موجودة أو مش بتاعتك')
-
-  // 4. نسجل الحصة
+  // 2. الإنشاء بالحالة المطلوبة
   await Prisma.session.create({
     data: {
-      sessionDate: data.sessionDate,
-      groupId: data.groupId,
-      note: data.note,
-      status: data.status || 'SCHEDULED',
+      groupId,
+      sessionDate,
+      status: status, // <--- هنا التغيير: بنسجل الحالة اللي جاية من الزرار
     },
   })
 
-  // 5. تحديث الصفحة
   revalidatePath('/dashboard/sessions')
+
+  // رسالة ذكية حسب الحالة
+  const msg = status === 'CANCELED' ? 'تم إلغاء الحصة 🔕' : 'تم بدء الحصة بنجاح 🚀'
+  return { success: true, message: msg }
 }

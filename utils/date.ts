@@ -4,6 +4,11 @@ export function startOfDay(date: Date) {
   return newDate
 }
 
+export function endOfDay(date: Date) {
+  const newDate = new Date(date)
+  newDate.setHours(23, 59, 59, 999)
+  return newDate
+}
 
 export const dayOfWeekMap: Record<string, number> = {
   SUNDAY: 0,
