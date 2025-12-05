@@ -64,7 +64,7 @@ export default function AttendanceSheet({
       } else {
         toast.error('حصلت مشكلة')
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error('حصل خطأ أثناء الحفظ')
     } finally {

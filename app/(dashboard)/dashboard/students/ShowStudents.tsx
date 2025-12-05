@@ -10,6 +10,7 @@ import { Ban } from 'lucide-react'
 import { getAllStudentsAction } from '../../../../actions/Student/getStudents'
 import RemoveStudent from './RemoveStudent'
 import UpdateStudentModal from './UpdateStudentModal'
+import Link from 'next/link'
 
 type ShowStudentsProps = {
   search?: string
@@ -43,10 +44,16 @@ async function ShowStudents({ search, groupId, grade }: ShowStudentsProps) {
 
               return (
                 <TableRow key={student.id}>
-                  <TableCell className='font-bold'>{student.name}</TableCell>
+                  <TableCell className='font-bold'>
+                    <Link
+                      href={`/dashboard/students/${student.id}`}
+                      className='hover:underline hover:text-primary transition-colors cursor-pointer'
+                    >
+                      {student.name}
+                    </Link>
+                  </TableCell>
                   <TableCell>{student.parentPhone}</TableCell>
                   <TableCell className='text-primary font-semibold'>
-
                     {currentGroup ? currentGroup.name : 'بدون جروب'}
                   </TableCell>
                   <TableCell>

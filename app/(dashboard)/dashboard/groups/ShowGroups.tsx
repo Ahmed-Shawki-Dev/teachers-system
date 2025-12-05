@@ -7,6 +7,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Ban } from 'lucide-react'
+import Link from 'next/link'
 import { getAllGroupsAction } from '../../../../actions/Group/getGroups'
 import { formatTo12Hour } from '../../../../utils/formatTime'
 import RemoveGroup from './RemoveGroup'
@@ -38,41 +39,52 @@ async function ShowGroups() {
           </TableHeader>
 
           <TableBody>
-            {groups.map((group) => (
-              <TableRow key={group.id}>
-                <TableCell className='font-bold text-lg'>{group.name}</TableCell>
+            {groups.map((group) => {
+              const schedules = group.schedule || []
 
-                <TableCell>
-                  <div className='flex flex-wrap gap-2'>
-                    {group.schedule.length > 0 ? (
-                      group.schedule.map((item) => (
-                        <div
-                          key={item.id}
-                          className='flex items-center gap-2 bg-secondary/50 px-3 py-1 rounded-md border text-sm'
-                        >
-                          <span className='font-bold text-primary'>
-                            {dayTranslation[item.dayOfWeek] || item.dayOfWeek}
-                          </span>
-                          <span className='text-muted-foreground text-xs'>|</span>
-                          <span dir='ltr' className='font-mono text-xs'>
-                            {formatTo12Hour(item.startTime)} - {formatTo12Hour(item.endTime)}
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <span className='text-muted-foreground text-sm italic'>بدون مواعيد</span>
-                    )}
-                  </div>
-                </TableCell>
+              return (
+                <TableRow key={group.id}>
+                  <TableCell className='font-medium text-lg'>
+                    <Link
+                      href={`/dashboard/groups/${group.id}`}
+                      className='hover:text-primary hover:underline'
+                    >
+                      {group.name}
+                    </Link>
+                  </TableCell>
 
-                <TableCell>
-                  <div className='flex gap-2 justify-center'>
-                    <UpdateGroupModal groupId={group.id} />
-                    <RemoveGroup groupId={group.id} />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                  <TableCell>
+                    <div className='flex flex-wrap gap-2'>
+                      {schedules.length > 0 ? (
+                        schedules.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className='flex items-center gap-2 bg-secondary/50 px-3 py-1 rounded-md border text-sm'
+                          >
+                            <span className='font-bold text-primary'>
+                              {dayTranslation[item.dayOfWeek] || item.dayOfWeek}
+                            </span>
+                            <span className='text-muted-foreground text-xs'>|</span>
+                            <span dir='ltr' className='font-mono text-xs'>
+                              {formatTo12Hour(item.startTime)} - {formatTo12Hour(item.endTime)}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <span className='text-muted-foreground text-sm italic'>بدون مواعيد</span>
+                      )}
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <div className='flex gap-2 justify-center'>
+                      <UpdateGroupModal groupId={group.id} />
+                      <RemoveGroup groupId={group.id} />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
 

@@ -9,14 +9,12 @@ export const getStudentHistory = async (studentId: string) => {
   const student = await Prisma.student.findUnique({
     where: { id: studentId },
     include: {
-      // 1. التعديل هنا: بنجيب المجموعة من خلال جدول الاشتراكات
       enrollments: {
         include: {
           group: { select: { name: true, price: true } },
         },
-        take: 1, // بنفترض إنه مشترك في مجموعة واحدة حالياً
+        take: 1,
       },
-      // 2. دي هتشتغل لما تعمل npx prisma generate
       attendances: {
         include: {
           session: { select: { sessionDate: true } },
@@ -30,15 +28,14 @@ export const getStudentHistory = async (studentId: string) => {
     throw new Error('الطالب غير موجود')
   }
 
-  // بنطلع بيانات الجروب من أول اشتراك (لو موجود)
   const activeEnrollment = student.enrollments[0]
   const groupInfo = activeEnrollment?.group
 
-  // حساب الإحصائيات
+  // حساب الإحصائيات (شيلنا الإذن)
   const total = student.attendances.length
   const present = student.attendances.filter((a) => a.status === 'PRESENT').length
   const absent = student.attendances.filter((a) => a.status === 'ABSENT').length
-  const excused = student.attendances.filter((a) => a.status === 'EXCUSED').length
+  // const excused شيلناها خلاص
 
   return {
     info: {
@@ -52,7 +49,7 @@ export const getStudentHistory = async (studentId: string) => {
       total,
       present,
       absent,
-      excused,
+      // شيلنا excused من هنا
       attendanceRate: total > 0 ? Math.round((present / total) * 100) : 0,
     },
     history: student.attendances.map((record) => ({
