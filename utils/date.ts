@@ -20,4 +20,3 @@ export const dayOfWeekMap: Record<string, number> = {
   SATURDAY: 6,
 }
 
-console.log(startOfDay(new Date('2005-10-10')))

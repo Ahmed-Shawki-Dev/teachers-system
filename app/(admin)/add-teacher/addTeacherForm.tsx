@@ -57,7 +57,6 @@ export default function AddTeacherForm() {
       await addTeacherAction({ name, email, password, avatarUrl, phone, bio })
       toast.success('Teacher added successfully!')
     } catch (err) {
-      console.error(err)
       toast.error('Failed to add teacher')
     }
   }

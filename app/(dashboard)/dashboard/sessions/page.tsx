@@ -19,7 +19,6 @@ export default function SessionsPage() {
       setLoading(true)
       const data = await getDailyClasses(selectedDate)
       setClasses(data)
-      console.log(classes)
     } catch (error) {
       toast.error('حصل مشكلة في تحميل الحصص', error!)
     } finally {

@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
-import { Cairo, JetBrains_Mono } from 'next/font/google'
+import { JetBrains_Mono, Tajawal } from 'next/font/google'
 import { ThemeProvider } from '../components/theme-provider'
 import { Toaster } from '../components/ui/sonner'
 import { EdgeStoreProvider } from '../lib/edgestore'
 import './globals.css'
 
-const cairoSans = Cairo({
+const tajawalSans = Tajawal({
   variable: '--font-sans',
   subsets: ['arabic', 'latin'],
-  weight: ['200', '300', '400', '500', '600', '700'],
+  weight: ['200', '300', '400', '500', '700','800'],
 })
 
 const jetBrainsMono = JetBrains_Mono({
@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ar' dir='rtl' suppressHydrationWarning>
-      <body className={`${cairoSans.variable} ${jetBrainsMono.variable} antialiased`}>
+      <body className={`${tajawalSans.variable} ${jetBrainsMono.variable} antialiased`}>
         <ThemeProvider
           attribute='class'
           defaultTheme='system'

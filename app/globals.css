@@ -47,7 +47,7 @@
   --sidebar-border: oklch(91% 0.012 90);
   --sidebar-ring: var(--primary);
 
-  --font-sans: Cairo, ui-sans-serif, sans-serif, system-ui;
+  --font-sans: Tajawal, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Signifier, Georgia, serif;
   --font-mono: JetBrains Mono, Courier New, monospace;
 

@@ -31,6 +31,11 @@ enum AttendanceStatus {
   EXCUSED
 }
 
+enum PaymentType {
+  PER_SESSION
+  MONTHLY
+}
+
 // 2. Models
 model Teacher {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -81,30 +86,33 @@ model Student {
   updatedAt   DateTime? @updatedAt
 
   teacherId String  @db.ObjectId
-  teacher   Teacher @relation(fields: [teacherId], references: [id])
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
 
   enrollments Enrollment[]
   attendances Attendance[] 
-  
+  payments Payment[]
+
   @@unique([name, parentPhone, teacherId])
 }
 
 model Group {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  // 3. شيل @unique من هنا
+
   name      String   
   price     Float    @default(0)
+  paymentType PaymentType @default(PER_SESSION)
   createdAt   DateTime? @default(now()) 
   updatedAt   DateTime? @updatedAt
 
   teacherId String  @db.ObjectId
-  teacher   Teacher @relation(fields: [teacherId], references: [id])
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
 
   enrollments Enrollment[]
   schedule    ClassSchedule[]
   sessions    Session[]
+  payments    Payment[]
 
-  // 4. ضيف السطر ده تحت: اسم المجموعة ميتكررش لنفس المدرس
+
   @@unique([name, teacherId])
 }
 
@@ -117,12 +125,12 @@ model Session {
   groupId String @db.ObjectId
   group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
-  // (تعديل الاسم) سجلات الحضور في الحصة دي
-  attendances Attendance[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+
+  payments Payment[]
+  attendances Attendance[]
   @@index([groupId])
 }
 
@@ -141,8 +149,33 @@ model Attendance {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // منع التكرار
+
   @@unique([sessionId, studentId])
   @@index([sessionId])
   @@index([studentId])
+}
+
+
+model Payment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount    Float   
+  date      DateTime @default(now())
+  
+  studentId String   @db.ObjectId
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+
+  groupId   String   @db.ObjectId
+  group     Group    @relation(fields: [groupId], references: [id])
+
+
+  sessionId String?  @db.ObjectId 
+  session   Session? @relation(fields: [sessionId], references: [id])
+
+  monthKey  String?  
+
+  type      PaymentType 
+  note      String?
+
+  createdAt DateTime @default(now())
 }

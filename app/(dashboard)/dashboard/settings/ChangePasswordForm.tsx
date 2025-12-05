@@ -54,7 +54,6 @@ export default function ChangePasswordForm() {
       }
     } catch (error) {
       toast.error('حدث خطأ أثناء تغيير كلمة المرور')
-      console.error(error)
     } finally {
       setLoading(false)
     }

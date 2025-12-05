@@ -57,7 +57,6 @@ export default function AddGroupModal() {
 
   async function onSubmit(data: IGroup) {
     try {
-      console.log(data)
       setLoading(true)
       await addGroupAction(data)
       toast.success('Group added successfully!')
