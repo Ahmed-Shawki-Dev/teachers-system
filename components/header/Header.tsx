@@ -11,7 +11,7 @@ import { Button } from '../ui/button'
 import UserMenu from './UserMenu'
 import Image from 'next/image'
 
-const Navbar = () => {
+const Navbar = ({className}:{className?:string}) => {
   const router = useRouter()
   const { teacher, setTeacher } = useTeacherStore()
   const [loading, setLoading] = useState(true)
@@ -42,22 +42,36 @@ const Navbar = () => {
   }, [teacher, setTeacher])
 
   return (
-    <nav className=' w-full flex justify-between items-center p-4 border-b bg-background '>
-      <div className='font-bold cursor-pointer select-none' onClick={() => router.push('/')}>
-        <Image src={'/logo.png'} alt='logo' width={80} height={80}  />
-      </div>
+    <nav className='top-0 z-50 w-full  '>
+      {/* Subtle gradient overlay */}
+      <div className={className} />
 
-      <div className='flex items-center gap-4'>
-        <ModeToggle />
-        {loading ? (
-          <Skeleton className='h-10 w-10 rounded-full' />
-        ) : teacher?.id ? (
-          <UserMenu />
-        ) : (
-          <Button size={'icon'} onClick={() => router.push('/login')}>
-            <LogIn />
-          </Button>
-        )}
+      <div className='relative flex justify-between items-center p-4 container mx-auto'>
+        {/* Logo */}
+        <div
+          className='font-bold cursor-pointer select-none hover:scale-105 transition-transform duration-200'
+          onClick={() => router.push('/')}
+        >
+          <Image src={'/logo.png'} alt='logo' width={80} height={80} />
+        </div>
+
+        {/* Actions */}
+        <div className='flex items-center gap-4'>
+          <ModeToggle />
+          {loading ? (
+            <Skeleton className='h-10 w-10 rounded-full' />
+          ) : teacher?.id ? (
+            <UserMenu />
+          ) : (
+            <Button
+              size={'icon'}
+              onClick={() => router.push('/login')}
+              className='bg-linear-to-r from-primary to-accent hover:opacity-90 transition-opacity shadow-md shadow-primary/20'
+            >
+              <LogIn />
+            </Button>
+          )}
+        </div>
       </div>
     </nav>
   )

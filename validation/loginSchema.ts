@@ -2,10 +2,10 @@ import z from 'zod'
 
 export const LoginSchema = z.object({
   email: z.string().email({
-    message: 'Please enter a valid email address.',
+    message: 'أكتب الإيميل صح',
   }),
   password: z.string().min(8, {
-    message: 'Password must be at least 8 characters.',
+    message: 'أكتب كلمة السر الصحيحة',
   }),
 })
 

@@ -1,10 +1,12 @@
 import { MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 
-const Footer = () => {
+const Footer = ({ className }: { className?: string }) => {
   return (
-    <footer className='border-t bg-background/95 backdrop-blur py-6 mt-auto'>
-      <div className='container flex flex-col md:flex-row items-center justify-between mx-auto gap-4 px-4 text-sm text-muted-foreground'>
+    <footer className=' relative   py-6 mt-auto'>
+      <div className={className} />
+
+      <div className='container relative z-50 flex flex-col md:flex-row items-center justify-between mx-auto gap-4 px-4 text-sm text-muted-foreground'>
         {/* 1. الحقوق */}
         <p>
           <span>جميع الحقوق محفوظة </span>
