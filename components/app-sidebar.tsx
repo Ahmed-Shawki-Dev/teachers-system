@@ -1,5 +1,6 @@
 'use client'
 import {
+  Banknote,
   Calendar,
   Clock10,
   Home,
@@ -31,6 +32,7 @@ const items = [
   { title: 'الحصص', url: '/dashboard/sessions', icon: Calendar },
   { title: 'المجاميع', url: '/dashboard/groups', icon: Clock10 },
   { title: 'الطلاب', url: '/dashboard/students', icon: PersonStandingIcon },
+  { title: 'المدفوعات', url: '/dashboard/payments', icon: Banknote },
   { title: 'الإمتحانات', url: '/dashboard/exams', icon: Newspaper },
   { title: 'الإعدادات', url: '/dashboard/settings', icon: Settings },
 ]

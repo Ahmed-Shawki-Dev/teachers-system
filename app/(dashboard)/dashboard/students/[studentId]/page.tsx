@@ -1,10 +1,11 @@
 import { getStudentHistory } from '@/actions/Student/getStudentHistory'
-
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Calendar, CheckCircle2, LucideIcon, Phone, Users, XCircle } from 'lucide-react'
+import { Calendar, CheckCircle2, LucideIcon, Phone, Wallet, XCircle } from 'lucide-react'
 import StudentAttendanceTable from './StudentAttendanceTable'
 import StudentExamsTable from './StudentExamsTable'
+import StudentPaymentsTable from './StudentPaymentsTable'
+
 
 export default async function StudentProfilePage({
   params,
@@ -12,8 +13,10 @@ export default async function StudentProfilePage({
   params: Promise<{ studentId: string }>
 }) {
   const { studentId } = await params
-  // دلوقتي بنستلم examsHistory كمان
-  const { info, stats, attendanceHistory, examsHistory } = await getStudentHistory(studentId)
+  // استقبلنا paymentsHistory
+  const { info, stats, attendanceHistory, examsHistory, paymentsHistory } = await getStudentHistory(
+    studentId,
+  )
 
   return (
     <div className='flex flex-col gap-6 p-4 container mx-auto max-w-5xl'>
@@ -27,12 +30,18 @@ export default async function StudentProfilePage({
                 كود الطالب: <span className='font-mono'>{info.id.slice(-6)}</span>
               </p>
             </div>
-            <Badge
-              variant={info.groupName === 'بدون مجموعة' ? 'destructive' : 'default'}
-              className='text-base px-4 py-1'
-            >
-              {info.groupName}
-            </Badge>
+            <div className='flex gap-2'>
+              <Badge
+                variant={info.groupName === 'بدون مجموعة' ? 'destructive' : 'default'}
+                className='text-base px-4 py-1'
+              >
+                {info.groupName}
+              </Badge>
+              {/* بادج لنوع الدفع */}
+              <Badge variant='secondary'>
+                {info.paymentType === 'PER_SESSION' ? 'نظام الحصة' : 'نظام الشهر'}
+              </Badge>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className='grid grid-cols-1 md:grid-cols-2 gap-6 pt-4'>
@@ -47,10 +56,10 @@ export default async function StudentProfilePage({
           </div>
           <div className='flex items-center gap-3 p-3 bg-muted/20 rounded-lg border'>
             <div className='bg-primary/10 p-2 rounded-full text-primary'>
-              <Users className='w-5 h-5' />
+              <Wallet className='w-5 h-5' />
             </div>
             <div>
-              <p className='text-xs text-muted-foreground'>سعر الحصة</p>
+              <p className='text-xs text-muted-foreground'>قيمة الاشتراك</p>
               <p className='font-bold text-lg'>
                 {info.price} <span className='text-xs font-normal text-muted-foreground'>ج.م</span>
               </p>
@@ -76,19 +85,16 @@ export default async function StudentProfilePage({
         />
       </div>
 
-      {/* 3. الجداول (المفصولة) */}
-      <div className='grid grid-cols-1 gap-6'>
-        {/* جدول الامتحانات أولاً (عشان مهم) */}
-        <StudentExamsTable exams={examsHistory} />
-
-        {/* جدول الغياب */}
-        <StudentAttendanceTable history={attendanceHistory} />
+      {/* 3. الجداول (امتحانات - مدفوعات - غياب) */}
+      <div className='grid grid-cols-1 gap-8'>
+        <StudentAttendanceTable history={attendanceHistory??[]} />
+        <StudentExamsTable exams={examsHistory??[]} />
+        <StudentPaymentsTable payments={paymentsHistory??[]} /> 
       </div>
     </div>
   )
 }
 
-// --- StatsCard ---
 interface StatsCardProps {
   label: string
   value: number

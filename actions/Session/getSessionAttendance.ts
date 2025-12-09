@@ -3,61 +3,59 @@ import { Prisma } from '@/lib/prisma'
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
 
 export const getSessionAttendance = async (sessionId: string) => {
-  // 1. أمان: نتأكد إن المدرس هو اللي بيطلب الداتا
+  // 1. أمان
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('غير مصرح لك')
 
-  // 2. نجيب بيانات الحصة عشان نعرف هي تبع أنهي مجموعة
+  // 2. هات بيانات الحصة + بيانات الجروب (السعر والنوع)
   const session = await Prisma.session.findUnique({
     where: { id: sessionId },
     include: {
       group: {
-        select: { id: true, name: true, teacherId: true },
+        // 👇 ضفنا price و paymentType
+        select: { id: true, name: true, teacherId: true, price: true, paymentType: true },
       },
     },
   })
 
   if (!session) throw new Error('الحصة غير موجودة')
-  if (session.group.teacherId !== teacher.id) throw new Error('لا تملك صلاحية الوصول لهذه الحصة')
+  if (session.group.teacherId !== teacher.id) throw new Error('لا تملك صلاحية')
 
-  // 3. نجيب كل الطلاب المسجلين في المجموعة دي
-  // ومعاهم "سجل الحضور" الخاص بالحصة دي تحديداً (لو موجود)
+  // 3. هات الطلاب + الغياب + الدفع
   const enrollments = await Prisma.enrollment.findMany({
-    where: {
-      groupId: session.groupId,
-    },
+    where: { groupId: session.groupId },
     include: {
       student: {
         include: {
-          attendances: {
-            where: { sessionId: sessionId }, // التريكاية: هات سجل الحضور للحصة دي بس
-          },
+          attendances: { where: { sessionId } }, // سجل الغياب للحصة دي
+          payments: { where: { sessionId } }, // 👇 سجل الدفع للحصة دي
         },
       },
     },
-    orderBy: { student: { name: 'asc' } }, // رتب الأسماء أبجدياً
+    orderBy: { student: { name: 'asc' } },
   })
 
-  // 4. نجهز الداتا بشكل نضيف للـ UI
+  // 4. تجهيز الداتا
   const students = enrollments.map((enrollment) => {
     const student = enrollment.student
-    // أول سجل في المصفوفة هو سجل الحضور (لأننا عاملين فلتر بـ sessionId)
     const record = student.attendances[0]
+    const payment = student.payments[0] // هل في وصل دفع؟
 
     return {
       studentId: student.id,
       name: student.name,
       parentPhone: student.parentPhone,
-      // لو ليه سجل رجع حالته (PRESENT/ABSENT)، لو ملوش رجع null (لسه ماتسجلش)
       status: record?.status || null,
       note: record?.note || '',
+      hasPaid: !!payment, // 👇 لو موجود يبقى ترو
     }
   })
 
   return {
     sessionDate: session.sessionDate,
     groupName: session.group.name,
-    status: session.status,
+    price: session.group.price, // 👇 بنرجع السعر
+    paymentType: session.group.paymentType, // 👇 بنرجع النوع
     students,
   }
 }

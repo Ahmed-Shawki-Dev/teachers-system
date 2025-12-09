@@ -1,12 +1,14 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CalendarCheck2 } from 'lucide-react'
+import { CalendarCheck2, Check, X } from 'lucide-react'
 
 type AttendanceRecord = {
   id: string
   date: Date
-  status: string // "PRESENT" | "ABSENT"
+  status: string
   note: string | null
+  hasPaid: boolean // 👈 الحالة الجديدة
+  paymentAmount: number
 }
 
 export default function StudentAttendanceTable({ history }: { history: AttendanceRecord[] }) {
@@ -22,10 +24,11 @@ export default function StudentAttendanceTable({ history }: { history: Attendanc
         {history.length > 0 ? (
           <div className='border rounded-lg overflow-hidden'>
             <table className='w-full text-right text-sm'>
-              <thead className='bg-muted text-muted-foreground'>
+              <thead className='bg-muted/50 text-muted-foreground'>
                 <tr>
                   <th className='p-4 font-medium'>التاريخ</th>
-                  <th className='p-4 font-medium'>الحالة</th>
+                  <th className='p-4 font-medium text-center'>الحالة</th>
+                  <th className='p-4 font-medium text-center'>الدفع</th> {/* عمود جديد */}
                   <th className='p-4 font-medium'>ملاحظات</th>
                 </tr>
               </thead>
@@ -35,12 +38,12 @@ export default function StudentAttendanceTable({ history }: { history: Attendanc
                     <td className='p-4 font-mono'>
                       {new Date(record.date).toLocaleDateString('ar-EG', {
                         weekday: 'long',
-                        year: 'numeric',
                         month: 'short',
                         day: 'numeric',
                       })}
                     </td>
-                    <td className='p-4'>
+
+                    <td className='p-4 text-center'>
                       {record.status === 'PRESENT' ? (
                         <Badge className='bg-green-100 text-green-700 hover:bg-green-200 border-green-200'>
                           حاضر
@@ -51,7 +54,26 @@ export default function StudentAttendanceTable({ history }: { history: Attendanc
                         </Badge>
                       )}
                     </td>
-                    <td className='p-4 text-muted-foreground max-w-[200px] truncate'>
+
+                    {/* حالة الدفع */}
+                    <td className='p-4 text-center'>
+                      {record.hasPaid ? (
+                        <div className='flex items-center justify-center gap-1 text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded-full border border-green-100 w-fit mx-auto'>
+                          <Check className='w-3 h-3' />
+                          <span>دفع</span>
+                        </div>
+                      ) : record.status === 'PRESENT' ? (
+                        // حضر بس مدفعش (عليه فلوس)
+                        <div className='flex items-center justify-center gap-1 text-red-500 font-bold text-xs bg-red-50 px-2 py-1 rounded-full border border-red-100 w-fit mx-auto'>
+                          <X className='w-3 h-3' />
+                          <span>لم يدفع</span>
+                        </div>
+                      ) : (
+                        <span className='text-muted-foreground'>-</span>
+                      )}
+                    </td>
+
+                    <td className='p-4 text-muted-foreground max-w-[150px] truncate'>
                       {record.note || '-'}
                     </td>
                   </tr>

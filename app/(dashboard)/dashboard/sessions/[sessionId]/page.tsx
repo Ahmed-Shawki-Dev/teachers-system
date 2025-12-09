@@ -15,9 +15,13 @@ export default async function SessionDetailsPage({
     <div className='container mx-auto py-6 max-w-4xl'>
       <AttendanceSheet
         sessionId={sessionId}
-        initialData={data.students} 
-        groupName={data.groupName}
-        date={data.sessionDate}
+        initialData={data.students}
+        sessionInfo={{
+          groupName: data.groupName,
+          date: data.sessionDate,
+          price: data.price,
+          paymentType: data.paymentType,
+        }}
       />
     </div>
   )
