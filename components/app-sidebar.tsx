@@ -29,8 +29,8 @@ import { usePathname } from 'next/navigation'
 const items = [
   { title: 'الصفحة الرئيسية', url: '/dashboard', icon: Home },
   { title: 'الحصص', url: '/dashboard/sessions', icon: Calendar },
-  { title: 'الطلاب', url: '/dashboard/students', icon: PersonStandingIcon },
   { title: 'المجاميع', url: '/dashboard/groups', icon: Clock10 },
+  { title: 'الطلاب', url: '/dashboard/students', icon: PersonStandingIcon },
   { title: 'الإمتحانات', url: '/dashboard/exams', icon: Newspaper },
   { title: 'الإعدادات', url: '/dashboard/settings', icon: Settings },
 ]

@@ -1,35 +1,51 @@
 'use server'
+
+import { Prisma } from '@/lib/prisma'
+import { IGroupInput } from '@/validation/groupSchema'
 import { revalidatePath } from 'next/cache'
-import { Prisma } from '../../lib/prisma'
-import { IGroup } from '../../validation/groupSchema'
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
+import { DayOfWeek, PaymentType } from '@prisma/client'
 
-export const updateGroupAction = async (id: string, data: IGroup) => {
-  const teacher = await getTeacherByTokenAction()
-  if (!teacher) throw new Error('غير مصرح لك')
+export const updateGroupAction = async (groupId: string, data: IGroupInput) => {
+  try {
+    const teacher = await getTeacherByTokenAction()
+    if (!teacher) return { success: false, message: 'غير مصرح لك' }
 
-  const group = await Prisma.group.findUnique({ where: { id } })
-  if (!group) throw new Error('المجموعة غير موجود')
+    // التأكد من ملكية المجموعة
+    const existingGroup = await Prisma.group.findUnique({
+      where: { id: groupId },
+    })
 
-  if (group.teacherId !== teacher.id) throw new Error('غير مصرح لك بتعديل هذه المجموعة')
+    if (!existingGroup || existingGroup.teacherId !== teacher.id) {
+      return { success: false, message: 'المجموعة غير موجودة أو لا تملك صلاحية تعديلها' }
+    }
 
-  await Prisma.classSchedule.deleteMany({
-    where: { groupId: id },
-  })
+    // التعديل (تحديث البيانات الأساسية + استبدال المواعيد)
+    await Prisma.group.update({
+      where: { id: groupId },
+      data: {
+        name: data.name,
+        price: data.price,
+        paymentType: data.paymentType as PaymentType,
 
-  await Prisma.group.update({
-    where: { id },
-    data: {
-      name: data.name,
-      schedule: {
-        create: data?.schedule?.map((item) => ({
-          dayOfWeek: item.dayOfWeek,
-          startTime: item.startTime,
-          endTime: item.endTime,
-        })),
+        // 👇 هنا السحر: بنمسح القديم ونحط الجديد
+        schedule: {
+          deleteMany: {}, // احذف كل المواعيد القديمة لهذه المجموعة
+          create: data.schedule.map((s) => ({
+            dayOfWeek: s.dayOfWeek as DayOfWeek,
+            startTime: s.startTime,
+            endTime: s.endTime,
+          })),
+        },
       },
-    },
-  })
+    })
 
-  revalidatePath('/dashboard/groups')
+    revalidatePath('/dashboard/groups')
+    revalidatePath(`/dashboard/groups/${groupId}`)
+
+    return { success: true, message: 'تم تعديل المجموعة والمواعيد بنجاح ✅' }
+  } catch (error) {
+    console.error(error)
+    return { success: false, message: 'حدث خطأ أثناء التعديل' }
+  }
 }

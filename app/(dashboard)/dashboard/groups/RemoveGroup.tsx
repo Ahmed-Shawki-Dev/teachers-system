@@ -10,7 +10,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Loader } from 'lucide-react'
+import { Loader, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { removeGroupAction } from '../../../../actions/Group/removeGroup'
@@ -35,7 +35,9 @@ export default function RemoveGroup({ groupId }: { groupId: string }) {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant='destructive'>حذف</Button>
+        <Button variant='destructive'>
+          <Trash />
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent dir='rtl'>
         <AlertDialogHeader>

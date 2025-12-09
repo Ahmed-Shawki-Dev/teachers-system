@@ -33,6 +33,7 @@ export default async function GroupDetailsPage({
 
   // 1. هات بيانات المجموعة
   const group = await getGroupDetails(groupId)
+  console.log(group.paymentType)
 
   return (
     <div className='flex flex-col gap-8 p-4 container mx-auto'>
@@ -53,7 +54,7 @@ export default async function GroupDetailsPage({
             <div className='flex items-center gap-2 text-muted-foreground bg-muted/20 p-3 rounded-lg w-fit'>
               <Wallet className='w-5 h-5 text-green-600' />
               <span className='font-semibold text-foreground'>{group.price} ج.م</span>
-              <span className='text-xs'>/ للحصة</span>
+              <span className='text-xs'>/ {group.paymentType==='MONTHLY'?"للشهر":"للحصة"}</span>
             </div>
           </CardContent>
         </Card>

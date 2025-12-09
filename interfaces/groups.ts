@@ -1,5 +1,5 @@
-import { IGroup } from "../validation/groupSchema"
+import { IGroupInput } from '../validation/groupSchema'
 
-export interface IGroupDB extends IGroup {
+export interface IGroupDB extends IGroupInput {
   id: string
 }

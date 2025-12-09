@@ -1,29 +1,39 @@
 'use server'
+
+import { Prisma } from '@/lib/prisma'
+import { IGroupInput } from '@/validation/groupSchema'
 import { revalidatePath } from 'next/cache'
-import { Prisma } from '../../lib/prisma'
-import { IGroup } from '../../validation/groupSchema'
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
+import { DayOfWeek, PaymentType } from '@prisma/client'
 
-export const addGroupAction = async (data: IGroup) => {
-  const teacher = await getTeacherByTokenAction()
-  if (!teacher) throw new Error('Not authenticated')
+export const addGroupAction = async (data: IGroupInput) => {
+  try {
+    const teacher = await getTeacherByTokenAction()
+    if (!teacher) return { success: false, message: 'غير مصرح لك' }
 
-  const { name, schedule } = data
+    // إنشاء المجموعة + المواعيد في خطوة واحدة
+    await Prisma.group.create({
+      data: {
+        name: data.name,
+        price: data.price,
+        paymentType: data.paymentType as PaymentType,
+        teacherId: teacher.id,
 
-  await Prisma.group.create({
-    data: {
-      name,
-      teacherId: teacher.id,
-      schedule: {
-        create:
-          schedule?.map((item) => ({
-            dayOfWeek: item.dayOfWeek,
-            startTime: item.startTime,
-            endTime: item.endTime,
-          })) || [], 
+        // 👇 السحر هنا: بنفك مصفوفة المواعيد ونعملها create
+        schedule: {
+          create: data.schedule.map((s) => ({
+            dayOfWeek: s.dayOfWeek as DayOfWeek,
+            startTime: s.startTime,
+            endTime: s.endTime,
+          })),
+        },
       },
-    },
-  })
+    })
 
-  revalidatePath('/dashboard/groups')
+    revalidatePath('/dashboard/groups')
+    return { success: true, message: 'تمت الإضافة بنجاح' }
+  } catch (error) {
+    console.error(error)
+    return { success: false, message: 'حدث خطأ في السيرفر' }
+  }
 }
