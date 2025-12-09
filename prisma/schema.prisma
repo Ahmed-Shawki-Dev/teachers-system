@@ -1,7 +1,5 @@
 datasource db {
   provider = "mongodb"
-  url = env("DATABASE_URL")
-
 }
 
 generator client {
@@ -91,6 +89,7 @@ model Student {
   enrollments Enrollment[]
   attendances Attendance[] 
   payments Payment[]
+  examResults ExamResult[]
 
   @@unique([name, parentPhone, teacherId])
 }
@@ -111,6 +110,7 @@ model Group {
   schedule    ClassSchedule[]
   sessions    Session[]
   payments    Payment[]
+  exams Exam[]
 
 
   @@unique([name, teacherId])
@@ -178,4 +178,40 @@ model Payment {
   note      String?
 
   createdAt DateTime @default(now())
+}
+
+
+model Exam{
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  date       DateTime   @default(now())
+  maxScore   Float
+
+  groupId    String     @db.ObjectId
+  group      Group      @relation(fields: [groupId],references: [id], onDelete: Cascade)
+
+  results   ExamResult[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([groupId])
+}
+
+
+model ExamResult{
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  score     Float
+
+  examId    String   @db.ObjectId
+  exam      Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  studentId String   @db.ObjectId
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([examId, studentId])
+  @@index([studentId])
 }

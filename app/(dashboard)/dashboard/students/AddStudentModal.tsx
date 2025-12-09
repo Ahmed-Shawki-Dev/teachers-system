@@ -79,7 +79,7 @@ export default function AddStudentModal() {
       <Form {...form}>
         <form id='form-add-student' onSubmit={form.handleSubmit(onSubmit)}>
           <DialogTrigger asChild>
-            <Button variant={'default'} size={'lg'}>
+            <Button >
               <PlusCircle />
               أضف طالب
             </Button>

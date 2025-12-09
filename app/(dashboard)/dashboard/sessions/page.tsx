@@ -31,17 +31,20 @@ export default function SessionsPage() {
   // 3. أول ما التاريخ يتغير، هات الداتا
   useEffect(() => {
     fetchClasses(date)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date])
 
   return (
-    <div className='space-y-6'>
-      {/* --- الهيدر والفلتر --- */}
-      <div className='flex flex-col sm:flex-row justify-between items-center gap-4 bg-transparent p-4 rounded-lg border'>
-        <h1 className='text-2xl font-bold'>جدول الحصص اليومي</h1>
-        <h2 className='text-xl font-semibold text-primary'>{dayName}</h2>{' '}
-        <div className='flex items-center gap-2'>
-          <span className='text-sm text-muted-foreground font-medium'>تاريخ العرض:</span>
+    <div className='flex flex-col gap-6 p-4 container mx-auto'>
+      {/* الهيدر */}
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card p-4 rounded-lg border shadow-sm'>
+        <div>
+          <h1 className='text-2xl font-bold text-primary'>جدول الحصص</h1>
+          <p className='text-sm text-muted-foreground'>عرض الحصص اليومية حسب التاريخ</p>
+        </div>
+
+        <div className='flex items-center gap-3 w-full sm:w-auto'>
+          <span className='text-sm font-medium text-primary'>{dayName}</span>
+
           <Input
             type='date'
             value={date}
@@ -51,7 +54,7 @@ export default function SessionsPage() {
         </div>
       </div>
 
-      {/* --- عرض الكروت --- */}
+      {/* المحتوى */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
         {loading ? (
           <div className='col-span-full flex justify-center py-20'>
@@ -59,11 +62,16 @@ export default function SessionsPage() {
           </div>
         ) : classes.length > 0 ? (
           classes.map((session, index) => (
-            <SessionCard key={index} session={session} currentDate={date} onUpdate={() => fetchClasses(date)} />
+            <SessionCard
+              key={index}
+              session={session}
+              currentDate={date}
+              onUpdate={() => fetchClasses(date)}
+            />
           ))
         ) : (
-          <div className='col-span-full text-center py-20 text-muted-foreground'>
-            مفيش حصص في الجدول لليوم ده 😴
+          <div className='col-span-full py-12 text-center bg-muted/20 rounded-lg border border-dashed text-muted-foreground'>
+            لا توجد حصص في هذا اليوم
           </div>
         )}
       </div>

@@ -1,7 +1,10 @@
 import { getStudentHistory } from '@/actions/Student/getStudentHistory'
+
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Calendar, CheckCircle2, Phone, Users, XCircle, type LucideIcon } from 'lucide-react'
+import { Calendar, CheckCircle2, LucideIcon, Phone, Users, XCircle } from 'lucide-react'
+import StudentAttendanceTable from './StudentAttendanceTable'
+import StudentExamsTable from './StudentExamsTable'
 
 export default async function StudentProfilePage({
   params,
@@ -9,11 +12,12 @@ export default async function StudentProfilePage({
   params: Promise<{ studentId: string }>
 }) {
   const { studentId } = await params
-  const { info, stats, history } = await getStudentHistory(studentId)
+  // دلوقتي بنستلم examsHistory كمان
+  const { info, stats, attendanceHistory, examsHistory } = await getStudentHistory(studentId)
 
   return (
     <div className='flex flex-col gap-6 p-4 container mx-auto max-w-5xl'>
-      {/* 1. كارت البيانات الأساسية */}
+      {/* 1. كارت البيانات (زي ما هو) */}
       <Card className='border-t-4 border-t-primary shadow-md'>
         <CardHeader>
           <CardTitle className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
@@ -23,7 +27,6 @@ export default async function StudentProfilePage({
                 كود الطالب: <span className='font-mono'>{info.id.slice(-6)}</span>
               </p>
             </div>
-
             <Badge
               variant={info.groupName === 'بدون مجموعة' ? 'destructive' : 'default'}
               className='text-base px-4 py-1'
@@ -42,7 +45,6 @@ export default async function StudentProfilePage({
               <p className='font-mono font-semibold text-lg dir-ltr text-right'>{info.phone}</p>
             </div>
           </div>
-
           <div className='flex items-center gap-3 p-3 bg-muted/20 rounded-lg border'>
             <div className='bg-primary/10 p-2 rounded-full text-primary'>
               <Users className='w-5 h-5' />
@@ -57,7 +59,7 @@ export default async function StudentProfilePage({
         </CardContent>
       </Card>
 
-      {/* 2. كروت الإحصائيات (بقوا 3 بس) */}
+      {/* 2. الإحصائيات (زي ما هي) */}
       <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
         <StatsCard label='إجمالي الحصص' value={stats.total} icon={Calendar} />
         <StatsCard
@@ -74,61 +76,19 @@ export default async function StudentProfilePage({
         />
       </div>
 
-      {/* 3. جدول الحضور التفصيلي */}
-      <Card>
-        <CardHeader>
-          <CardTitle className='text-lg'>سجل الحضور والغياب</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {history.length > 0 ? (
-            <div className='border rounded-lg overflow-hidden'>
-              <table className='w-full text-right text-sm'>
-                <thead className='bg-muted text-muted-foreground'>
-                  <tr>
-                    <th className='p-4 font-medium'>التاريخ</th>
-                    <th className='p-4 font-medium'>الحالة</th>
-                    <th className='p-4 font-medium'>ملاحظات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.map((record) => (
-                    <tr
-                      key={record.id}
-                      className='border-b last:border-0 hover:bg-muted/5 transition-colors'
-                    >
-                      <td className='p-4 font-mono'>
-                        {new Date(record.date).toLocaleDateString('ar-EG', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </td>
-                      <td className='p-4'>
-                        <StatusBadge status={record.status} />
-                      </td>
-                      <td className='p-4 text-muted-foreground max-w-[200px] truncate'>
-                        {record.note || '-'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className='flex flex-col items-center justify-center py-12 text-muted-foreground bg-muted/10 rounded-lg border border-dashed'>
-              <Calendar className='w-10 h-10 mb-2 opacity-20' />
-              <p>لا يوجد سجل حضور لهذا الطالب حتى الآن</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* 3. الجداول (المفصولة) */}
+      <div className='grid grid-cols-1 gap-6'>
+        {/* جدول الامتحانات أولاً (عشان مهم) */}
+        <StudentExamsTable exams={examsHistory} />
+
+        {/* جدول الغياب */}
+        <StudentAttendanceTable history={attendanceHistory} />
+      </div>
     </div>
   )
 }
 
-// --- مكونات مساعدة ---
-
+// --- StatsCard ---
 interface StatsCardProps {
   label: string
   value: number
@@ -152,23 +112,5 @@ function StatsCard({
         <div className='text-xs font-medium text-muted-foreground'>{label}</div>
       </CardContent>
     </Card>
-  )
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    PRESENT: 'bg-green-100 text-green-700 border-green-200',
-    ABSENT: 'bg-red-100 text-red-700 border-red-200',
-  }
-
-  const labels: Record<string, string> = {
-    PRESENT: 'حاضر',
-    ABSENT: 'غائب',
-  }
-
-  return (
-    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${styles[status] || ''}`}>
-      {labels[status] || status}
-    </span>
   )
 }

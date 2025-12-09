@@ -1,5 +1,13 @@
 'use client'
-import { Calendar, Clock10, Home, LifeBuoy, PersonStandingIcon, Settings } from 'lucide-react'
+import {
+  Calendar,
+  Clock10,
+  Home,
+  LifeBuoy,
+  Newspaper,
+  PersonStandingIcon,
+  Settings,
+} from 'lucide-react'
 import Image from 'next/image'
 
 import { Button } from '@/components/ui/button'
@@ -23,6 +31,7 @@ const items = [
   { title: 'الحصص', url: '/dashboard/sessions', icon: Calendar },
   { title: 'الطلاب', url: '/dashboard/students', icon: PersonStandingIcon },
   { title: 'المجاميع', url: '/dashboard/groups', icon: Clock10 },
+  { title: 'الإمتحانات', url: '/dashboard/exams', icon: Newspaper },
   { title: 'الإعدادات', url: '/dashboard/settings', icon: Settings },
 ]
 

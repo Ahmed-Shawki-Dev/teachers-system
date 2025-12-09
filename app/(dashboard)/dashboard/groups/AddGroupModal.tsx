@@ -75,7 +75,7 @@ export default function AddGroupModal() {
       <Form {...form}>
         <form id='form-add-group' onSubmit={form.handleSubmit(onSubmit)}>
           <DialogTrigger asChild>
-            <Button variant={'outline'} size={'lg'}>
+            <Button  >
               <PlusCircle />
               أضف مجموعة
             </Button>

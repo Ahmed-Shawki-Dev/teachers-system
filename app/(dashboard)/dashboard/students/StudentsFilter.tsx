@@ -3,57 +3,57 @@
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { grades } from '@/data/grades'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function StudentsFilter() {
+// تعريف نوع الجروب
+type GroupOption = {
+  id: string
+  name: string
+}
+
+export default function StudentsFilter({ groups }: { groups: GroupOption[] }) {
   const searchParams = useSearchParams()
-  const pathname = usePathname()
   const { replace } = useRouter()
 
-  const handleFilter = (grade: string) => {
+  // بنقرا القيمة الحالية من الرابط عشان تفضل مختارة بعد الريفريش
+  const currentGroupId = searchParams.get('groupId') || 'all'
+
+  const handleFilter = (groupId: string) => {
     const params = new URLSearchParams(searchParams)
 
-    // لو اختار صف معين نحطه في الـ URL
-    if (grade && grade !== 'all') {
-      params.set('grade', grade)
+    if (groupId && groupId !== 'all') {
+      params.set('groupId', groupId)
     } else {
-      params.delete('grade')
+      params.delete('groupId')
     }
 
-    replace(`${pathname}?${params.toString()}`)
+    replace(`?${params.toString()}`)
   }
 
   return (
-    <Select onValueChange={handleFilter} defaultValue={searchParams.get('grade') || 'all'}>
-      <SelectTrigger className='w-[200px]'>
-        <SelectValue placeholder='كل الصفوف الدراسية' />
+    <Select value={currentGroupId} onValueChange={handleFilter}>
+      <SelectTrigger className='w-[200px] bg-background'>
+        <SelectValue placeholder='كل المجموعات' />
       </SelectTrigger>
 
-      <SelectContent className='max-h-[300px]'>
+      <SelectContent>
         <SelectItem value='all' className='font-bold text-primary'>
-          عرض كل الصفوف
+          عرض الكل
         </SelectItem>
 
-        {/* اللوب اللي بيقسم المراحل */}
-        {grades.map((group) => (
-          <SelectGroup key={group.label}>
-            <SelectLabel className='text-muted-foreground bg-muted/50 px-2 py-1'>
-              {group.label}
-            </SelectLabel>
-            {group.options.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        ))}
+        {groups.length > 0 ? (
+          groups.map((group) => (
+            <SelectItem key={group.id} value={group.id}>
+              {group.name}
+            </SelectItem>
+          ))
+        ) : (
+          <div className='p-2 text-sm text-muted-foreground text-center'>لا توجد مجموعات</div>
+        )}
       </SelectContent>
     </Select>
   )

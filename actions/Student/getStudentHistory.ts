@@ -15,11 +15,19 @@ export const getStudentHistory = async (studentId: string) => {
         },
         take: 1,
       },
+      // 1. سجل الغياب
       attendances: {
         include: {
           session: { select: { sessionDate: true } },
         },
         orderBy: { session: { sessionDate: 'desc' } },
+      },
+      // 2. سجل الامتحانات (الجديد)
+      examResults: {
+        include: {
+          exam: { select: { title: true, maxScore: true, date: true } },
+        },
+        orderBy: { exam: { date: 'desc' } },
       },
     },
   })
@@ -31,11 +39,9 @@ export const getStudentHistory = async (studentId: string) => {
   const activeEnrollment = student.enrollments[0]
   const groupInfo = activeEnrollment?.group
 
-  // حساب الإحصائيات (شيلنا الإذن)
   const total = student.attendances.length
   const present = student.attendances.filter((a) => a.status === 'PRESENT').length
   const absent = student.attendances.filter((a) => a.status === 'ABSENT').length
-  // const excused شيلناها خلاص
 
   return {
     info: {
@@ -49,14 +55,22 @@ export const getStudentHistory = async (studentId: string) => {
       total,
       present,
       absent,
-      // شيلنا excused من هنا
       attendanceRate: total > 0 ? Math.round((present / total) * 100) : 0,
     },
-    history: student.attendances.map((record) => ({
+    // قائمة الغياب
+    attendanceHistory: student.attendances.map((record) => ({
       id: record.id,
       date: record.session.sessionDate,
       status: record.status,
       note: record.note,
+    })),
+    // قائمة الامتحانات (الجديدة)
+    examsHistory: student.examResults.map((result) => ({
+      id: result.id,
+      title: result.exam.title,
+      date: result.exam.date,
+      score: result.score,
+      maxScore: result.exam.maxScore,
     })),
   }
 }
