@@ -111,7 +111,7 @@ const LoginForm = () => {
                   <div>
                     <Button
                       type='submit'
-                      className='w-full bg-linear-to-r from-primary to-accent hover:opacity-90 transition-all duration-200 shadow-lg shadow-primary/25 hover:scale-[1.02]'
+                      className='w-full  hover:opacity-90 transition-all duration-200 shadow-lg shadow-primary/25 hover:scale-[1.02]'
                     >
                       سجل الدخول
                     </Button>

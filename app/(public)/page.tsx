@@ -51,7 +51,7 @@ export default async function Home() {
             النظام الأذكى للمدرس المصري 🇪🇬
           </Badge>
 
-          <h1 className='text-5xl md:text-8xl font-black tracking-tight text-foreground leading-[1.1]'>
+          <h1 className='text-5xl md:text-8xl font-black tracking-tight text-foreground leading-tight'>
             نظم مجموعاتك وطلابك <br />
             <span className='text-transparent bg-clip-text bg-linear-to-r from-primary via-primary to-accent'>
               بذكاء ومن موبايلك
@@ -68,7 +68,7 @@ export default async function Home() {
           <div className='flex flex-col sm:flex-row gap-4 justify-center pt-8'>
             <Button
               size='lg'
-              className='text-lg h-14 px-8 rounded-full bg-linear-to-r from-primary to-accent hover:opacity-90 transition-opacity shadow-lg shadow-primary/25'
+              className='text-lg h-14 px-8 rounded-full  hover:opacity-90 transition-opacity shadow-lg shadow-primary/25'
               asChild
             >
               <Link href={WHATSAPP_LINK} target='_blank'>
@@ -215,7 +215,7 @@ export default async function Home() {
             <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
               <Button
                 size='lg'
-                className='h-14 px-10 text-xl rounded-full bg-linear-to-r from-primary to-accent hover:opacity-90 transition-opacity shadow-xl'
+                className='h-14 px-10 text-xl rounded-full  hover:opacity-90 transition-opacity shadow-xl'
                 asChild
               >
                 <Link href={WHATSAPP_LINK} target='_blank'>
