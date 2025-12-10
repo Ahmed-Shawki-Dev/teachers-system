@@ -1,5 +1,4 @@
 'use client'
-
 import { getDailyClasses, SessionCardData } from '@/actions/Session/getDailyClasses'
 import { Input } from '@/components/ui/input'
 import { Loader2 } from 'lucide-react'

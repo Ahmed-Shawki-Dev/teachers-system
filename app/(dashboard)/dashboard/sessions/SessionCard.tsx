@@ -77,7 +77,7 @@ export default function SessionCard({
               : 'bg-primary/10 text-primary',
           )}
         >
-          {status === 'COMPLETED' ? 'تمت' : status === 'CANCELED' ? 'ملغية 🔕' : 'جارية'}
+          {status === 'COMPLETED' ? 'تمت' : status === 'CANCELED' ? 'ملغية' : 'جارية'}
         </span>
       </CardHeader>
 
