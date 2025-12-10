@@ -5,14 +5,15 @@ import { formatTo12Hour } from '@/utils/formatTime'
 import {
   ArrowLeft,
   Calendar,
+  Clock,
   CreditCard,
   GraduationCap,
+  LayoutDashboard,
+  LucideIcon, // الأيقونة الجديدة
   PlusCircle,
   Users,
   Wallet,
   Zap,
-  Clock,
-  LucideIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { OverviewChart } from './OverviewChart'
@@ -22,20 +23,28 @@ export default async function DashboardPage() {
 
   return (
     <div className='flex flex-col gap-6 p-6 container mx-auto'>
-      {/* 1. الترويسة */}
-      <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
-        <div>
-          <h2 className='text-3xl font-bold tracking-tight'>لوحة القيادة</h2>
-          <p className='text-muted-foreground mt-1'>نظرة عامة على نشاطك وأرقامك الفعلية.</p>
+      {/* 1. الهيدر الموحد الجديد */}
+      <div className='flex flex-col md:flex-row justify-between items-center gap-4 bg-card p-4 rounded-lg border shadow-sm'>
+        <div className='flex items-center gap-2'>
+          <div className='bg-primary/10 p-2 rounded-full text-primary'>
+            <LayoutDashboard className='w-6 h-6' />
+          </div>
+          <div>
+            <h2 className='text-2xl font-bold tracking-tight text-primary'>لوحة القيادة</h2>
+            <p className='text-sm text-muted-foreground'>نظرة عامة على نشاطك وأرقامك الفعلية</p>
+          </div>
         </div>
-        <div className='text-sm font-medium bg-secondary px-4 py-2 rounded-full border'>
-          {new Date().toLocaleDateString('ar-EG', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          })}{' '}
-          📅
+
+        {/* التاريخ */}
+        <div className='text-sm font-medium bg-secondary px-4 py-2 rounded-full border flex items-center gap-2'>
+          <span>
+            {new Date().toLocaleDateString('ar-EG', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
+          </span>
         </div>
       </div>
 
@@ -65,7 +74,7 @@ export default async function DashboardPage() {
 
       {/* 3. التقسيمة الرئيسية */}
       <div className='grid gap-6 grid-cols-1 lg:grid-cols-7 items-start'>
-        {/* العمود الجانبي (الأهم: الحصص + الإجراءات) - 3 أعمدة */}
+        {/* العمود الجانبي */}
         <div className='col-span-1 lg:col-span-3 flex flex-col gap-6 h-full'>
           {/* جدول اليوم */}
           <Card className='flex-1 shadow-sm border-t-4 border-t-primary'>
@@ -147,7 +156,7 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
-        {/* الرسم البياني (4 أعمدة) */}
+        {/* الرسم البياني */}
         <Card className='col-span-1 lg:col-span-4 shadow-sm h-full'>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
@@ -156,7 +165,7 @@ export default async function DashboardPage() {
             </CardTitle>
             <CardDescription>متابعة التحصيلات الشهرية الفعلية</CardDescription>
           </CardHeader>
-          <CardContent className='pl-0 pr-4'>
+          <CardContent className='pl-0 pr-4 '>
             <OverviewChart data={stats.chartData} />
           </CardContent>
         </Card>

@@ -11,7 +11,7 @@ interface OverviewChartProps {
 
 export function OverviewChart({ data }: OverviewChartProps) {
   return (
-    <div className='h-[350px] w-full'>
+    <div className='md:h-[500px] h-[350px] w-full'>
       <ResponsiveContainer width='100%' height='100%'>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray='3 3' vertical={false} stroke='#E5E7EB' />

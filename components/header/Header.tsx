@@ -42,11 +42,11 @@ const Navbar = ({className}:{className?:string}) => {
   }, [teacher, setTeacher])
 
   return (
-    <nav className='top-0 z-50 w-full border-b-2 '>
+    <nav className='top-0 z-50 w-full border-b '>
       {/* Subtle gradient overlay */}
       <div className={className} />
 
-      <div className='relative flex justify-between items-center p-4 container mx-auto'>
+      <div className='relative flex justify-between  items-center p-4 container mx-auto'>
         {/* Logo */}
         <div
           className='font-bold cursor-pointer select-none hover:scale-105 transition-transform duration-200'

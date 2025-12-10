@@ -1,5 +1,6 @@
 'use client'
 
+import { removeExamAction } from '@/actions/Exam/removeExam'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,9 +14,8 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Loader2, X } from 'lucide-react'
-import { removeExamAction } from '@/actions/Exam/removeExam'
-import { toast } from 'sonner'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 export default function RemoveExam({ examId }: { examId: string }) {
   const [loading, setLoading] = useState(false)
@@ -42,7 +42,7 @@ export default function RemoveExam({ examId }: { examId: string }) {
         <Button
           variant='link'
           size='icon'
-          className='h-6 w-6 text-muted-foreground hover:text-red-600 hover:bg-red-50 absolute top-1 left-1 z-10'
+          className='h-6 w-6 text-muted-foreground hover:text-red-600  absolute top-1 left-1 z-10'
           onClick={(e) => e.stopPropagation()}
         >
           <X className='h-4 w-4' />

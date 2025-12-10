@@ -37,7 +37,7 @@ export default function RootLayout({
         >
           <EdgeStoreProvider>{children}</EdgeStoreProvider>
 
-          <Toaster position='top-center' richColors />
+          <Toaster position='bottom-right' richColors/>
         </ThemeProvider>
       </body>
     </html>

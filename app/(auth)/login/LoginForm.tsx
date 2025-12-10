@@ -36,11 +36,11 @@ const LoginForm = () => {
         credentials: 'include',
       })
       if (!res.ok) throw new Error('خطأ في تسجيل الدخول')
-      toast.success('أحلى تحية لأحلى أستاذ❤️')
+      toast.success('تم تسجيل الدخول بنجاح')
       router.push('/')
       router.refresh()
     } catch (error) {
-      toast.error('الإيميل أو الباسورد غلط')
+      toast.error('البريد الإلكتروني أو كلمة المرور غير صحيحة')
     }
   }
 
@@ -58,9 +58,9 @@ const LoginForm = () => {
             {/* العنوان */}
             <div className='text-center space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200 fill-mode-both'>
               <h2 className='text-3xl font-bold tracking-tight bg-linear-to-br from-primary to-accent bg-clip-text text-transparent'>
-                أهلاً بعودتك
+                مرحباً بك
               </h2>
-              <p className='text-sm text-muted-foreground'>ادخل بياناتك لتسجيل الدخول</p>
+              <p className='text-sm text-muted-foreground'>يرجى إدخال بيانات الحساب للمتابعة</p>
             </div>
 
             {/* الفورم */}
@@ -77,7 +77,7 @@ const LoginForm = () => {
                         <FormControl>
                           <Input
                             className='mt-1 bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200'
-                            placeholder='you@example.com'
+                            placeholder='example@domain.com'
                             type='email'
                             {...field}
                           />
@@ -97,7 +97,7 @@ const LoginForm = () => {
                         <FormControl>
                           <Input
                             className='mt-1 bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200'
-                            placeholder='اكتب الباسورد بتاعك'
+                            placeholder='••••••••'
                             type='password'
                             {...field}
                           />
@@ -113,7 +113,7 @@ const LoginForm = () => {
                       type='submit'
                       className='w-full  hover:opacity-90 transition-all duration-200 shadow-lg shadow-primary/25 hover:scale-[1.02]'
                     >
-                      سجل الدخول
+                      تسجيل الدخول
                     </Button>
                   </div>
                 </form>
