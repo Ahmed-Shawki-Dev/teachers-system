@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { JetBrains_Mono, Cairo } from 'next/font/google'
+import { Geist_Mono, Cairo } from 'next/font/google'
 import { ThemeProvider } from '../components/theme-provider'
 import { Toaster } from '../components/ui/sonner'
 import { EdgeStoreProvider } from '../lib/edgestore'
@@ -11,7 +11,7 @@ const cairoSans = Cairo({
   weight: ['200', '300', '400', '500', '700', '800'],
 })
 
-const jetBrainsMono = JetBrains_Mono({
+const geistMono = Geist_Mono({
   variable: '--font-mono',
   subsets: ['latin'],
 })
@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ar' dir='rtl' suppressHydrationWarning>
-      <body className={`${cairoSans.variable} ${jetBrainsMono.variable} antialiased`}>
+      <body className={`${cairoSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider
           attribute='class'
           defaultTheme='system'

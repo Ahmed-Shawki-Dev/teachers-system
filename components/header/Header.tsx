@@ -42,7 +42,7 @@ const Navbar = ({className}:{className?:string}) => {
   }, [teacher, setTeacher])
 
   return (
-    <nav className='top-0 z-50 w-full  '>
+    <nav className='top-0 z-50 w-full border-b-2 '>
       {/* Subtle gradient overlay */}
       <div className={className} />
 
