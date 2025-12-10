@@ -1,5 +1,13 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { CalendarCheck2, Check, X } from 'lucide-react'
 
 type AttendanceRecord = {
@@ -7,7 +15,7 @@ type AttendanceRecord = {
   date: Date
   status: string
   note: string | null
-  hasPaid: boolean // 👈 الحالة الجديدة
+  hasPaid: boolean
   paymentAmount: number
 }
 
@@ -23,27 +31,27 @@ export default function StudentAttendanceTable({ history }: { history: Attendanc
       <CardContent>
         {history.length > 0 ? (
           <div className='border rounded-lg overflow-hidden'>
-            <table className='w-full text-right text-sm'>
-              <thead className='bg-muted/50 text-muted-foreground'>
-                <tr>
-                  <th className='p-4 font-medium'>التاريخ</th>
-                  <th className='p-4 font-medium text-center'>الحالة</th>
-                  <th className='p-4 font-medium text-center'>الدفع</th> {/* عمود جديد */}
-                  <th className='p-4 font-medium'>ملاحظات</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow className='bg-muted/50 hover:bg-muted/50'>
+                  <TableHead>التاريخ</TableHead>
+                  <TableHead className='text-center'>الحالة</TableHead>
+                  <TableHead className='text-center'>الدفع</TableHead>
+                  <TableHead>ملاحظات</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {history.map((record) => (
-                  <tr key={record.id} className='border-b last:border-0 hover:bg-muted/5'>
-                    <td className='p-4 font-mono'>
+                  <TableRow key={record.id} className='hover:bg-muted/5 transition-colors'>
+                    <TableCell className='font-mono'>
                       {new Date(record.date).toLocaleDateString('ar-EG', {
                         weekday: 'long',
                         month: 'short',
                         day: 'numeric',
                       })}
-                    </td>
+                    </TableCell>
 
-                    <td className='p-4 text-center'>
+                    <TableCell className='text-center'>
                       {record.status === 'PRESENT' ? (
                         <Badge className='bg-green-100 text-green-700 hover:bg-green-200 border-green-200'>
                           حاضر
@@ -53,17 +61,15 @@ export default function StudentAttendanceTable({ history }: { history: Attendanc
                           غائب
                         </Badge>
                       )}
-                    </td>
+                    </TableCell>
 
-                    {/* حالة الدفع */}
-                    <td className='p-4 text-center'>
+                    <TableCell className='text-center'>
                       {record.hasPaid ? (
                         <div className='flex items-center justify-center gap-1 text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded-full border border-green-100 w-fit mx-auto'>
                           <Check className='w-3 h-3' />
                           <span>دفع</span>
                         </div>
                       ) : record.status === 'PRESENT' ? (
-                        // حضر بس مدفعش (عليه فلوس)
                         <div className='flex items-center justify-center gap-1 text-red-500 font-bold text-xs bg-red-50 px-2 py-1 rounded-full border border-red-100 w-fit mx-auto'>
                           <X className='w-3 h-3' />
                           <span>لم يدفع</span>
@@ -71,15 +77,15 @@ export default function StudentAttendanceTable({ history }: { history: Attendanc
                       ) : (
                         <span className='text-muted-foreground'>-</span>
                       )}
-                    </td>
+                    </TableCell>
 
-                    <td className='p-4 text-muted-foreground max-w-[150px] truncate'>
+                    <TableCell className='text-muted-foreground max-w-[150px] truncate'>
                       {record.note || '-'}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         ) : (
           <div className='flex flex-col items-center justify-center py-8 text-muted-foreground bg-muted/10 rounded-lg border border-dashed'>

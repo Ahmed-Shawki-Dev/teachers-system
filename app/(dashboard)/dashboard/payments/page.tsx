@@ -7,6 +7,7 @@ import { AlertCircle, Ban, Wallet } from 'lucide-react'
 import FilterSelect from './FilterSelect'
 import MonthlyTable from './MonthlyTable'
 import UnpaidTable from './UnpaidTable'
+import { redirect } from 'next/navigation' // 👈 استيراد مهم
 
 export default async function PaymentsPage({
   searchParams,
@@ -16,30 +17,35 @@ export default async function PaymentsPage({
   const params = await searchParams
   const groups = await getAllGroupsAction()
 
-  // 1. حساب التواريخ أوتوماتيك (ديناميك)
+  // 1. حساب التواريخ
   const now = new Date()
   const currentMonth = (now.getMonth() + 1).toString()
   const currentYear = now.getFullYear()
 
-  // 2. توليد قائمة السنين (السنة الحالية + السنة اللي فاتت + السنة الجاية)
-  // يعني لو إحنا في 2025، القائمة هتبقى: [2024, 2025, 2026]
-  // الكود ده هيشتغل في أي زمن
+  // 🛡️ SECURITY CHECK: URL Validation
+  // لو السنة مبعوثة وتكون أكبر من السنة الجاية أو أقل من اللي فاتت، اطرده
+  if (params.year) {
+    const yearNum = parseInt(params.year)
+    if (isNaN(yearNum) || yearNum > currentYear + 1 || yearNum < currentYear - 1) {
+      // رجعه لنفس الصفحة بس شيل السنة من اللينك عشان ياخد الديفولت
+      redirect(`/dashboard/payments?groupId=${params.groupId || ''}`)
+    }
+  }
+
+  // 2. القائمة
   const yearOptions = [
     { value: (currentYear - 1).toString(), label: (currentYear - 1).toString() },
     { value: currentYear.toString(), label: currentYear.toString() },
     { value: (currentYear + 1).toString(), label: (currentYear + 1).toString() },
   ]
 
-  // تحديد القيم المختارة (أو الافتراضية)
   const selectedGroupId = params.groupId || (groups.length > 0 ? groups[0].id : '')
   const selectedMonth = params.month || currentMonth
   const selectedYear = params.year || currentYear.toString()
 
-  // الجروب المختار ونوعه
   const selectedGroup = groups.find((g) => g.id === selectedGroupId)
   const isMonthly = selectedGroup?.paymentType === 'MONTHLY'
 
-  // جلب الداتا
   let monthlyData = null
   let unpaidData = null
 
@@ -53,14 +59,14 @@ export default async function PaymentsPage({
 
   return (
     <div className='container mx-auto p-4 space-y-6'>
-      {/* الهيدر والفلاتر */}
+      {/* نفس الـ JSX بتاعك بالظبط بدون تغيير */}
       <div className='flex flex-col md:flex-row justify-between items-center gap-4 bg-card p-4 rounded-lg border shadow-sm'>
         <div className='flex items-center gap-2'>
           <div className='bg-primary/10 p-2 rounded-full text-primary'>
             <Wallet className='w-6 h-6' />
           </div>
           <div>
-            <h1 className='text-2xl font-bold'>الماليات والتحصيل</h1>
+            <h1 className='text-2xl font-bold text-primary'>الماليات والتحصيل</h1>
             <p className='text-sm text-muted-foreground'>
               {selectedGroup ? `عرض ماليات مجموعة: ${selectedGroup.name}` : 'اختر مجموعة'}
             </p>
@@ -68,14 +74,6 @@ export default async function PaymentsPage({
         </div>
 
         <div className='flex gap-2 flex-wrap justify-center'>
-          <FilterSelect
-            paramKey='groupId'
-            options={groups.map((g) => ({ value: g.id, label: g.name }))}
-            defaultValue={selectedGroupId}
-            placeholder='اختر المجموعة'
-          />
-
-          {/* فلاتر الشهر والسنة تظهر فقط للمجموعات الشهرية */}
           {isMonthly && (
             <>
               <FilterSelect
@@ -86,15 +84,18 @@ export default async function PaymentsPage({
                 }))}
                 defaultValue={selectedMonth}
               />
-
-              {/* قائمة السنين الديناميكية */}
               <FilterSelect paramKey='year' options={yearOptions} defaultValue={selectedYear} />
             </>
           )}
+          <FilterSelect
+            paramKey='groupId'
+            options={groups.map((g) => ({ value: g.id, label: g.name }))}
+            defaultValue={selectedGroupId}
+            placeholder='اختر المجموعة'
+          />
         </div>
       </div>
 
-      {/* عرض الجدول */}
       <Card>
         <CardHeader>
           <CardTitle className='flex justify-between items-center'>

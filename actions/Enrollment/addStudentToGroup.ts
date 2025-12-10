@@ -1,4 +1,3 @@
-// actions/Student/addStudentAndEnroll.ts
 'use server'
 
 import { revalidatePath } from 'next/cache'
@@ -13,7 +12,6 @@ export async function addStudentAndEnrollAction(data: {
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('غير مسجل الدخول')
 
-  // تأكد إن الجروب بتاع المدرس
   const group = await Prisma.group.findFirst({
     where: { id: data.groupId, teacherId: teacher.id },
   })

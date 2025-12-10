@@ -19,32 +19,30 @@ type ShowStudentsProps = {
 }
 
 async function ShowStudents({ search, groupId, grade }: ShowStudentsProps) {
-
   const students = await getAllStudentsAction(search, groupId, grade)
 
   return (
     <div className='w-full px-4'>
-      <div className='max-w-5xl w-full mx-auto overflow-x-auto rounded-lg border bg-background p-4'>
-        <Table className='min-w-full text-right'>
+      <div className='max-w-5xl w-full mx-auto rounded-lg border bg-background overflow-hidden'>
+        <Table className='text-right'>
           <TableHeader>
-            <TableRow>
-              <TableHead className='text-right font-black'>الإسم</TableHead>
-              <TableHead className='text-right font-black'>رقم ولي الأمر</TableHead>
-              <TableHead className='text-right font-black'>الصف</TableHead>
-              <TableHead className='text-center font-black'>الإجراءات</TableHead>
+            <TableRow className='bg-muted/50 hover:bg-muted/50'>
+              <TableHead>الإسم</TableHead>
+              <TableHead>رقم ولي الأمر</TableHead>
+              <TableHead>الصف</TableHead>
+              <TableHead className='text-center'>الإجراءات</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {students.map((student) => {
-              // بنطلع اسم الجروب لو موجود
               const enrollment = student.enrollments[0]
               const currentGroup = enrollment?.group
               const currentGroupId = enrollment?.groupId || ''
 
               return (
                 <TableRow key={student.id}>
-                  <TableCell className='font-bold'>
+                  <TableCell className='font-bold text-base'>
                     <Link
                       href={`/dashboard/students/${student.id}`}
                       className='hover:underline hover:text-primary transition-colors cursor-pointer'
@@ -72,15 +70,18 @@ async function ShowStudents({ search, groupId, grade }: ShowStudentsProps) {
                 </TableRow>
               )
             })}
+            {students.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className='h-40'>
+                  <div className='text-center flex flex-col justify-center items-center gap-2 text-muted-foreground'>
+                    <Ban className='opacity-50' />
+                    <span>لا يوجد أي طلاب</span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
-
-        {students.length === 0 && (
-          <div className='text-center py-10 text-muted-foreground flex flex-col justify-center items-center gap-2'>
-            <Ban />
-            <span>لا يوجد أي طلاب</span>
-          </div>
-        )}
       </div>
     </div>
   )

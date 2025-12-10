@@ -6,7 +6,6 @@ import StudentAttendanceTable from './StudentAttendanceTable'
 import StudentExamsTable from './StudentExamsTable'
 import StudentPaymentsTable from './StudentPaymentsTable'
 
-
 export default async function StudentProfilePage({
   params,
 }: {
@@ -87,9 +86,11 @@ export default async function StudentProfilePage({
 
       {/* 3. الجداول (امتحانات - مدفوعات - غياب) */}
       <div className='grid grid-cols-1 gap-8'>
-        <StudentAttendanceTable history={attendanceHistory??[]} />
-        <StudentExamsTable exams={examsHistory??[]} />
-        <StudentPaymentsTable payments={paymentsHistory??[]} /> 
+        <StudentAttendanceTable history={attendanceHistory ?? []} />
+        <StudentExamsTable exams={examsHistory ?? []} />
+        {info.paymentType !== 'PER_SESSION' && (
+          <StudentPaymentsTable payments={paymentsHistory ?? []} />
+        )}{' '}
       </div>
     </div>
   )

@@ -3,7 +3,15 @@
 import { settleStudentDebt } from '@/actions/Payment/settleStudentDebt'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { CheckCheck, Loader2 } from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { CheckCheck, Loader2, TimerOff } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -40,47 +48,51 @@ export default function UnpaidTable({ data, price, groupId }: UnpaidTableProps) 
 
   return (
     <div className='border rounded-md overflow-hidden'>
-      <table className='w-full text-right'>
+      <Table className='text-right'>
         {/* الهيدر: أحمر فاتح في اللايت، وأحمر غامق شفاف في الدارك */}
-        <thead className='bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-100 text-sm'>
-          <tr>
-            <th className='p-4'>الطالب</th>
-            <th className='p-4 text-center'>حصص متأخرة</th>
-            <th className='p-4 text-center'>المديونية ({price}ج/حصة)</th>
-            <th className='p-4'>التواريخ</th>
-            <th className='p-4 text-center'>تسوية</th>
-          </tr>
-        </thead>
-        <tbody>
+        <TableHeader>
+          <TableRow className='bg-red-50 dark:bg-red-950/40 hover:bg-red-50 dark:hover:bg-red-950/40'>
+            <TableHead className='text-red-900 dark:text-red-100'>الطالب</TableHead>
+            <TableHead className='text-center text-red-900 dark:text-red-100'>حصص متأخرة</TableHead>
+            <TableHead className='text-center text-red-900 dark:text-red-100'>
+              المديونية ({price}ج/حصة)
+            </TableHead>
+            <TableHead className='text-red-900 dark:text-red-100'>التواريخ</TableHead>
+            <TableHead className='text-center text-red-900 dark:text-red-100'>تسوية</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {data.map((student) => (
-            <tr
+            <TableRow
               key={student.studentId}
-              className='border-b last:border-0 hover:bg-red-50/50 dark:hover:bg-red-900/10 transition-colors'
+              className='hover:bg-red-50/50 dark:hover:bg-red-900/10 transition-colors'
             >
-              <td className='p-4 font-bold text-red-700 dark:text-red-400'>{student.name}</td>
+              <TableCell className='font-bold text-red-700 dark:text-red-400'>
+                {student.name}
+              </TableCell>
 
-              <td className='p-4 text-center'>
+              <TableCell className='text-center'>
                 <Badge
                   variant='outline'
                   className='bg-background text-red-700 dark:text-red-400 border-red-200 dark:border-red-800 text-base px-3'
                 >
                   {student.unpaidCount}
                 </Badge>
-              </td>
+              </TableCell>
 
-              <td className='p-4 text-center font-black text-lg text-red-600 dark:text-red-500'>
+              <TableCell className='text-center font-black text-lg text-red-600 dark:text-red-500'>
                 {student.totalDebt} ج.م
-              </td>
+              </TableCell>
 
-              <td className='p-4 text-xs text-muted-foreground font-mono'>
+              <TableCell className='text-xs text-muted-foreground font-mono'>
                 {student.unpaidDates
                   .map((d) =>
                     new Date(d).toLocaleDateString('ar-EG', { month: 'numeric', day: 'numeric' }),
                   )
                   .join(' ، ')}
-              </td>
+              </TableCell>
 
-              <td className='p-4 text-center'>
+              <TableCell className='text-center'>
                 <Button
                   size='sm'
                   onClick={() => handleSettle(student.studentId)}
@@ -93,17 +105,21 @@ export default function UnpaidTable({ data, price, groupId }: UnpaidTableProps) 
                     <CheckCheck className='w-4 h-4' />
                   )}
                 </Button>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-
-      {data.length === 0 && (
-        <div className='p-12 text-center text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20'>
-        لا يوجد متأخرات
-        </div>
-      )}
+          {data.length === 0 && (
+            <TableRow>
+              <TableCell
+                colSpan={5}
+                className='p-12   text-xl text-center  '
+              >
+                <span>لا يوجد أي متأخرات</span>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   )
 }

@@ -1,5 +1,13 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Banknote, CalendarClock } from 'lucide-react'
 
 type PaymentRecord = {
@@ -22,32 +30,32 @@ export default function StudentPaymentsTable({ payments }: { payments: PaymentRe
       <CardContent>
         {payments.length > 0 ? (
           <div className='border rounded-lg overflow-hidden'>
-            <table className='w-full text-right text-sm'>
-              <thead className='bg-muted text-muted-foreground'>
-                <tr>
-                  <th className='p-4 font-medium'>التاريخ</th>
-                  <th className='p-4 font-medium'>المبلغ</th>
-                  <th className='p-4 font-medium'>تفاصيل</th>
-                  <th className='p-4 font-medium'>النوع</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow className='bg-muted/50 hover:bg-muted/50'>
+                  <TableHead>التاريخ</TableHead>
+                  <TableHead>المبلغ</TableHead>
+                  <TableHead>تفاصيل</TableHead>
+                  <TableHead>النوع</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {payments.map((p) => (
-                  <tr key={p.id} className='border-b last:border-0 hover:bg-muted/5'>
-                    <td className='p-4 font-mono'>
-                      {new Date(p.date).toLocaleDateString('ar-EG')}
-                    </td>
-                    <td className='p-4 font-bold text-green-700'>{p.amount} ج.م</td>
-                    <td className='p-4 text-muted-foreground'>{p.details}</td>
-                    <td className='p-4'>
+                  <TableRow key={p.id} className='hover:bg-muted/5 transition-colors'>
+                    <TableCell >
+                      {new Date(p.date).toLocaleDateString('en-EG')}
+                    </TableCell>
+                    <TableCell className='font-bold text-green-700'>{p.amount} ج.م</TableCell>
+                    <TableCell className='text-muted-foreground'>{p.details}</TableCell>
+                    <TableCell>
                       <Badge variant='outline' className='text-xs'>
                         {p.type === 'PER_SESSION' ? 'حصة' : 'شهر'}
                       </Badge>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         ) : (
           <div className='flex flex-col items-center justify-center py-8 text-muted-foreground bg-muted/10 rounded-lg border border-dashed'>

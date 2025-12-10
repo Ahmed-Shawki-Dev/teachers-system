@@ -4,6 +4,15 @@ import { toggleMonthlyPayment } from '@/actions/Payment/toggleMonthlyPayment'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { cn } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -72,38 +81,39 @@ export default function MonthlyTable({ data, groupId, monthKey, amount }: Monthl
       </div>
 
       <div className='border rounded-md overflow-hidden bg-background'>
-        <table className='w-full text-right'>
-          <thead className='bg-muted/50 text-sm'>
-            <tr>
-              <th className='p-4'>الطالب</th>
-              <th className='p-4 text-center'>الحالة</th>
-              <th className='p-4 text-center'>الإجراء</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table className='text-right'>
+          <TableHeader>
+            <TableRow className='bg-muted/50 hover:bg-muted/50'>
+              <TableHead>الطالب</TableHead>
+              <TableHead className='text-center'>الحالة</TableHead>
+              <TableHead className='text-center'>الإجراء</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {filteredData.map((student) => (
-              <tr
+              <TableRow
                 key={student.studentId}
-                className={`border-b last:border-0 hover:bg-muted/5 transition-colors ${
-                  !student.isPaid ? 'dark:bg-red-950/10 bg-red-50/30' : ''
-                }`}
+                className={cn(
+                  'hover:bg-muted/5 transition-colors',
+                  !student.isPaid && '',
+                )}
               >
-                <td className='p-4 font-medium'>
+                <TableCell className='font-medium'>
                   <div>{student.name}</div>
                   <div className='text-xs text-muted-foreground md:hidden'>{student.phone}</div>
-                </td>
-                <td className='p-4 text-center'>
+                </TableCell>
+                <TableCell className='text-center'>
                   {student.isPaid ? (
                     <Badge className='bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 border-green-200 dark:border-green-800 shadow-none'>
-                      تم الدفع 
+                      تم الدفع
                     </Badge>
                   ) : (
                     <Badge variant='outline' className='text-muted-foreground border-dashed'>
                       لم يدفع
                     </Badge>
                   )}
-                </td>
-                <td className='p-4 text-center'>
+                </TableCell>
+                <TableCell className='text-center'>
                   <Button
                     size='sm'
                     variant={student.isPaid ? 'ghost' : 'default'}
@@ -119,18 +129,18 @@ export default function MonthlyTable({ data, groupId, monthKey, amount }: Monthl
                       'تحصيل'
                     )}
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
             {filteredData.length === 0 && (
-              <tr>
-                <td colSpan={3} className='p-8 text-center text-muted-foreground'>
+              <TableRow>
+                <TableCell colSpan={3} className='p-8 text-center text-muted-foreground'>
                   لا توجد بيانات
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   )

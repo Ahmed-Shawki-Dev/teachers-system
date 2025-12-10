@@ -13,7 +13,7 @@ export const getAllGroupsAction = async () => {
       schedule: true,
     },
     where: { teacherId: teacher.id },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: 'asc' },
   })
 
   return groups as unknown as IGroupDB[]

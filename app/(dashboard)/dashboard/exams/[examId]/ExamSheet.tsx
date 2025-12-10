@@ -5,6 +5,14 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Loader2, Save, Search } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -29,9 +37,7 @@ export default function ExamSheet({
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
-  // دالة تحديث الدرجة (Local State)
   const handleScoreChange = (studentId: string, value: string) => {
-    // لو مسح الرقم خليه null
     if (value === '') {
       setStudents((prev) =>
         prev.map((s) => (s.studentId === studentId ? { ...s, score: null } : s)),
@@ -41,7 +47,6 @@ export default function ExamSheet({
 
     const numValue = parseFloat(value)
 
-    // منع إدخال درجة أكبر من العظمى (UX Validation)
     if (numValue > examInfo.maxScore) {
       toast.warning(`الدرجة لا يمكن أن تتعدى ${examInfo.maxScore}`)
       return
@@ -54,16 +59,13 @@ export default function ExamSheet({
     )
   }
 
-  // الفلترة
   const filteredStudents = students.filter(
     (s) => s.name.includes(searchTerm) || s.parentPhone.includes(searchTerm),
   )
 
-  // الحفظ
   const handleSave = async () => {
     setLoading(true)
     try {
-      // بنفلتر الطلاب اللي ليهم درجات بس عشان نبعتهم
       const gradesToSave = students
         .filter((s) => s.score !== null)
         .map((s) => ({
@@ -90,7 +92,7 @@ export default function ExamSheet({
 
   return (
     <div className='space-y-6'>
-      <Card >
+      <Card>
         <CardHeader className='flex flex-col md:flex-row gap-4 items-center justify-between'>
           <div>
             <CardTitle className='flex items-center gap-2'>
@@ -124,39 +126,37 @@ export default function ExamSheet({
 
         <CardContent>
           <div className='border rounded-md overflow-hidden'>
-            <table className='w-full text-sm text-right'>
-              <thead className='bg-muted/50'>
-                <tr className='border-b'>
-                  <th className='p-4 font-medium'>اسم الطالب</th>
-                  <th className='p-4 font-medium w-[150px] text-center'>الدرجة</th>
-                  <th className='p-4 font-medium hidden sm:table-cell'>النسبة</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow className='bg-muted/50 hover:bg-muted/50'>
+                  <TableHead>اسم الطالب</TableHead>
+                  <TableHead className='w-[150px] text-center'>الدرجة</TableHead>
+                  <TableHead className='hidden sm:table-cell'>النسبة</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {filteredStudents.length > 0 ? (
                   filteredStudents.map((student) => {
-                    // حساب النسبة المئوية للعرض فقط
                     const percentage =
                       student.score !== null
                         ? Math.round((student.score / examInfo.maxScore) * 100)
                         : 0
 
-                    // تلوين الدرجة (أحمر لو ساقط - أقل من 50%)
                     const isFail = percentage < 50 && student.score !== null
 
                     return (
-                      <tr
+                      <TableRow
                         key={student.studentId}
-                        className='border-b last:border-0 hover:bg-muted/5'
+                        className='hover:bg-muted/5 transition-colors'
                       >
-                        <td className='p-4 font-medium'>
+                        <TableCell className='font-medium'>
                           <div>{student.name}</div>
                           <div className='text-xs text-muted-foreground md:hidden'>
                             {student.parentPhone}
                           </div>
-                        </td>
+                        </TableCell>
 
-                        <td className='p-4'>
+                        <TableCell>
                           <div className='relative flex items-center justify-center'>
                             <Input
                               type='number'
@@ -171,9 +171,9 @@ export default function ExamSheet({
                               / {examInfo.maxScore}
                             </span>
                           </div>
-                        </td>
+                        </TableCell>
 
-                        <td className='p-4 hidden sm:table-cell'>
+                        <TableCell className='hidden sm:table-cell'>
                           {student.score !== null ? (
                             <Badge
                               variant={isFail ? 'destructive' : 'secondary'}
@@ -184,19 +184,19 @@ export default function ExamSheet({
                           ) : (
                             <span className='text-muted-foreground'>-</span>
                           )}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     )
                   })
                 ) : (
-                  <tr>
-                    <td colSpan={3} className='p-8 text-center text-muted-foreground'>
+                  <TableRow>
+                    <TableCell colSpan={3} className='p-8 text-center text-muted-foreground'>
                       لا يوجد طلاب
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>

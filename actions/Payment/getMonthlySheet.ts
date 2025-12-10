@@ -7,10 +7,20 @@ export const getMonthlySheet = async (groupId: string, monthKey: string) => {
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('Unauthorized')
 
+  // 🛡️ SECURITY CHECK
+  // نتأكد إن السنة في الـ monthKey منطقية
+  const [_, yearStr] = monthKey.split('-')
+  const year = parseInt(yearStr)
+  const currentYear = new Date().getFullYear()
+
+  if (isNaN(year) || year > currentYear + 1 || year < currentYear - 1) {
+    // نرجع شيت فاضي أو نضرب إيرور، الأفضل هنا نضرب إيرور عشان الـ UI يفهم
+    throw new Error('Invalid Date Range')
+  }
+
   const group = await Prisma.group.findUnique({
     where: { id: groupId },
     include: {
-      // بنجيب الطلاب بتوع الجروب
       enrollments: {
         include: { student: true },
         orderBy: { student: { name: 'asc' } },
@@ -20,15 +30,13 @@ export const getMonthlySheet = async (groupId: string, monthKey: string) => {
 
   if (!group || group.teacherId !== teacher.id) throw new Error('غير مصرح')
 
-  // بنجيب اللي دفعوا الشهر ده
   const payments = await Prisma.payment.findMany({
     where: {
       groupId,
-      monthKey, // "10-2023"
+      monthKey,
     },
   })
 
-  // بنركب الداتا على بعض
   const sheet = group.enrollments.map((e) => {
     const isPaid = payments.some((p) => p.studentId === e.studentId)
     return {

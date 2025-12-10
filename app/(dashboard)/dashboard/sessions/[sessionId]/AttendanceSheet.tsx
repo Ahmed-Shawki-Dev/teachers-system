@@ -3,11 +3,19 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { cn } from '@/lib/utils'
-import { DollarSign, Loader2, Save, Search } from 'lucide-react' // ضفنا أيقونة الدولار
+import { DollarSign, Loader2, Save, Search } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { upsertAttendanceAction } from '../upsertAttendance' // تأكد إن ده اسم الأكشن عندك
+import { upsertAttendanceAction } from '../upsertAttendance'
 
 type StudentRecord = {
   studentId: string
@@ -15,13 +23,13 @@ type StudentRecord = {
   parentPhone: string
   status: 'PRESENT' | 'ABSENT' | 'EXCUSED' | null
   note: string
-  hasPaid: boolean // 👈 ضفنا دي
+  hasPaid: boolean
 }
 
 export default function AttendanceSheet({
   sessionId,
   initialData,
-  sessionInfo, // 👈 بيانات الجروب (اسم، نوع دفع، سعر)
+  sessionInfo,
 }: {
   sessionId: string
   initialData: StudentRecord[]
@@ -36,16 +44,16 @@ export default function AttendanceSheet({
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
-  // 1. دالة تغيير الحضور (الذكية)
+  // 1. دالة التغيير (تحديث الحالة + الفلوس أوتوماتيك)
   const toggleAttendance = (studentId: string) => {
     setStudents((prev) =>
       prev.map((s) => {
         if (s.studentId === studentId) {
+          // قلب الحالة (لو حاضر يبقى غايب والعكس)
           const newStatus = s.status === 'PRESENT' ? 'ABSENT' : 'PRESENT'
 
-          // اللوجيك الذكي:
           // لو بقى "حاضر" والمجموعة "بالحصة" -> يبقى "دفع" أوتوماتيك
-          // لو بقى "غائب" -> يبقى "مدفعش" أكيد
+          // لو بقى "غائب" -> يبقى "مدفعش"
           const shouldPay = sessionInfo.paymentType === 'PER_SESSION'
           const newHasPaid = shouldPay && newStatus === 'PRESENT' ? true : false
 
@@ -56,7 +64,7 @@ export default function AttendanceSheet({
     )
   }
 
-  // 2. دالة تغيير الدفع (للحالات الاستثنائية)
+  // 2. دالة تغيير الدفع (يدوي للحالات الخاصة)
   const togglePayment = (studentId: string) => {
     setStudents((prev) =>
       prev.map((s) => (s.studentId === studentId ? { ...s, hasPaid: !s.hasPaid } : s)),
@@ -72,15 +80,14 @@ export default function AttendanceSheet({
     try {
       const formattedData = students.map((s) => ({
         studentId: s.studentId,
-        // 👇 التعديل هنا: بنجبره يقبلها كـ "PRESENT" أو "ABSENT" مش مجرد نص
         status: (s.status === 'PRESENT' ? 'PRESENT' : 'ABSENT') as 'PRESENT' | 'ABSENT',
-        note: s.note || '', // عشان ميبقاش undefined
+        note: s.note || '',
         hasPaid: s.hasPaid,
       }))
 
       const res = await upsertAttendanceAction(
         sessionId,
-        formattedData, // دلوقتي النوع متطابق
+        formattedData,
         sessionInfo.price,
         sessionInfo.paymentType === 'PER_SESSION',
       )
@@ -133,96 +140,95 @@ export default function AttendanceSheet({
         </CardHeader>
 
         <CardContent>
-          <div className='border rounded-md overflow-hidden'>
-            <table className='w-full text-sm text-right'>
-              <thead className='bg-muted/50'>
-                <tr className='border-b'>
-                  <th className='p-4 font-medium'>اسم الطالب</th>
-                  <th className='p-4 font-medium text-center w-[120px]'>التحضير</th>
-
-                  {/* عمود الدفع يظهر فقط لو المجموعة بالحصة */}
+          <div className='rounded-md border'>
+            <Table>
+              <TableHeader className='bg-muted/50 h-14'>
+                <TableRow>
+                  <TableHead className='text-right font-bold text-primary'>اسم الطالب</TableHead>
+                  <TableHead className='text-center font-bold text-primary w-[100px]'>
+                    حضور
+                  </TableHead>
                   {isPerSession && (
-                    <th className='p-4 font-medium text-center w-[120px]'>
-                      الدفع{' '}
-                      <span className='text-xs text-muted-foreground'>({sessionInfo.price}ج)</span>
-                    </th>
+                    <TableHead className='text-center font-bold text-primary w-[100px]'>
+                      دفع ({sessionInfo.price}ج)
+                    </TableHead>
                   )}
-                </tr>
-              </thead>
-              <tbody>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {filteredStudents.length > 0 ? (
                   filteredStudents.map((student) => {
                     const isPresent = student.status === 'PRESENT'
 
                     return (
-                      <tr
+                      <TableRow
                         key={student.studentId}
                         className={cn(
-                          'border-b last:border-0 transition-colors',
-                          isPresent ? 'bg-green-50/40' : 'hover:bg-muted/5',
+                          'cursor-pointer transition-colors',
+                          isPresent
+                            ? 'bg-green-50/50 hover:bg-green-100/50 dark:bg-green-900/10 dark:hover:bg-green-900/20'
+                            : 'hover:bg-muted/50',
                         )}
+                        // الضغط على الصف كله بيغير الحضور
+                        onClick={() => toggleAttendance(student.studentId)}
                       >
                         {/* اسم الطالب */}
-                        <td
-                          className='p-4 font-medium cursor-pointer'
-                          onClick={() => toggleAttendance(student.studentId)}
-                        >
+                        <TableCell className='font-medium py-3'>
                           <div className='text-base'>{student.name}</div>
                           <div className='text-xs text-muted-foreground md:hidden'>
                             {student.parentPhone}
                           </div>
-                        </td>
+                        </TableCell>
 
-                        {/* زرار الحضور */}
-                        <td className='p-4 text-center'>
-                          <div
-                            onClick={() => toggleAttendance(student.studentId)}
-                            className={cn(
-                              'inline-flex cursor-pointer items-center justify-center rounded-full px-3 py-1 text-xs font-bold border select-none transition-all',
-                              isPresent
-                                ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200'
-                                : 'bg-red-100 text-red-700 border-red-200 hover:bg-red-200',
-                            )}
-                          >
-                            {isPresent ? 'حاضر' : 'غائب'}
+                        {/* Checkbox الحضور */}
+                        <TableCell className='text-center'>
+                          <div className='flex items-center justify-center'>
+                            <input
+                              type='checkbox'
+                              checked={isPresent}
+                              onChange={() => {}} 
+                              className='w-5 h-5 accent-primary cursor-pointer rounded border-gray-300 focus:ring-primary'
+                            />
                           </div>
-                        </td>
+                        </TableCell>
 
                         {/* زرار الدفع (للحصة فقط) */}
                         {isPerSession && (
-                          <td className='p-4 text-center'>
-                            <button
+                          <TableCell className='text-center'>
+                            <Button
+                              variant='ghost'
+                              size='icon'
                               onClick={(e) => {
                                 e.stopPropagation()
                                 togglePayment(student.studentId)
                               }}
                               className={cn(
-                                'w-9 h-9 rounded-full flex items-center justify-center border transition-all mx-auto',
+                                'rounded-full h-8 w-8 transition-all hover:scale-110',
                                 student.hasPaid
-                                  ? 'bg-green-600 text-white border-green-600 shadow-sm hover:bg-green-700'
-                                  : 'bg-transparent text-muted-foreground border-dashed hover:border-red-400 hover:text-red-500',
+                                  ? 'bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 hover:text-white'
+                                  : 'bg-transparent text-muted-foreground hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30',
                               )}
                               title={student.hasPaid ? 'تم الدفع' : 'لم يدفع'}
                             >
                               <DollarSign className='w-4 h-4' />
-                            </button>
-                          </td>
+                            </Button>
+                          </TableCell>
                         )}
-                      </tr>
+                      </TableRow>
                     )
                   })
                 ) : (
-                  <tr>
-                    <td
+                  <TableRow>
+                    <TableCell
                       colSpan={isPerSession ? 3 : 2}
-                      className='p-8 text-center text-muted-foreground'
+                      className='h-24 text-center text-muted-foreground'
                     >
                       لا يوجد طالب بهذا الاسم
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>

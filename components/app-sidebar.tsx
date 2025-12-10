@@ -73,7 +73,7 @@ export function AppSidebar() {
       <SidebarFooter className='p-4'>
         <div className='bg-muted/50 rounded-lg p-4 border border-dashed text-center space-y-3'>
           <div className='relative w-12 h-12 mx-auto rounded-full overflow-hidden border-2 border-primary/20'>
-            <Image src='/ahmedshawki.webp' alt='Ahmed Shawki' fill className='object-cover' />
+            <Image src='/ahmedshawki.webp' alt='Ahmed Shawki'  className='object-cover' width={50} height={50} />
           </div>
           <div>
             <h4 className='font-bold text-sm'>واجهت مشكلة؟</h4>

@@ -52,7 +52,13 @@ const Navbar = ({className}:{className?:string}) => {
           className='font-bold cursor-pointer select-none hover:scale-105 transition-transform duration-200'
           onClick={() => router.push('/')}
         >
-          <Image src={'/logo.png'} alt='logo' width={80} height={80} />
+<Image
+  src="/logo.png"
+  alt="logo"
+  width={90}
+  height={90}
+  style={{ width: '90px', height: 'auto' }}
+/>
         </div>
 
         {/* Actions */}
