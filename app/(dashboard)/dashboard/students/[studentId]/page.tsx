@@ -26,7 +26,7 @@ export default async function StudentProfilePage({
             <div>
               <h1 className='text-2xl font-bold'>{info.name}</h1>
               <p className='text-muted-foreground text-sm mt-1'>
-                كود الطالب: <span className='font-mono'>{info.id.slice(-6)}</span>
+                كود الطالب: <span >{info.id.slice(-6)}</span>
               </p>
             </div>
             <div className='flex gap-2'>
@@ -50,7 +50,7 @@ export default async function StudentProfilePage({
             </div>
             <div>
               <p className='text-xs text-muted-foreground'>رقم ولي الأمر</p>
-              <p className='font-mono font-semibold text-lg dir-ltr text-right'>{info.phone}</p>
+              <p className=' font-semibold text-lg dir-ltr text-right'>{info.phone}</p>
             </div>
           </div>
           <div className='flex items-center gap-3 p-3 bg-muted/20 rounded-lg border'>

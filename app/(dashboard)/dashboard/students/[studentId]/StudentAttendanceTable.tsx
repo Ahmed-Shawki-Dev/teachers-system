@@ -43,7 +43,7 @@ export default function StudentAttendanceTable({ history }: { history: Attendanc
               <TableBody>
                 {history.map((record) => (
                   <TableRow key={record.id} className='hover:bg-muted/5 transition-colors'>
-                    <TableCell className='font-mono'>
+                    <TableCell >
                       {new Date(record.date).toLocaleDateString('ar-EG', {
                         weekday: 'long',
                         month: 'short',

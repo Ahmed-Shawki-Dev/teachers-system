@@ -6,11 +6,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Ban } from 'lucide-react'
+import { Ban, Eye } from 'lucide-react'
+import Link from 'next/link'
 import { getAllStudentsAction } from '../../../../actions/Student/getStudents'
+import { Button } from '../../../../components/ui/button'
 import RemoveStudent from './RemoveStudent'
 import UpdateStudentModal from './UpdateStudentModal'
-import Link from 'next/link'
 
 type ShowStudentsProps = {
   search?: string
@@ -56,6 +57,14 @@ async function ShowStudents({ search, groupId, grade }: ShowStudentsProps) {
                   </TableCell>
                   <TableCell>
                     <div className='flex gap-2 justify-center'>
+                      <Link
+                        href={`/dashboard/students/${student.id}`}
+                        className='text-primary hover:underline underline-offset-4'
+                      >
+                        <Button size='icon'>
+                          <Eye className='w-4 h-4' />
+                        </Button>
+                      </Link>
                       <UpdateStudentModal
                         studentId={student.id}
                         initialData={{

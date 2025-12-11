@@ -1,5 +1,4 @@
 import { getAllGroupsAction } from '@/actions/Group/getGroups'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -9,7 +8,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatTo12Hour } from '@/utils/formatTime'
-import { Ban, Clock, Coins, Eye } from 'lucide-react'
+import { Ban, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '../../../../components/ui/button'
 import RemoveGroup from './RemoveGroup'
@@ -30,14 +29,14 @@ export default async function ShowGroups() {
 
   return (
     <div className='w-full px-4'>
-      <div className='max-w-6xl w-full mx-auto rounded-lg border bg-card shadow-sm overflow-hidden'>
+      <div className='max-w-6xl w-full mx-auto rounded-lg border  shadow-sm overflow-hidden'>
         <Table className='text-right'>
           <TableHeader>
             <TableRow className='bg-muted/50 hover:bg-muted/50'>
               <TableHead className='w-[200px]'>المجموعة</TableHead>
               <TableHead>نظام الدفع</TableHead>
               <TableHead>المواعيد</TableHead>
-              <TableHead className='text-center w-[150px]'>تعديل / حذف</TableHead>
+              <TableHead className='text-center w-[150px]'>الإجراءات</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -60,12 +59,12 @@ export default async function ShowGroups() {
 
                     {/* السعر ونظام الدفع */}
                     <TableCell>
-                      <div className='flex flex-col gap-1'>
-                        <Badge variant='outline' className='w-fit gap-1'>
-                          <Coins className='w-3 h-3 text-yellow-600' />
-                          {group.price} ج.م
-                        </Badge>
-                        <span className='text-xs text-muted-foreground font-medium'>
+                      <div className='flex flex-col gap-1 items-start'>
+                        <div className='flex items-center gap-1 text-sm font-semibold'>
+                          <span>{group.price} ج.م</span>
+                        </div>
+
+                        <span className='text-xs text-muted-foreground'>
                           {group.paymentType === 'PER_SESSION' ? 'نظام الحصة' : 'نظام شهري'}
                         </span>
                       </div>
@@ -73,23 +72,20 @@ export default async function ShowGroups() {
 
                     {/* المواعيد */}
                     <TableCell>
-                      <div className='flex flex-wrap gap-2'>
+                      <div className='flex flex-col  flex-wrap gap-1.5'>
                         {schedules.length > 0 ? (
                           schedules.map((item, idx) => (
                             <div
                               key={idx}
-                              className='flex items-center gap-1.5 bg-secondary/40 px-2 py-1 rounded border text-xs sm:text-sm'
+                              className='px-2 py-0.5 rounded-full border w-fit bg-secondary/30 text-xs flex items-center gap-1'
                             >
-                              <span className='font-semibold text-foreground'>
+                              <span className='font-medium '>
                                 {dayTranslation[item.dayOfWeek] || item.dayOfWeek}
                               </span>
-                              <span className='text-muted-foreground'>|</span>
-                              <div className='flex items-center gap-1 dir-ltr'>
-                                <Clock className='w-3 h-3 text-muted-foreground' />
-                                <span className='font-mono'>{formatTo12Hour(item.startTime)}</span>
-                                <span>-</span>
-                                <span className='font-mono'>{formatTo12Hour(item.endTime)}</span>
-                              </div>
+                              <span className='opacity-40'>•</span>
+                              <span className='flex items-center gap-1 dir-ltr'>
+                                {formatTo12Hour(item.startTime)} - {formatTo12Hour(item.endTime)}
+                              </span>
                             </div>
                           ))
                         ) : (
@@ -107,7 +103,7 @@ export default async function ShowGroups() {
                           href={`/dashboard/groups/${group.id}`}
                           className='text-primary hover:underline underline-offset-4'
                         >
-                          <Button size='icon' variant='ghost'>
+                          <Button size='icon'>
                             <Eye className='w-4 h-4' />
                           </Button>
                         </Link>

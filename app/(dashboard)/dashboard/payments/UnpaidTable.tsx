@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { CheckCheck, Loader2, TimerOff } from 'lucide-react'
+import { CheckCheck, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -84,7 +84,7 @@ export default function UnpaidTable({ data, price, groupId }: UnpaidTableProps) 
                 {student.totalDebt} ج.م
               </TableCell>
 
-              <TableCell className='text-xs text-muted-foreground font-mono'>
+              <TableCell className='text-xs text-muted-foreground '>
                 {student.unpaidDates
                   .map((d) =>
                     new Date(d).toLocaleDateString('ar-EG', { month: 'numeric', day: 'numeric' }),
@@ -110,10 +110,7 @@ export default function UnpaidTable({ data, price, groupId }: UnpaidTableProps) 
           ))}
           {data.length === 0 && (
             <TableRow>
-              <TableCell
-                colSpan={5}
-                className='p-12   text-xl text-center  '
-              >
+              <TableCell colSpan={5} className='p-12   text-xl text-center  '>
                 <span>لا يوجد أي متأخرات</span>
               </TableCell>
             </TableRow>

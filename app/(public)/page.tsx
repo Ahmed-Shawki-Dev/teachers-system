@@ -21,58 +21,61 @@ export default async function Home() {
   const stats = await getLandingStats()
 
   const WHATSAPP_NUMBER = '201098786468'
-  const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=السلام عليكم، أنا مدرس ومهتم بنظام الإدارة وعايز أعرف التفاصيل`
+  const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=السلام عليكم، أنا مدرس ومهتم بنظام الدفتر وعايز أعرف التفاصيل`
 
   return (
-    <div className='flex flex-col min-h-screen bg-background overflow-hidden'>
+    <div className='font-serif relative flex flex-col min-h-screen bg-background overflow-hidden selection:bg-primary/10'>
+      {/* الخلفية الهادئة */}
+      <div className='absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-size-[24px_24px] z-0 pointer-events-none' />
+
       {/* --- HERO SECTION --- */}
-      <section className='relative flex flex-col items-center justify-center text-center px-4 py-24 md:py-40 min-h-[85vh]'>
-        {/* Animated Gradient Background */}
-        <div className='absolute inset-0 bg-linear-to-b from-accent/20 via-background to-background'>
-          <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-primary/30 via-transparent to-transparent animate-pulse' />
-          <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,var(--tw-gradient-stops))] from-accent/30 via-transparent to-transparent animate-pulse [animation-delay:1s]' />
-        </div>
+      {/* قللنا الـ py في الموبايل لـ 16 عشان نلم الدنيا */}
+      <section className='relative flex flex-col items-center justify-center text-center px-4 py-16 md:py-32 min-h-[90vh]'>
+        {/* Glow Effects */}
+        <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-primary/5 blur-[60px] md:blur-[90px] rounded-full pointer-events-none' />
 
-        {/* Mesh Pattern Overlay */}
-        <div
-          className='absolute inset-0 opacity-20'
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--primary)) 1px, transparent 0)`,
-            backgroundSize: '40px 40px',
-          }}
-        />
+        <div className='max-w-5xl space-y-6 z-10 relative'>
+          {/* Badge */}
+          <div className='animate-in fade-in slide-in-from-bottom-2 duration-500'>
+            <Badge
+              variant='secondary'
+              className='px-4 py-1.5 text-xs md:text-sm font-medium border border-primary/20 bg-background/50 backdrop-blur-md rounded-full shadow-sm'
+            >
+              <Sparkles className='w-3.5 h-3.5 mr-2 text-amber-500 inline-block' />
+              <span className='bg-linear-to-r from-primary to-primary/50 bg-clip-text text-transparent font-bold'>
+                النظام الأذكى للمدرس المصري 🇪🇬
+              </span>
+            </Badge>
+          </div>
 
-        <div className='max-w-5xl space-y-8 z-10 relative'>
-          <Badge
-            variant='outline'
-            className='px-4 py-1.5 text-sm font-medium text-primary border-primary/20 bg-primary/10 backdrop-blur-sm rounded-full shadow-sm'
-          >
-            <Sparkles className='w-3.5 h-3.5 mr-2 inline-block' />
-            النظام الأذكى للمدرس المصري 🇪🇬
-          </Badge>
-
-          <h1 className='text-5xl md:text-8xl font-black tracking-tight text-foreground leading-tight'>
+          {/* Title: صغرنا الخط في الموبايل لـ 4xl عشان ميتكسرش */}
+          <h1 className='text-4xl md:text-7xl lg:text-8xl font-bold tracking-tight text-foreground leading-[1.2] md:leading-[1.15] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100'>
             نظم مجموعاتك وطلابك <br />
-            <span className='text-transparent bg-clip-text bg-linear-to-r from-primary via-primary to-accent'>
-              بذكاء ومن موبايلك
+            {/* decoration والخط اتشالوا من الموبايل (hidden block -> inline-block) */}
+            <span className='relative block md:inline-block mt-1 md:mt-2'>
+              {/* الخط اللي تحت الكلام بيظهر بس في الشاشات الكبيرة */}
+              <span className='hidden md:block absolute inset-x-0 bottom-2 md:bottom-4 h-4 md:h-6 bg-primary/10 -rotate-1 rounded-full -z-10' />
+              <span className='relative text-primary'>بذكاء ومن موبايلك</span>
             </span>
           </h1>
 
-          <p className='text-lg md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed'>
+          {/* Subtitle: خط أصغر وأوضح */}
+          <p className='text-base md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 px-2'>
             نظم حصصك وطلابك ومالياتك من الموبايل في ثواني.
-            <br className='hidden md:block' />
+            <br className='hidden sm:block' />
             وداعاً للورقة والقلم..{' '}
             <span className='text-foreground font-medium'>ركز في الشرح وسيب الإدارة علينا.</span>
           </p>
 
-          <div className='flex flex-col sm:flex-row gap-4 justify-center pt-8'>
+          {/* Buttons: زراير كاملة العرض في الموبايل */}
+          <div className='flex flex-col sm:flex-row gap-3 md:gap-5 justify-center pt-6 md:pt-8 w-full max-w-sm sm:max-w-none mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300'>
             <Button
               size='lg'
-              className='text-lg h-14 px-8 rounded-full  hover:opacity-90 transition-opacity shadow-lg shadow-primary/25'
+              className='w-full sm:w-auto h-12 md:h-14 px-8 md:px-10 text-base md:text-lg rounded-full shadow-xl shadow-primary/20 hover:scale-105 transition-all duration-300'
               asChild
             >
               <Link href={WHATSAPP_LINK} target='_blank'>
-                <PhoneCall className='w-5 h-5 ml-2' />
+                <PhoneCall className='w-4 h-4 md:w-5 md:h-5 ml-2' />
                 اطلب نسختك الآن
               </Link>
             </Button>
@@ -80,11 +83,11 @@ export default async function Home() {
             <Button
               size='lg'
               variant='outline'
-              className='text-lg h-14 px-8 rounded-full border-2 border-primary/20 backdrop-blur-sm bg-background/50 hover:bg-background/80 transition-all'
+              className='w-full sm:w-auto h-12 md:h-14 px-8 md:px-10 text-base md:text-lg rounded-full border-primary/20 hover:bg-muted/50 transition-all'
               asChild
             >
               <Link href='/login'>
-                <LogIn className='w-5 h-5 ml-2' />
+                <LogIn className='w-4 h-4 md:w-5 md:h-5 ml-2' />
                 دخول المشتركين
               </Link>
             </Button>
@@ -93,51 +96,38 @@ export default async function Home() {
       </section>
 
       {/* --- STATS SECTION --- */}
-      <section className='relative py-16'>
-        <div className='absolute inset-0 bg-background' />
-        <div className='container mx-auto px-4 relative z-10'>
-          <div className='grid grid-cols-2 lg:grid-cols-4 gap-8'>
-            <StatItem
-              value={stats.teachers || 0}
-              label='مدرس بيستخدم النظام'
-              icon={Users}
-              color='text-blue-600'
-            />
+      <section className='relative py-12 md:py-16 border-y border-border/40 bg-muted/30 backdrop-blur-sm'>
+        <div className='container mx-auto px-4'>
+          {/* gap-y-8 في الموبايل عشان نفصل الأرقام عن بعض */}
+          <div className='grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 md:gap-10'>
+            <StatItem value={stats.teachers || 0} label='مدرس' icon={Users} color='text-primary' />
             <StatItem
               value={stats.students || 0}
-              label='طالب يتم متابعته'
+              label='طالب'
               icon={TrendingUp}
               color='text-green-600'
             />
             <StatItem
               value={stats.groups || 0}
-              label='مجموعة دراسية'
+              label='مجموعة'
               icon={PieChart}
-              color='text-orange-600'
+              color='text-orange-500'
             />
-            <StatItem
-              value={100}
-              label='دعم فني مباشر'
-              suffix='%'
-              icon={Zap}
-              color='text-yellow-600'
-            />
+            <StatItem value={100} label='دعم فني' suffix='%' icon={Zap} color='text-yellow-500' />
           </div>
         </div>
       </section>
 
       {/* --- FEATURES SECTION --- */}
-      <section id='features' className='container mx-auto px-4 py-24 relative'>
-        <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent opacity-50' />
-
-        <div className='text-center mb-16 space-y-4 relative z-10'>
-          <h2 className='text-3xl md:text-5xl font-black'>ليه تشترك معانا؟ 🤔</h2>
-          <p className='text-xl text-muted-foreground max-w-2xl mx-auto'>
-            أدوات مصممة خصيصاً لاحتياجات المدرس، مش مجرد برنامج محاسبة.
+      <section id='features' className='container mx-auto px-4 py-16 md:py-24'>
+        <div className='text-center mb-10 md:mb-16 space-y-3'>
+          <h2 className='text-2xl md:text-5xl font-bold'>ليه تشترك معانا؟ 🤔</h2>
+          <p className='text-base md:text-xl text-muted-foreground'>
+            أدوات مصممة خصيصاً لاحتياجات المدرس.
           </p>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8'>
           {features.map((feature, index) => (
             <FeatureCard key={index} {...feature} delay={index * 0.1} />
           ))}
@@ -145,17 +135,19 @@ export default async function Home() {
       </section>
 
       {/* --- HOW IT WORKS --- */}
-      <section className='relative py-24'>
-
+      <section className='relative py-16 md:py-24 '>
         <div className='container mx-auto px-4 relative z-10'>
-          <div className='text-center mb-16'>
-            <Badge variant='secondary' className='mb-4 backdrop-blur-sm bg-primary/10'>
+          <div className='text-center mb-10 md:mb-16'>
+            <Badge
+              variant='secondary'
+              className='mb-3 md:mb-4 backdrop-blur-sm bg-background/50 border border-primary/20'
+            >
               ابدأ في 3 خطوات
             </Badge>
-            <h2 className='text-3xl md:text-5xl font-black mb-4'>رحلة الانضمام ⚡</h2>
+            <h2 className='text-2xl md:text-5xl font-bold mb-4'>رحلة الانضمام ⚡</h2>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto'>
             {[
               {
                 emoji: '📞',
@@ -177,15 +169,18 @@ export default async function Home() {
               },
             ].map((step, i) => (
               <div key={i} className='relative group'>
+                {/* الخلفية بتظهر بس في الكمبيوتر عشان متبقاش تقيلة ع الموبايل */}
                 <div
-                  className={`absolute inset-0 rounded-2xl bg-linear-to-br ${step.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl`}
+                  className={`hidden md:block absolute inset-0 rounded-3xl bg-linear-to-br ${step.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl`}
                 />
-                <div className='relative p-8 bg-card/80 backdrop-blur-sm rounded-2xl border border-primary/10 h-full flex flex-col items-center text-center hover:border-primary/30 transition-all'>
-                  <div className='w-16 h-16 mb-6 rounded-2xl bg-linear-to-br from-primary/20 to-accent/20 flex items-center justify-center text-3xl shadow-lg'>
+                <div className='relative p-6 md:p-8 bg-card/50 backdrop-blur-sm rounded-3xl border border-primary/10 h-full flex flex-col items-center text-center hover:border-primary/30 transition-all'>
+                  <div className='w-14 h-14 md:w-16 md:h-16 mb-4 md:mb-6 rounded-2xl bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center text-2xl md:text-3xl shadow-sm'>
                     {step.emoji}
                   </div>
-                  <h3 className='text-xl font-bold mb-3'>{step.title}</h3>
-                  <p className='text-muted-foreground'>{step.desc}</p>
+                  <h3 className='text-lg md:text-xl font-bold mb-2 md:mb-3'>{step.title}</h3>
+                  <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
+                    {step.desc}
+                  </p>
                 </div>
               </div>
             ))}
@@ -193,43 +188,39 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* --- FINAL CTA --- */}
-      <section className='py-24 px-4 text-center relative overflow-hidden'>
-        {/* Animated Gradient Background */}
-        <div className='absolute inset-0 bg-linear-to-t from-accent/50 via-background to-background'/>
-        <div
-          className='absolute inset-0 opacity-10'
-          style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, hsl(var(--primary)) 1px, transparent 0)`,
-            backgroundSize: '40px 40px',
-          }}
-        />
+      {/* --- CTA FINAL --- */}
+      <section className='py-16 md:py-24 px-4'>
+        <div className='container mx-auto max-w-5xl'>
+          <div className='bg-card border border-primary/10 rounded-3xl md:rounded-[2.5rem] p-8 md:p-16 text-center relative overflow-hidden shadow-xl md:shadow-2xl shadow-primary/5'>
+            <div className='absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-primary/5 blur-[60px] md:blur-[100px] rounded-full pointer-events-none' />
+            <div className='absolute bottom-0 left-0 w-64 md:w-96 h-64 md:h-96 bg-accent/5 blur-[60px] md:blur-[100px] rounded-full pointer-events-none' />
 
-        <div className='container mx-auto max-w-3xl relative z-10'>
-          <div className='backdrop-blur-xl bg-background/80 p-12 rounded-3xl border border-primary/20 shadow-2xl shadow-primary/10'>
-            <h2 className='text-4xl md:text-6xl font-black leading-tight mb-6'>
+            <h2 className='text-2xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight'>
               جاهز تنظم وقتك ومجهودك؟
             </h2>
-            <p className='text-xl text-muted-foreground mb-8'>تواصل معنا الآن والحق آخر العروض</p>
+            <p className='text-lg md:text-xl text-muted-foreground mb-8 md:mb-10 max-w-2xl mx-auto'>
+              تواصل معنا الآن والحق آخر العروض
+            </p>
 
-            <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
+            <div className='flex flex-col sm:flex-row gap-4 md:gap-5 justify-center items-center'>
               <Button
                 size='lg'
-                className='h-14 px-10 text-xl rounded-full  hover:opacity-90 transition-opacity shadow-xl'
+                className='w-full sm:w-auto h-12 md:h-14 px-8 md:px-10 text-base md:text-lg rounded-full shadow-lg'
                 asChild
               >
                 <Link href={WHATSAPP_LINK} target='_blank'>
-                  <Phone className='w-5 h-5 ml-2' />
+                  <Phone className='w-4 h-4 md:w-5 md:h-5 ml-2' />
                   تواصل واتساب
                 </Link>
               </Button>
 
-              <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                <CheckCircle2 className='w-4 h-4 text-green-600' />
-                <span>دعم فني متواصل</span>
-                <span className='mx-2'>•</span>
-                <CheckCircle2 className='w-4 h-4 text-green-600' />
-                <span>تحديثات مجانية</span>
+              <div className='flex flex-wrap justify-center gap-4 md:gap-6 text-sm md:text-base text-muted-foreground font-medium'>
+                <span className='flex items-center gap-2'>
+                  <CheckCircle2 className='w-4 h-4 md:w-5 md:h-5 text-green-500' /> دعم فني
+                </span>
+                <span className='flex items-center gap-2'>
+                  <CheckCircle2 className='w-4 h-4 md:w-5 md:h-5 text-green-500' /> تحديثات
+                </span>
               </div>
             </div>
           </div>

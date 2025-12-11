@@ -42,11 +42,11 @@ const Navbar = ({className}:{className?:string}) => {
   }, [teacher, setTeacher])
 
   return (
-    <nav className='top-0 z-50 w-full border-b '>
+    <nav className='top-0 z-50 w-full bg-transparent  '>
       {/* Subtle gradient overlay */}
       <div className={className} />
 
-      <div className='relative flex justify-between  items-center p-4 container mx-auto'>
+      <div className='relative flex justify-between  items-center p-3  container mx-auto'>
         {/* Logo */}
         <div
           className='font-bold cursor-pointer select-none hover:scale-105 transition-transform duration-200'
@@ -72,7 +72,7 @@ const Navbar = ({className}:{className?:string}) => {
             <Button
               size={'icon'}
               onClick={() => router.push('/login')}
-              className='bg-linear-to-r from-primary to-accent hover:opacity-90 transition-opacity shadow-md shadow-primary/20'
+              className='bg-linear-to-r from-primary to-accent/50 hover:opacity-90 transition-opacity shadow-md shadow-primary/20'
             >
               <LogIn />
             </Button>

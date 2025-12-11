@@ -31,7 +31,7 @@ export default function SessionCard({
           <CardTitle className='text-lg text-muted-foreground'>{groupName}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='text-sm font-mono text-muted-foreground mb-2 text-right' dir='ltr'>
+          <div className='text-sm  text-muted-foreground mb-2 text-right' dir='ltr'>
             {formatTo12Hour(startTime)} - {formatTo12Hour(endTime)}
           </div>
           <div className='text-xs text-muted-foreground'>عدد الطلاب: {studentCount}</div>
@@ -82,7 +82,7 @@ export default function SessionCard({
       </CardHeader>
 
       <CardContent>
-        <div className='text-2xl font-bold font-mono mb-1 text-right '>
+        <div className='text-2xl font-bold  mb-1 text-right '>
           {formatTo12Hour(startTime)}
           <span className='text-sm text-muted-foreground font-sans'> حتى </span>
           {formatTo12Hour(endTime)}

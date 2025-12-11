@@ -76,7 +76,7 @@ export default async function GroupDetailsPage({
                 >
                   <span className='font-bold'>{translateDay(sch.dayOfWeek)}</span>
                   <div
-                    className='flex items-center gap-1 text-sm font-mono text-muted-foreground'
+                    className='flex items-center gap-1 text-sm  text-muted-foreground'
                     dir='ltr'
                   >
                     <Clock className='w-3 h-3' />

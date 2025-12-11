@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader } from 'lucide-react'
+import { Edit, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -85,7 +85,7 @@ export default function UpdateStudentModal({
       <Form {...form}>
         <form id={`form-update-student-${studentId}`} onSubmit={form.handleSubmit(onSubmit)}>
           <DialogTrigger asChild>
-            <Button variant={'outline'}>تعديل</Button>
+            <Button variant={'secondary'}><Edit/></Button>
           </DialogTrigger>
           <DialogContent className='sm:max-w-[425px] '>
             <DialogHeader>
