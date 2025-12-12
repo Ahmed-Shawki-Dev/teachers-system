@@ -20,7 +20,7 @@ type ExamRecord = {
 
 export default function StudentExamsTable({ exams }: { exams: ExamRecord[] }) {
   return (
-    <Card>
+    <Card className='bg-transparent'>
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <FileBarChart2 className='w-5 h-5 text-primary' />
@@ -49,9 +49,7 @@ export default function StudentExamsTable({ exams }: { exams: ExamRecord[] }) {
                   return (
                     <TableRow key={exam.id} className='hover:bg-muted/5 transition-colors'>
                       <TableCell className='font-bold'>{exam.title}</TableCell>
-                      <TableCell >
-                        {new Date(exam.date).toLocaleDateString('en-EG')}
-                      </TableCell>
+                      <TableCell>{new Date(exam.date).toLocaleDateString('en-EG')}</TableCell>
                       <TableCell>
                         <span className='font-bold'>{exam.score}</span>
                         <span className='text-muted-foreground text-xs'> / {exam.maxScore}</span>

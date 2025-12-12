@@ -5,10 +5,7 @@ import { useRouter } from 'next/navigation'
 const Logo = () => {
   const router = useRouter()
   return (
-    <div
-      className='font-bold cursor-pointer select-none hover:scale-105 transition-transform duration-200'
-      onClick={() => router.push('/')}
-    >
+    <div className='font-bold cursor-pointer select-none ' onClick={() => router.push('/')}>
       <Image
         src='/logo-final.svg'
         className='dark:hidden block'

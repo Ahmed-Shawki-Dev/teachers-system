@@ -74,13 +74,11 @@ export default async function StudentProfilePage({
           label='حضور'
           value={stats.present}
           icon={CheckCircle2}
-          color='text-green-600 bg-green-50'
         />
         <StatsCard
           label='غياب'
           value={stats.absent}
           icon={XCircle}
-          color='text-red-600 bg-red-50'
         />
       </div>
 

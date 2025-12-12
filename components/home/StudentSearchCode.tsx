@@ -21,7 +21,7 @@ export default function StudentSearchCode() {
 
     setLoading(true)
     // توجيه المستخدم لصفحة البروفايل مباشرة
-    router.push(`/portal/${code}`)
+    router.push(`/student/${code}`)
   }
 
   return (

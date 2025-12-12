@@ -20,7 +20,7 @@ type PaymentRecord = {
 
 export default function StudentPaymentsTable({ payments }: { payments: PaymentRecord[] }) {
   return (
-    <Card>
+    <Card className='bg-transparent'>
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <Banknote className='w-5 h-5 text-green-600' />
@@ -42,9 +42,7 @@ export default function StudentPaymentsTable({ payments }: { payments: PaymentRe
               <TableBody>
                 {payments.map((p) => (
                   <TableRow key={p.id} className='hover:bg-muted/5 transition-colors'>
-                    <TableCell >
-                      {new Date(p.date).toLocaleDateString('en-EG')}
-                    </TableCell>
+                    <TableCell>{new Date(p.date).toLocaleDateString('en-EG')}</TableCell>
                     <TableCell className='font-bold text-green-700'>{p.amount} ج.م</TableCell>
                     <TableCell className='text-muted-foreground'>{p.details}</TableCell>
                     <TableCell>

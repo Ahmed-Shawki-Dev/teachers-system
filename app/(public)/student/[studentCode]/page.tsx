@@ -35,7 +35,7 @@ export default async function PortalStudentProfile({ params }: PageProps) {
     return (
       <div className='min-h-screen flex flex-col items-center justify-center gap-4'>
         <h1 className='text-2xl font-bold text-destructive'>الكود غير صحيح</h1>
-        <Link href='/portal'>
+        <Link href='/student'>
           <Button variant='outline'>العودة للبحث</Button>
         </Link>
       </div>
@@ -51,7 +51,7 @@ export default async function PortalStudentProfile({ params }: PageProps) {
     >
       {/* زر العودة */}
       <Link
-        href='/portal'
+        href='/student'
         className='flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors w-fit'
       >
         <ArrowRight className='w-4 h-4' />
@@ -110,18 +110,8 @@ export default async function PortalStudentProfile({ params }: PageProps) {
       {/* 2. الإحصائيات (كودك) */}
       <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
         <StatsCard label='إجمالي الحصص' value={stats.total} icon={Calendar} />
-        <StatsCard
-          label='حضور'
-          value={stats.present}
-          icon={CheckCircle2}
-          color='text-green-600 bg-green-50'
-        />
-        <StatsCard
-          label='غياب'
-          value={stats.absent}
-          icon={XCircle}
-          color='text-red-600 bg-red-50'
-        />
+        <StatsCard label='حضور' value={stats.present} icon={CheckCircle2} />
+        <StatsCard label='غياب' value={stats.absent} icon={XCircle} />
       </div>
 
       {/* 3. الجداول (إعادة استخدام الكومبوننتس بتاعتك) 🚀 */}

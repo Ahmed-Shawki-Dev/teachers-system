@@ -1,7 +1,7 @@
 'use client'
 
 import { Skeleton } from '@/components/ui/skeleton'
-import { LogIn } from 'lucide-react'
+import { LogIn, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { getTeacherByTokenAction } from '../../actions/Teacher/getTeacherByToken'
@@ -57,13 +57,19 @@ const Navbar = ({ className }: { className?: string }) => {
           ) : teacher?.id ? (
             <UserMenu />
           ) : (
-            <Button
-              size={'icon'}
-              onClick={() => router.push('/login')}
-              className='light:bg-linear-to-r light:from-primary light:to-accent/50 hover:opacity-90 dark:bg-foreground transition-opacity shadow-md shadow-primary/20'
-            >
-              <LogIn className='dark:text-background' />
-            </Button>
+            <>
+              <Button variant={'outline'} onClick={() => router.push('/student')}>
+                <Search className='mr-2 h-4 w-4' />
+                تتبع الطالب
+              </Button>
+              <Button
+                onClick={() => router.push('/login')}
+                className='light:bg-linear-to-r light:from-primary light:to-accent/50 hover:opacity-90 dark:bg-foreground transition-opacity shadow-md shadow-primary/20'
+              >
+                <LogIn className='dark:text-background' />
+                دخول
+              </Button>
+            </>
           )}
         </div>
       </div>

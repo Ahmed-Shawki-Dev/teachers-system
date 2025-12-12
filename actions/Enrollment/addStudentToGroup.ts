@@ -28,7 +28,7 @@ export async function addStudentAndEnrollAction(data: {
     // Loop للتأكد من أن الكود فريد عالمياً
     do {
       nextCode = generateRandomCode()
-      const existingStudent = await tx.student.findUnique({
+      const existingStudent = await tx.student.findFirst({
         where: { studentCode: nextCode },
         select: { id: true },
       })

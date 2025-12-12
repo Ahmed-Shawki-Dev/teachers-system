@@ -43,8 +43,8 @@ export default function StudentSearchPage() {
         <form onSubmit={handleSearch} className='space-y-4'>
           <div className='relative'>
             <Input
-              placeholder='كود الطالب (مثال: 145236)'
-              className='text-center text-lg tracking-widest h-12 font-mono'
+              placeholder='كود الطالب'
+              className='text-center text-lg tracking-widest h-12 '
               value={code}
               onChange={(e) => setCode(e.target.value)}
               maxLength={8}
