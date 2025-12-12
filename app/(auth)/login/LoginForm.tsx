@@ -11,13 +11,17 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react' // 1. استيراد أيقونة اللودينج
 import { useRouter } from 'next/navigation'
+import { useState } from 'react' // 2. استيراد useState
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { ILogin, LoginSchema } from '../../../validation/loginSchema'
 
 const LoginForm = () => {
   const router = useRouter()
+  // 3. حالة التحميل
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<ILogin>({
     resolver: zodResolver(LoginSchema),
@@ -28,6 +32,7 @@ const LoginForm = () => {
   })
 
   async function onSubmit(values: ILogin) {
+    setIsLoading(true) // 4. بدء التحميل
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
@@ -35,20 +40,22 @@ const LoginForm = () => {
         body: JSON.stringify(values),
         credentials: 'include',
       })
+
       if (!res.ok) throw new Error('خطأ في تسجيل الدخول')
+
       toast.success('تم تسجيل الدخول بنجاح')
       router.push('/')
       router.refresh()
+      // ملحوظة: مش هنعمل setIsLoading(false) هنا عشان يفضل يلف لحد ما الصفحة تنقل
     } catch (error) {
       toast.error('البريد الإلكتروني أو كلمة المرور غير صحيحة')
+      setIsLoading(false) // 5. وقف التحميل فقط في حالة الخطأ
     }
   }
 
   return (
-    // Container Animation (Fade In + Slide Up)
     <div className='relative z-10 flex min-h-[760px] w-full items-center justify-center animate-in fade-in slide-in-from-bottom-4 duration-700'>
       <div className='flex w-full flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none xl:px-24'>
-        {/* Card Animation (Zoom In slightly) */}
         <div className='mx-auto w-full max-w-sm lg:w-96 animate-in zoom-in-95 duration-500 delay-150 fill-mode-both'>
           {/* Glass Card */}
           <div className='relative backdrop-blur-xl bg-background/80 p-8 rounded-2xl border border-primary/20 shadow-xl shadow-primary/10'>
@@ -79,6 +86,7 @@ const LoginForm = () => {
                             className='mt-1 bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200'
                             placeholder='example@domain.com'
                             type='email'
+                            disabled={isLoading} // تعطيل الحقل أثناء التحميل
                             {...field}
                           />
                         </FormControl>
@@ -99,6 +107,7 @@ const LoginForm = () => {
                             className='mt-1 bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200'
                             placeholder='••••••••'
                             type='password'
+                            disabled={isLoading} // تعطيل الحقل أثناء التحميل
                             {...field}
                           />
                         </FormControl>
@@ -111,9 +120,17 @@ const LoginForm = () => {
                   <div>
                     <Button
                       type='submit'
-                      className='w-full  hover:opacity-90 transition-all duration-200 shadow-lg shadow-primary/25 hover:scale-[1.02]'
+                      disabled={isLoading} // 6. تعطيل الزر أثناء التحميل
+                      className='w-full hover:opacity-90 transition-all duration-200 shadow-lg shadow-primary/25 hover:scale-[1.02]'
                     >
-                      تسجيل الدخول
+                      {isLoading ? (
+                        <div className='flex items-center gap-2'>
+                          <Loader2 className='h-4 w-4 animate-spin' />
+                          <span>جاري الدخول...</span>
+                        </div>
+                      ) : (
+                        'تسجيل الدخول'
+                      )}
                     </Button>
                   </div>
                 </form>

@@ -22,11 +22,11 @@ export default function StudentSearchPage() {
 
     setLoading(true)
     // توجيه لصفحة الطالب
-    router.push(`/portal/${code}`)
+    router.push(`/student/${code}`)
   }
 
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center bg-muted/20 p-4'>
+    <div className='h-[80vh] flex flex-col items-center justify-center bg-muted/20 p-4 '>
       <div className='w-full max-w-md bg-background rounded-2xl border shadow-xl p-8 space-y-8 text-center'>
         {/* اللوجو */}
         <div className='flex justify-center mb-6'>

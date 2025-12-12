@@ -59,15 +59,15 @@ const Navbar = ({ className }: { className?: string }) => {
           ) : (
             <>
               <Button variant={'outline'} onClick={() => router.push('/student')}>
-                <Search className='mr-2 h-4 w-4' />
-                تتبع الطالب
+                <Search />
+                <span className='hidden md:inline'> تتبع الطالب</span>
               </Button>
               <Button
                 onClick={() => router.push('/login')}
                 className='light:bg-linear-to-r light:from-primary light:to-accent/50 hover:opacity-90 dark:bg-foreground transition-opacity shadow-md shadow-primary/20'
               >
                 <LogIn className='dark:text-background' />
-                دخول
+                <span className='hidden md:inline dark:text-background'> دخول</span>
               </Button>
             </>
           )}
