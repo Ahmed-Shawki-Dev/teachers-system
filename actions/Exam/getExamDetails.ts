@@ -17,14 +17,14 @@ export const getExamDetails = async (examId: string) => {
   if (!exam) throw new Error('الامتحان غير موجود')
   if (exam.group.teacherId !== teacher.id) throw new Error('غير مصرح لك')
 
-  // 2. هات طلاب المجموعة + نتايجهم في الامتحان ده (لو موجودة)
+  // 2. هات طلاب المجموعة + نتايجهم
   const enrollments = await Prisma.enrollment.findMany({
     where: { groupId: exam.groupId },
     include: {
       student: {
         include: {
           examResults: {
-            where: { examId: examId }, // التريكاية: هات نتيجته في الامتحان ده بس
+            where: { examId: examId },
           },
         },
       },
@@ -35,13 +35,16 @@ export const getExamDetails = async (examId: string) => {
   // 3. نضف الداتا للعرض
   const students = enrollments.map((enrollment) => {
     const student = enrollment.student
-    const result = student.examResults[0] // النتيجة (لو موجودة)
+    const result = student.examResults[0]
 
     return {
       studentId: student.id,
       name: student.name,
       parentPhone: student.parentPhone,
-      score: result ? result.score : null, // لو ملوش نتيجة رجع null
+      score: result ? result.score : null,
+
+      // 🛑 التعديل الأول: هات القيمة الحقيقية مش true
+      studentCode: student.studentCode,
     }
   })
 

@@ -45,7 +45,7 @@ export const toggleMonthlyPayment = async (
         monthKey, // الشهر اللي بيدفع عشانه (بعد ما اتأكدنا إنه سليم)
       },
     })
-    revalidatePath('/dashboard/payments')
+    revalidatePath('/dashboard/payments', 'page')
     return { status: 'paid', message: 'تم التحصيل بنجاح ✅' }
   }
 }

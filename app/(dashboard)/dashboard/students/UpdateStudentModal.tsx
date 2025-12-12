@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Edit, Loader } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -43,6 +44,7 @@ export default function UpdateStudentModal({
   studentId: string
   initialData: IStudent
 }) {
+  const router = useRouter()
   const [groups, setGroups] = useState<IGroupDB[]>([])
   const [hasFetched, setHasFetched] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -65,7 +67,6 @@ export default function UpdateStudentModal({
     }
   }, [open, hasFetched])
 
-  
   async function onSubmit(data: IStudent) {
     try {
       setLoading(true)
@@ -73,6 +74,7 @@ export default function UpdateStudentModal({
       toast.success('تم تعديل بيانات الطالب بنجاح')
       form.reset()
       setOpen(false)
+      router.refresh()
     } catch (error) {
       toast.error('Failed')
       throw new Error('Error', error!)

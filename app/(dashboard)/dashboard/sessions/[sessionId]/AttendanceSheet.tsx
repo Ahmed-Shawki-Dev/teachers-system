@@ -15,11 +15,12 @@ import { cn } from '@/lib/utils'
 import { DollarSign, Loader2, Save, Search } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { upsertAttendanceAction } from '../upsertAttendance'
+import { upsertAttendanceAction } from '../../../../../actions/Attendance/upsertAttendance'
 
 type StudentRecord = {
   studentId: string
   name: string
+  studentCode: string // 1. ✅ زودنا الكود هنا
   parentPhone: string
   status: 'PRESENT' | 'ABSENT' | 'EXCUSED' | null
   note: string
@@ -44,19 +45,13 @@ export default function AttendanceSheet({
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
-  // 1. دالة التغيير (تحديث الحالة + الفلوس أوتوماتيك)
   const toggleAttendance = (studentId: string) => {
     setStudents((prev) =>
       prev.map((s) => {
         if (s.studentId === studentId) {
-          // قلب الحالة (لو حاضر يبقى غايب والعكس)
           const newStatus = s.status === 'PRESENT' ? 'ABSENT' : 'PRESENT'
-
-          // لو بقى "حاضر" والمجموعة "بالحصة" -> يبقى "دفع" أوتوماتيك
-          // لو بقى "غائب" -> يبقى "مدفعش"
           const shouldPay = sessionInfo.paymentType === 'PER_SESSION'
           const newHasPaid = shouldPay && newStatus === 'PRESENT' ? true : false
-
           return { ...s, status: newStatus, hasPaid: newHasPaid }
         }
         return s
@@ -64,15 +59,18 @@ export default function AttendanceSheet({
     )
   }
 
-  // 2. دالة تغيير الدفع (يدوي للحالات الخاصة)
   const togglePayment = (studentId: string) => {
     setStudents((prev) =>
       prev.map((s) => (s.studentId === studentId ? { ...s, hasPaid: !s.hasPaid } : s)),
     )
   }
 
+  // 2. ✅ تعديل الفلتر عشان يشمل الكود والاسم والرقم
   const filteredStudents = students.filter(
-    (student) => student.name.includes(searchTerm) || student.parentPhone.includes(searchTerm),
+    (student) =>
+      student.name.includes(searchTerm) ||
+      student.parentPhone.includes(searchTerm) ||
+      student.studentCode.includes(searchTerm), // 👈 ضيفنا دي
   )
 
   const handleSave = async () => {
@@ -126,7 +124,7 @@ export default function AttendanceSheet({
             <div className='relative flex-1 md:w-[250px]'>
               <Search className='absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
               <Input
-                placeholder='بحث عن طالب...'
+                placeholder='بحث بالاسم، الكود، أو الهاتف...'
                 className='pr-9'
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -144,7 +142,7 @@ export default function AttendanceSheet({
             <Table>
               <TableHeader className='bg-muted/50 h-14'>
                 <TableRow>
-                  <TableHead className='text-right font-bold text-primary'>اسم الطالب</TableHead>
+                  <TableHead className='text-right font-bold text-primary'>بيانات الطالب</TableHead>
                   <TableHead className='text-center font-bold text-primary w-[100px]'>
                     حضور
                   </TableHead>
@@ -169,30 +167,30 @@ export default function AttendanceSheet({
                             ? 'bg-green-50/50 hover:bg-green-100/50 dark:bg-green-900/10 dark:hover:bg-green-900/20'
                             : 'hover:bg-muted/50',
                         )}
-                        // الضغط على الصف كله بيغير الحضور
                         onClick={() => toggleAttendance(student.studentId)}
                       >
-                        {/* اسم الطالب */}
+                        {/* 3. ✅ عرضنا الكود تحت الاسم عشان يبقى واضح */}
                         <TableCell className='font-medium py-3'>
                           <div className='text-base'>{student.name}</div>
-                          <div className='text-xs text-muted-foreground md:hidden'>
-                            {student.parentPhone}
+                          <div className='flex gap-2 text-xs text-muted-foreground'>
+                            <span className='font-mono bg-muted px-1 rounded'>
+                              {student.studentCode}
+                            </span>
+                            <span>{student.parentPhone}</span>
                           </div>
                         </TableCell>
 
-                        {/* Checkbox الحضور */}
                         <TableCell className='text-center'>
                           <div className='flex items-center justify-center'>
                             <input
                               type='checkbox'
                               checked={isPresent}
-                              onChange={() => {}} 
+                              onChange={() => {}}
                               className='w-5 h-5 accent-primary cursor-pointer rounded border-gray-300 focus:ring-primary'
                             />
                           </div>
                         </TableCell>
 
-                        {/* زرار الدفع (للحصة فقط) */}
                         {isPerSession && (
                           <TableCell className='text-center'>
                             <Button
@@ -223,7 +221,7 @@ export default function AttendanceSheet({
                       colSpan={isPerSession ? 3 : 2}
                       className='h-24 text-center text-muted-foreground'
                     >
-                      لا يوجد طالب بهذا الاسم
+                      لا يوجد طالب بهذا البحث
                     </TableCell>
                   </TableRow>
                 )}

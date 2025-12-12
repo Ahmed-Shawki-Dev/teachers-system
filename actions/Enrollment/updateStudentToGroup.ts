@@ -58,7 +58,7 @@ export async function updateStudentAndEnrollAction(
         groupId: data.groupId,
       },
     })
-    revalidatePath('/dashboard/students')
+    revalidatePath('/dashboard/students','page')
     
     return updatedStudent
   })

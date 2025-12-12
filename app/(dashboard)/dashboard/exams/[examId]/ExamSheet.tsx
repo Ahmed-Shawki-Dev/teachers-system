@@ -17,9 +17,11 @@ import { Loader2, Save, Search } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+// 🛑 1. تحديث النوع
 type StudentGrade = {
   studentId: string
   name: string
+  studentCode: string // 👈 ضفناها هنا
   parentPhone: string
   score: number | null
 }
@@ -59,8 +61,12 @@ export default function ExamSheet({
     )
   }
 
+  // 🛑 2. تحديث الفلتر ليشمل الكود
   const filteredStudents = students.filter(
-    (s) => s.name.includes(searchTerm) || s.parentPhone.includes(searchTerm),
+    (s) =>
+      s.name.includes(searchTerm) ||
+      s.parentPhone.includes(searchTerm) ||
+      s.studentCode.includes(searchTerm), // 👈 البحث بالكود
   )
 
   const handleSave = async () => {
@@ -111,7 +117,7 @@ export default function ExamSheet({
           <div className='relative w-full md:w-auto'>
             <Search className='absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
             <Input
-              placeholder='بحث عن طالب...'
+              placeholder='بحث بالكود أو الاسم...'
               className='pr-9 w-full md:w-[250px]'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -129,7 +135,7 @@ export default function ExamSheet({
             <Table>
               <TableHeader>
                 <TableRow className='bg-muted/50 hover:bg-muted/50'>
-                  <TableHead>اسم الطالب</TableHead>
+                  <TableHead>بيانات الطالب</TableHead>
                   <TableHead className='w-[150px] text-center'>الدرجة</TableHead>
                   <TableHead className='hidden sm:table-cell'>النسبة</TableHead>
                 </TableRow>
@@ -151,8 +157,12 @@ export default function ExamSheet({
                       >
                         <TableCell className='font-medium'>
                           <div>{student.name}</div>
-                          <div className='text-xs text-muted-foreground md:hidden'>
-                            {student.parentPhone}
+                          {/* 🛑 3. عرض الكود تحت الاسم */}
+                          <div className='flex gap-2 text-xs text-muted-foreground'>
+                            <span className='bg-muted px-1 rounded font-mono'>
+                              {student.studentCode}
+                            </span>
+                            <span className='md:hidden'>{student.parentPhone}</span>
                           </div>
                         </TableCell>
 
@@ -191,7 +201,7 @@ export default function ExamSheet({
                 ) : (
                   <TableRow>
                     <TableCell colSpan={3} className='p-8 text-center text-muted-foreground'>
-                      لا يوجد طلاب
+                      لا يوجد طلاب مطابقين للبحث
                     </TableCell>
                   </TableRow>
                 )}

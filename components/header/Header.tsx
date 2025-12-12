@@ -9,6 +9,8 @@ import { useTeacherStore } from '../../store/useAuthStore'
 import Logo from '../Logo'
 import { ModeToggle } from '../toggle-theme'
 import { Button } from '../ui/button'
+import { SidebarTrigger } from '../ui/sidebar'
+import { Separator } from '../ui/separator'
 import UserMenu from './UserMenu'
 
 const Navbar = ({ className }: { className?: string }) => {
@@ -18,6 +20,7 @@ const Navbar = ({ className }: { className?: string }) => {
 
   useEffect(() => {
     const checkTeacher = async () => {
+      // نفس اللوجيك بتاعك بالظبط لجلب البيانات
       if (!teacher) {
         try {
           const data = await getTeacherByTokenAction()
@@ -42,38 +45,66 @@ const Navbar = ({ className }: { className?: string }) => {
   }, [teacher, setTeacher])
 
   return (
-    <nav className='top-0 z-50 w-full  '>
-      {/* Subtle gradient overlay */}
-      <div className={className} />
+    <header
+      className={`sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md ${className}`}
+    >
+      <div className='container mx-auto flex h-16 items-center justify-between px-4'>
+        {/* 1. المنطقة اليمنى: التريجر (بشرط) + اللوجو */}
+        <div className='flex items-center gap-2'>
+          {/* 🛑 التعديل الأهم: الزرار والفاصل يظهروا بس لو المدرس موجود (يعني جوا الداشبورد) */}
+          {teacher?.id && (
+            <>
+              <SidebarTrigger className='h-9 w-9' />
+              <Separator orientation='vertical' className='h-6 mx-1 hidden sm:block' />
+            </>
+          )}
 
-      <div className='relative flex justify-between  items-center p-4  container mx-auto'>
-        {/* Logo */}
-        <Logo />
-        {/* Actions */}
-        <div className='flex items-center gap-4'>
+          {/* اللوجو يظهر دايماً */}
+          <div className='flex items-center gap-2'>
+            <Logo />
+          </div>
+        </div>
+
+        {/* 2. المنطقة اليسرى */}
+        <div className='flex items-center gap-3'>
           <ModeToggle />
+
           {loading ? (
-            <Skeleton className='h-10 w-10 rounded-full' />
+            <Skeleton className='h-9 w-9 rounded-full' />
           ) : teacher?.id ? (
             <UserMenu />
           ) : (
             <>
-              <Button variant={'outline'} onClick={() => router.push('/student')}>
-                <Search />
-                <span className='hidden md:inline'> تتبع الطالب</span>
+              <Button
+                variant='ghost'
+                onClick={() => router.push('/student')}
+                className='hidden sm:flex font-bold'
+              >
+                <Search className='w-4 h-4 ml-2' />
+                تتبع الطالب
               </Button>
+
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={() => router.push('/student')}
+                className='sm:hidden'
+              >
+                <Search className='w-5 h-5' />
+              </Button>
+
               <Button
                 onClick={() => router.push('/login')}
-                className='light:bg-linear-to-r light:from-primary light:to-accent/50 hover:opacity-90 dark:bg-foreground transition-opacity shadow-md shadow-primary/20'
+                className='dark:text-background dark:bg-foreground'
               >
-                <LogIn className='dark:text-background' />
-                <span className='hidden md:inline dark:text-background'> دخول</span>
+                <LogIn className='w-4 h-4 ml-2' />
+                <span>دخول</span>
               </Button>
             </>
           )}
         </div>
       </div>
-    </nav>
+    </header>
   )
 }
 
