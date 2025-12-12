@@ -1,3 +1,4 @@
+// components/Student/StudentAttendanceTable.tsx
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -19,7 +20,17 @@ type AttendanceRecord = {
   paymentAmount: number
 }
 
-export default function StudentAttendanceTable({ history }: { history: AttendanceRecord[] }) {
+// 1. ضفنا paymentType هنا 👇
+export default function StudentAttendanceTable({
+  history,
+  paymentType,
+}: {
+  history: AttendanceRecord[]
+  paymentType: string
+}) {
+  // متغير عشان نعرف هل هو بيحاسب بالحصة ولا لأ
+  const isPerSession = paymentType === 'PER_SESSION'
+
   return (
     <Card>
       <CardHeader>
@@ -36,14 +47,17 @@ export default function StudentAttendanceTable({ history }: { history: Attendanc
                 <TableRow className='bg-muted/50 hover:bg-muted/50'>
                   <TableHead>التاريخ</TableHead>
                   <TableHead className='text-center'>الحالة</TableHead>
-                  <TableHead className='text-center'>الدفع</TableHead>
+
+                  {/* 2. إخفاء عنوان العمود لو مش بالحصة 👇 */}
+                  {isPerSession && <TableHead className='text-center'>الدفع</TableHead>}
+
                   <TableHead>ملاحظات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {history.map((record) => (
                   <TableRow key={record.id} className='hover:bg-muted/5 transition-colors'>
-                    <TableCell >
+                    <TableCell>
                       {new Date(record.date).toLocaleDateString('ar-EG', {
                         weekday: 'long',
                         month: 'short',
@@ -63,21 +77,24 @@ export default function StudentAttendanceTable({ history }: { history: Attendanc
                       )}
                     </TableCell>
 
-                    <TableCell className='text-center'>
-                      {record.hasPaid ? (
-                        <div className='flex items-center justify-center gap-1 text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded-full border border-green-100 w-fit mx-auto'>
-                          <Check className='w-3 h-3' />
-                          <span>دفع</span>
-                        </div>
-                      ) : record.status === 'PRESENT' ? (
-                        <div className='flex items-center justify-center gap-1 text-red-500 font-bold text-xs bg-red-50 px-2 py-1 rounded-full border border-red-100 w-fit mx-auto'>
-                          <X className='w-3 h-3' />
-                          <span>لم يدفع</span>
-                        </div>
-                      ) : (
-                        <span className='text-muted-foreground'>-</span>
-                      )}
-                    </TableCell>
+                    {/* 3. إخفاء الخانة نفسها لو مش بالحصة 👇 */}
+                    {isPerSession && (
+                      <TableCell className='text-center'>
+                        {record.hasPaid ? (
+                          <div className='flex items-center justify-center gap-1 text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded-full border border-green-100 w-fit mx-auto'>
+                            <Check className='w-3 h-3' />
+                            <span>دفع</span>
+                          </div>
+                        ) : record.status === 'PRESENT' ? (
+                          <div className='flex items-center justify-center gap-1 text-red-500 font-bold text-xs bg-red-50 px-2 py-1 rounded-full border border-red-100 w-fit mx-auto'>
+                            <X className='w-3 h-3' />
+                            <span>لم يدفع</span>
+                          </div>
+                        ) : (
+                          <span className='text-muted-foreground'>-</span>
+                        )}
+                      </TableCell>
+                    )}
 
                     <TableCell className='text-muted-foreground max-w-[150px] truncate'>
                       {record.note || '-'}

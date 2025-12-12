@@ -13,6 +13,7 @@ import {
   Zap,
 } from 'lucide-react'
 import Link from 'next/link'
+import StudentSearchCode from '../../components/home/StudentSearchCode'
 import { features } from '../../data/features'
 import FeatureCard from './FeatureCard'
 import StatItem from './StatItem'
@@ -28,92 +29,108 @@ export default async function Home() {
       {/* الخلفية الهادئة */}
       <div className='absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-size-[24px_24px] z-0 pointer-events-none' />
 
-      {/* --- HERO SECTION --- */}
-      {/* قللنا الـ py في الموبايل لـ 16 عشان نلم الدنيا */}
-      <section className='relative flex flex-col items-center justify-center text-center px-4 py-16 md:py-32 min-h-[90vh]'>
-        {/* Glow Effects */}
-        <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-primary/5 blur-[60px] md:blur-[90px] rounded-full pointer-events-none' />
+      {/* --- HERO WRAPPER --- */}
+      <section className='relative z-10 pt-24 pb-16 md:pt-32 md:pb-24 px-4'>
+        {/* ========================================= */}
+        {/* PART 1: THE HERO (Marketing Message)      */}
+        {/* ========================================= */}
+        {/* min-h-[60vh] دي اللي بتخلي الهيرو واخد راحته في الطول */}
+        <div className='container mx-auto max-w-6xl text-center flex flex-col justify-center min-h-[50vh] md:min-h-[60vh]'>
+          <div className='flex flex-col items-center mb-8'>
+            <div className='inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-8 animate-in fade-in slide-in-from-bottom-3 duration-700'>
+              <Sparkles className='w-3 h-3 mr-2' />
+              النظام الأذكى للمدرس المصري 🇪🇬
+            </div>
 
-        <div className='max-w-5xl space-y-6 z-10 relative'>
-          {/* Badge */}
-          <div className='animate-in fade-in slide-in-from-bottom-2 duration-500'>
-            <Badge
-              variant='secondary'
-              className='px-4 py-1.5 text-xs md:text-sm font-medium border border-primary/20 bg-background/50 backdrop-blur-md rounded-full shadow-sm'
-            >
-              <Sparkles className='w-3.5 h-3.5 mr-2 text-amber-500 inline-block' />
-              <span className='bg-linear-to-r from-primary to-primary/50 bg-clip-text text-transparent font-bold'>
-                النظام الأذكى للمدرس المصري 🇪🇬
-              </span>
-            </Badge>
-          </div>
+            <h1 className='text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-foreground mb-8 leading-[1.1] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100'>
+              نظم مجموعاتك وطلابك <br className='hidden md:block' />
+              <span className='text-primary'>بذكاء ومن موبايلك</span>
+            </h1>
 
-          {/* Title: صغرنا الخط في الموبايل لـ 4xl عشان ميتكسرش */}
-          <h1 className='text-4xl md:text-7xl lg:text-8xl font-bold tracking-tight text-foreground leading-[1.2] md:leading-[1.15] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100'>
-            نظم مجموعاتك وطلابك <br />
-            {/* decoration والخط اتشالوا من الموبايل (hidden block -> inline-block) */}
-            <span className='relative block md:inline-block mt-1 md:mt-2'>
-              {/* الخط اللي تحت الكلام بيظهر بس في الشاشات الكبيرة */}
-              <span className='hidden md:block absolute inset-x-0 bottom-2 md:bottom-4 h-4 md:h-6 bg-primary/10 -rotate-1 rounded-full -z-10' />
-              <span className='relative text-primary'>بذكاء ومن موبايلك</span>
-            </span>
-          </h1>
+            <p className='text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-5 duration-700 delay-200'>
+              وداعاً للورقة والقلم. ركز في الشرح وسيب الغياب، الامتحانات، والماليات علينا.
+            </p>
 
-          {/* Subtitle: خط أصغر وأوضح */}
-          <p className='text-base md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 px-2'>
-            نظم حصصك وطلابك ومالياتك من الموبايل في ثواني.
-            <br className='hidden sm:block' />
-            وداعاً للورقة والقلم..{' '}
-            <span className='text-foreground font-medium'>ركز في الشرح وسيب الإدارة علينا.</span>
-          </p>
-
-          {/* Buttons: زراير كاملة العرض في الموبايل */}
-          <div className='flex flex-col sm:flex-row gap-3 md:gap-5 justify-center pt-6 md:pt-8 w-full max-w-sm sm:max-w-none mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300'>
-            <Button
-              size='lg'
-              className='w-full sm:w-auto h-12 md:h-14 px-8 md:px-10 text-base md:text-lg rounded-full shadow-xl shadow-primary/20 hover:scale-105 transition-all duration-300'
-              asChild
-            >
-              <Link href={WHATSAPP_LINK} target='_blank'>
-                <PhoneCall className='w-4 h-4 md:w-5 md:h-5 ml-2' />
-                اطلب نسختك الآن
-              </Link>
-            </Button>
-
-            <Button
-              size='lg'
-              variant='outline'
-              className='w-full sm:w-auto h-12 md:h-14 px-8 md:px-10 text-base md:text-lg rounded-full border-primary/20 hover:bg-muted/50 transition-all'
-              asChild
-            >
-              <Link href='/login'>
-                <LogIn className='w-4 h-4 md:w-5 md:h-5 ml-2' />
-                دخول المشتركين
-              </Link>
-            </Button>
+            <div className='flex flex-col sm:flex-row gap-5 justify-center items-center w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300'>
+              <Button
+                size='lg'
+                className='h-14 px-10 text-lg rounded-full w-full sm:w-auto shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-transform hover:scale-105'
+                asChild
+              >
+                <Link href={WHATSAPP_LINK} target='_blank'>
+                  <PhoneCall className='w-5 h-5 ml-2' />
+                  اطلب نسختك الآن
+                </Link>
+              </Button>
+              <Button
+                size='lg'
+                variant='outline'
+                className='h-14 px-10 text-lg rounded-full w-full sm:w-auto border-2 hover:bg-muted/50'
+                asChild
+              >
+                <Link href='/login'>
+                  <LogIn className='w-5 h-5 ml-2' />
+                  دخول المشتركين
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
-      </section>
 
-      {/* --- STATS SECTION --- */}
-      <section className='relative py-12 md:py-16 border-y border-border/40 bg-muted/30 backdrop-blur-sm'>
-        <div className='container mx-auto px-4'>
-          {/* gap-y-8 في الموبايل عشان نفصل الأرقام عن بعض */}
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 md:gap-10'>
-            <StatItem value={stats.teachers || 0} label='مدرس' icon={Users} color='text-primary' />
-            <StatItem
-              value={stats.students || 0}
-              label='طالب'
-              icon={TrendingUp}
-              color='text-green-600'
-            />
-            <StatItem
-              value={stats.groups || 0}
-              label='مجموعة'
-              icon={PieChart}
-              color='text-orange-500'
-            />
-            <StatItem value={100} label='دعم فني' suffix='%' icon={Zap} color='text-yellow-500' />
+        {/* ========================================= */}
+        {/* PART 2: THE CARD (Search + Stats)         */}
+        {/* ========================================= */}
+        {/* فصلناه بـ mt-12 md:mt-24 عشان ينزل تحت الهيرو بمسافة محترمة */}
+        <div className='container mx-auto max-w-6xl mt-12 md:mt-24 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500'>
+          {/* The Big Integrated Card */}
+          <div className='relative mx-auto max-w-5xl'>
+            {/* الخلفية الموحدة */}
+            <div className='absolute inset-0 bg-linear-to-b from-primary/5 to-transparent rounded-[3rem] -z-10 blur-2xl opacity-60' />
+
+            <div className='bg-card/40 backdrop-blur-md border border-white/10 rounded-[2.5rem] p- md:p-8 overflow-hidden relative shadow-lg'>
+              {/* A. Search Component */}
+              <div className='mb-14 relative z-10'>
+                <StudentSearchCode />
+              </div>
+
+              {/* Separator */}
+              <div className='flex items-center gap-6 mb-10 opacity-40'>
+                <div className='h-px bg-border flex-1' />
+                <span className='text-sm font-semibold text-muted-foreground tracking-widest uppercase'>
+                  أرقام نفخر بها
+                </span>
+                <div className='h-px bg-border flex-1' />
+              </div>
+
+              {/* B. Stats Grid */}
+              <div className='grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12'>
+                <StatItem
+                  value={stats.teachers || 0}
+                  label='مدرس'
+                  icon={Users}
+                  color='text-blue-500'
+                />
+                <StatItem
+                  value={stats.students || 0}
+                  label='طالب'
+                  icon={TrendingUp}
+                  color='text-green-500'
+                />
+                <StatItem
+                  value={stats.groups || 0}
+                  label='مجموعة'
+                  icon={PieChart}
+                  color='text-orange-500'
+                />
+                <StatItem
+                  value={100}
+                  label='دعم فني'
+                  suffix='%'
+                  icon={Zap}
+                  color='text-yellow-500'
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -129,59 +146,34 @@ export default async function Home() {
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8'>
           {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} delay={index * 0.1} />
+            <FeatureCard key={index} {...feature} />
           ))}
         </div>
       </section>
 
       {/* --- HOW IT WORKS --- */}
-      <section className='relative py-16 md:py-24 '>
-        <div className='container mx-auto px-4 relative z-10'>
-          <div className='text-center mb-10 md:mb-16'>
-            <Badge
-              variant='secondary'
-              className='mb-3 md:mb-4 backdrop-blur-sm bg-background/50 border border-primary/20'
-            >
-              ابدأ في 3 خطوات
-            </Badge>
-            <h2 className='text-2xl md:text-5xl font-bold mb-4'>رحلة الانضمام ⚡</h2>
-          </div>
+      <section className='py-24 relative z-10 '>
+        <div className='container mx-auto px-4 text-center'>
+          <Badge variant='outline' className='mb-4 bg-background'>
+            كيف تبدأ؟
+          </Badge>
+          <h2 className='text-3xl md:text-5xl font-bold mb-16'>ابدأ رحلتك في 3 خطوات</h2>
 
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-8 relative'>
+            <div className='hidden md:block absolute top-12 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-primary/20 to-transparent z-0' />
+
             {[
-              {
-                emoji: '📞',
-                title: '1. تواصل معنا',
-                desc: 'كلمنا واتساب، هنعرف عدد طلابك ومجموعاتك ونجهزلك حسابك فوراً.',
-                color: 'from-blue-500/20 to-blue-600/20',
-              },
-              {
-                emoji: '🔑',
-                title: '2. استلم مفاتيحك',
-                desc: 'هتستلم اسم المستخدم وكلمة السر، وفيديو شرح بسيط يخليك أستاذ في النظام.',
-                color: 'from-emerald-500/20 to-emerald-600/20',
-              },
-              {
-                emoji: '📱',
-                title: '3. انطلق بشغلك',
-                desc: 'ضيف طلابك وابدأ شغل فوراً، وأي وقت تحتاجنا الدعم الفني معاك.',
-                color: 'from-purple-500/20 to-purple-600/20',
-              },
+              { title: 'تواصل معنا', icon: '📞', desc: 'كلمنا واتساب وهنجهزلك حسابك فوراً' },
+              { title: 'استلم مفاتيحك', icon: '🔑', desc: 'اسم مستخدم وكلمة مرور وفيديو شرح' },
+              { title: 'انطلق بشغلك', icon: '🚀', desc: 'ضيف طلابك وابدأ شغل فوراً' },
             ].map((step, i) => (
-              <div key={i} className='relative group'>
-                {/* الخلفية بتظهر بس في الكمبيوتر عشان متبقاش تقيلة ع الموبايل */}
-                <div
-                  className={`hidden md:block absolute inset-0 rounded-3xl bg-linear-to-br ${step.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl`}
-                />
-                <div className='relative p-6 md:p-8 bg-card/50 backdrop-blur-sm rounded-3xl border border-primary/10 h-full flex flex-col items-center text-center hover:border-primary/30 transition-all'>
-                  <div className='w-14 h-14 md:w-16 md:h-16 mb-4 md:mb-6 rounded-2xl bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center text-2xl md:text-3xl shadow-sm'>
-                    {step.emoji}
-                  </div>
-                  <h3 className='text-lg md:text-xl font-bold mb-2 md:mb-3'>{step.title}</h3>
-                  <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
-                    {step.desc}
-                  </p>
+              <div key={i} className='relative z-10 flex flex-col items-center '>
+                <div className='w-24 h-24 rounded-full bg-background border-4 border-muted flex items-center justify-center text-4xl mb-6 shadow-xl relative group transition-transform hover:scale-110'>
+                  <span className='relative z-10'>{step.icon}</span>
+                  <div className='absolute inset-0 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors' />
                 </div>
+                <h3 className='text-xl font-bold mb-2'>{step.title}</h3>
+                <p className='text-muted-foreground max-w-xs'>{step.desc}</p>
               </div>
             ))}
           </div>
@@ -191,7 +183,7 @@ export default async function Home() {
       {/* --- CTA FINAL --- */}
       <section className='py-16 md:py-24 px-4'>
         <div className='container mx-auto max-w-5xl'>
-          <div className='bg-card border border-primary/10 rounded-3xl md:rounded-[2.5rem] p-8 md:p-16 text-center relative overflow-hidden shadow-xl md:shadow-2xl shadow-primary/5'>
+          <div className='bg-card/80 border border-primary/10 rounded-3xl md:rounded-[2.5rem] p-8 md:p-16 text-center relative overflow-hidden shadow-xl md:shadow-2xl shadow-primary/5'>
             <div className='absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-primary/5 blur-[60px] md:blur-[100px] rounded-full pointer-events-none' />
             <div className='absolute bottom-0 left-0 w-64 md:w-96 h-64 md:h-96 bg-accent/5 blur-[60px] md:blur-[100px] rounded-full pointer-events-none' />
 

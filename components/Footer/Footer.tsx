@@ -19,7 +19,7 @@ const Footer = ({ className }: { className?: string }) => {
           <span>❤️</span>
           <span>بواسطة</span>
           <Link
-            href='https://www.linkedin.com/in/ahmedshawkidev'
+            href='https://ahmedshawkidev.vercel.app/'
             target='_blank'
             className='font-bold text-primary hover:underline underline-offset-4'
           >

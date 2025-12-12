@@ -60,9 +60,9 @@ const Navbar = ({ className }: { className?: string }) => {
             <Button
               size={'icon'}
               onClick={() => router.push('/login')}
-              className='bg-linear-to-r from-primary to-accent/50 hover:opacity-90 transition-opacity shadow-md shadow-primary/20'
+              className='light:bg-linear-to-r light:from-primary light:to-accent/50 hover:opacity-90 dark:bg-foreground transition-opacity shadow-md shadow-primary/20'
             >
-              <LogIn />
+              <LogIn className='dark:text-background' />
             </Button>
           )}
         </div>
