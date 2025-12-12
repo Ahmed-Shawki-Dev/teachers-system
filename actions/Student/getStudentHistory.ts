@@ -63,6 +63,7 @@ export const getStudentHistory = async (studentId: string) => {
   return {
     info: {
       id: student.id,
+      studentCode: student.studentCode,
       name: student.name,
       phone: student.parentPhone,
       groupName: groupInfo?.name || 'بدون مجموعة',

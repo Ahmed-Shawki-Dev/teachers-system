@@ -65,11 +65,12 @@ export default function UpdateStudentModal({
     }
   }, [open, hasFetched])
 
+  
   async function onSubmit(data: IStudent) {
     try {
       setLoading(true)
       await updateStudentAndEnrollAction(studentId, data)
-      toast.success('تم تعديل الطالب بنجاح')
+      toast.success('تم تعديل بيانات الطالب بنجاح')
       form.reset()
       setOpen(false)
     } catch (error) {
@@ -85,7 +86,9 @@ export default function UpdateStudentModal({
       <Form {...form}>
         <form id={`form-update-student-${studentId}`} onSubmit={form.handleSubmit(onSubmit)}>
           <DialogTrigger asChild>
-            <Button variant={'secondary'}><Edit/></Button>
+            <Button variant={'secondary'}>
+              <Edit />
+            </Button>
           </DialogTrigger>
           <DialogContent className='sm:max-w-[425px] '>
             <DialogHeader>

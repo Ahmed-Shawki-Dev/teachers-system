@@ -1,3 +1,5 @@
+// components/Student/ShowStudents.tsx
+
 import {
   Table,
   TableBody,
@@ -28,6 +30,8 @@ async function ShowStudents({ search, groupId, grade }: ShowStudentsProps) {
         <Table className='text-right'>
           <TableHeader>
             <TableRow className='bg-muted/50 hover:bg-muted/50'>
+              {/* 🛑 عمود الكود الجديد */}
+              <TableHead className='w-[100px]'>الكود</TableHead>
               <TableHead>الإسم</TableHead>
               <TableHead>رقم ولي الأمر</TableHead>
               <TableHead>الصف</TableHead>
@@ -43,7 +47,12 @@ async function ShowStudents({ search, groupId, grade }: ShowStudentsProps) {
 
               return (
                 <TableRow key={student.id}>
-                  <TableCell className='font-bold text-base'>
+                  {/* 🛑 عرض الكود في الصف */}
+                  <TableCell className='font-mono font-bold text-sm text-primary/80'>
+                    {student.studentCode}
+                  </TableCell>
+
+                  <TableCell >
                     <Link
                       href={`/dashboard/students/${student.id}`}
                       className='hover:underline hover:text-primary transition-colors cursor-pointer'
@@ -52,7 +61,7 @@ async function ShowStudents({ search, groupId, grade }: ShowStudentsProps) {
                     </Link>
                   </TableCell>
                   <TableCell>{student.parentPhone}</TableCell>
-                  <TableCell className='text-primary font-semibold'>
+                  <TableCell >
                     {currentGroup ? currentGroup.name : 'بدون جروب'}
                   </TableCell>
                   <TableCell>
@@ -81,7 +90,7 @@ async function ShowStudents({ search, groupId, grade }: ShowStudentsProps) {
             })}
             {students.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className='h-40'>
+                <TableCell colSpan={5} className='h-40'>
                   <div className='text-center flex flex-col justify-center items-center gap-2 text-muted-foreground'>
                     <Ban className='opacity-50' />
                     <span>لا يوجد أي طلاب</span>

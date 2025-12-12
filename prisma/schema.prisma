@@ -78,6 +78,7 @@ model Enrollment {
 
 model Student {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentCode String @unique
   name        String
 
   parentPhone String   

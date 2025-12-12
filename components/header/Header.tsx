@@ -2,11 +2,11 @@
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { LogIn } from 'lucide-react'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { getTeacherByTokenAction } from '../../actions/Teacher/getTeacherByToken'
 import { useTeacherStore } from '../../store/useAuthStore'
+import Logo from '../Logo'
 import { ModeToggle } from '../toggle-theme'
 import { Button } from '../ui/button'
 import UserMenu from './UserMenu'
@@ -42,34 +42,13 @@ const Navbar = ({ className }: { className?: string }) => {
   }, [teacher, setTeacher])
 
   return (
-    <nav className='top-0 z-50 w-full bg-transparent  '>
+    <nav className='top-0 z-50 w-full  '>
       {/* Subtle gradient overlay */}
       <div className={className} />
 
-      <div className='relative flex justify-between  items-center p-3  container mx-auto'>
+      <div className='relative flex justify-between  items-center p-4  container mx-auto'>
         {/* Logo */}
-        <div
-          className='font-bold cursor-pointer select-none hover:scale-105 transition-transform duration-200'
-          onClick={() => router.push('/')}
-        >
-          <Image
-            src='/logo.png'
-            className='dark:hidden block'
-            alt='logo'
-            width={90}
-            height={90}
-            style={{ width: '90px', height: 'auto' }}
-          />
-          <Image
-            src='/logo-dark.png'
-            className='dark:block hidden'
-            alt='logo'
-            width={90}
-            height={90}
-            style={{ width: '90px', height: 'auto' }}
-          />
-        </div>
-
+        <Logo />
         {/* Actions */}
         <div className='flex items-center gap-4'>
           <ModeToggle />

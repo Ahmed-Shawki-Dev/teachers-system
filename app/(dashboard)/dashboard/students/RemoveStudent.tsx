@@ -24,7 +24,7 @@ export default function RemoveStudent({ studentId }: { studentId: string }) {
       setLoading(true)
       await removeStudentAction(studentId)
       setOpen(false)
-      toast.success('الطالب اتمسح بنجاح')
+      toast.success('تم حذف الطالب بنجاح')
     } catch (error) {
       toast.error('Failed')
       throw new Error('Error', error!)

@@ -59,6 +59,7 @@ export async function updateStudentAndEnrollAction(
       },
     })
     revalidatePath('/dashboard/students')
+    
     return updatedStudent
   })
 }

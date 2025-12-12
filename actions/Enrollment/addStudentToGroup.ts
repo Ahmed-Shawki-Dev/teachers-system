@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { Prisma } from '../../lib/prisma'
+import { generateRandomCode } from '../../utils/generateRandomCode'
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
 
 export async function addStudentAndEnrollAction(data: {
@@ -12,18 +13,38 @@ export async function addStudentAndEnrollAction(data: {
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('غير مسجل الدخول')
 
+  const { groupId, ...studentData } = data
+
   const group = await Prisma.group.findFirst({
-    where: { id: data.groupId, teacherId: teacher.id },
+    where: { id: groupId, teacherId: teacher.id },
   })
   if (!group) throw new Error('الجروب مش موجود أو مش بتاعك')
 
   return await Prisma.$transaction(async (tx) => {
-    // 1. أضف الطالب
+    // 🔍 👈 Logic التوليد الآمن الجديد
+    let nextCode: string
+    let isCodeUnique = false
+
+    // Loop للتأكد من أن الكود فريد عالمياً
+    do {
+      nextCode = generateRandomCode()
+      const existingStudent = await tx.student.findUnique({
+        where: { studentCode: nextCode },
+        select: { id: true },
+      })
+
+      if (!existingStudent) {
+        isCodeUnique = true
+      }
+    } while (!isCodeUnique)
+    // 👆 انتهى Logic التوليد الآمن
+
+    // 1. أضف الطالب بالكود الجديد
     const student = await tx.student.create({
       data: {
-        name: data.name,
-        parentPhone: data.parentPhone,
+        ...studentData,
         teacherId: teacher.id,
+        studentCode: nextCode,
       },
     })
 
@@ -31,11 +52,11 @@ export async function addStudentAndEnrollAction(data: {
     await tx.enrollment.create({
       data: {
         studentId: student.id,
-        groupId: data.groupId,
+        groupId: groupId,
       },
     })
 
     revalidatePath('/dashboard/students')
-    return student
+    return { student, studentCode: nextCode }
   })
 }

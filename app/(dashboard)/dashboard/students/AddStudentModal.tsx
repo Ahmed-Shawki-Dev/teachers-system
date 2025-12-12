@@ -63,7 +63,7 @@ export default function AddStudentModal() {
     try {
       setLoading(true)
       await addStudentAndEnrollAction(data)
-      toast.success('Student added successfully!')
+      toast.success('تم إضافة الطالب بنجاح')
       form.reset()
       setOpen(false)
     } catch (error) {

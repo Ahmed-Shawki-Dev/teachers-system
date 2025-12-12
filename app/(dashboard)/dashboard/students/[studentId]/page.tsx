@@ -26,7 +26,7 @@ export default async function StudentProfilePage({
             <div>
               <h1 className='text-2xl font-bold'>{info.name}</h1>
               <p className='text-muted-foreground text-sm mt-1'>
-                كود الطالب: <span >{info.id.slice(-6)}</span>
+                كود الطالب: <span>{info.studentCode}</span>
               </p>
             </div>
             <div className='flex gap-2'>
