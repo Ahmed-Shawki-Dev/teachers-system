@@ -10,7 +10,7 @@ const Footer = ({ className }: { className?: string }) => {
         {/* 1. الحقوق */}
         <p>
           <span>جميع الحقوق محفوظة </span>
-          <span className='font-semibold'>أستاذ.</span>
+          <span className='font-semibold'>الدفتر.</span>
           <span>&copy; {new Date().getFullYear()}</span>
         </p>
 
