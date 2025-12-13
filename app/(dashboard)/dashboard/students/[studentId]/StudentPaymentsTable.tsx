@@ -20,7 +20,7 @@ type PaymentRecord = {
 
 export default function StudentPaymentsTable({ payments }: { payments: PaymentRecord[] }) {
   return (
-    <Card className='bg-transparent'>
+    <Card >
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <Banknote className='w-5 h-5 text-green-600' />

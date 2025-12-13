@@ -1,14 +1,13 @@
 import { getGroupDetails } from '@/actions/Group/getGroupDetails'
-import { getAllStudentsAction } from '@/actions/Student/getStudents' // 1. استيراد الأكشن
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DayOfWeek } from '@prisma/client'
 import { Calendar, Clock, Users, Wallet } from 'lucide-react'
+import { Suspense } from 'react'
 import StudentSearchInput from '../../../../../components/StudentSearchInput'
-import ShowStudents from '../../students/ShowStudents'
-import PaginationControl from '@/components/ui/PaginationControl' // 2. استيراد الباجينيشن
+import StudentsList from './StudentsList'
+import StudentsSkeleton from './StudentsSkeleton'
 
-// دالة الترجمة (زي ما هي)
 const translateDay = (day: DayOfWeek) => {
   const days: Record<string, string> = {
     SUNDAY: 'الأحد',
@@ -27,7 +26,7 @@ export default async function GroupDetailsPage({
   searchParams,
 }: {
   params: Promise<{ groupId: string }>
-  searchParams: Promise<{ query?: string; page?: string }> // زودنا page
+  searchParams: Promise<{ query?: string; page?: string }>
 }) {
   const { groupId } = await params
   const { query, page: pageParam } = await searchParams
@@ -35,23 +34,14 @@ export default async function GroupDetailsPage({
   const page = Number(pageParam) || 1
   const queryStr = query || ''
 
-  // 1. هات بيانات المجموعة
+  // 1. بيانات المجموعة (سريعة ومهمة للعنوان، مش محتاجة Suspense)
   const group = await getGroupDetails(groupId)
-
-  // 2. 🛑 هات طلاب المجموعة دي بس (Server Side Fetching)
-  // بعتنا groupId عشان يفلتر، وبعتنا page عشان الباجينيشن
-  const { data: students, metadata } = await getAllStudentsAction(
-    page,
-    20,
-    queryStr,
-    groupId, // 👈 أهم نقطة: بنجبره يجيب طلاب الجروب ده بس
-  )
 
   return (
     <div className='flex flex-col gap-8 p-4 container mx-auto'>
-      {/* القسم العلوي: تفاصيل المجموعة (زي ما هو) */}
+      {/* === القسم العلوي: تفاصيل المجموعة (ثابت) === */}
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        <Card className='md:col-span-2 border-t-4 border-t-primary'>
+        <Card className='md:col-span-2 border-t-4 border-t-primary shadow-sm'>
           <CardHeader>
             <CardTitle className='flex justify-between items-center'>
               <span className='text-2xl font-bold text-primary'>{group.name}</span>
@@ -73,7 +63,7 @@ export default async function GroupDetailsPage({
         </Card>
 
         {/* كارت المواعيد */}
-        <Card>
+        <Card className='shadow-sm'>
           <CardHeader>
             <CardTitle className='text-lg flex items-center gap-2'>
               <Calendar className='w-5 h-5 text-primary' />
@@ -101,17 +91,22 @@ export default async function GroupDetailsPage({
         </Card>
       </div>
 
-      {/* القسم السفلي: جدول الطلاب */}
-      <h2 className='text-xl font-bold border-r-4 border-primary pr-3'>طلاب المجموعة</h2>
-      <div className='space-y-4 flex flex-col items-center'>
-        {/* السيرش شغال لأنه بيحدث الـ URL */}
-        <StudentSearchInput />
+      {/* === القسم السفلي: جدول الطلاب (Streaming) === */}
+      <div>
+        <div className='flex items-center justify-between mb-4'>
+          <h2 className='text-xl font-bold border-r-4 border-primary pr-3'>طلاب المجموعة</h2>
+        </div>
 
-        {/* 🛑 هنا التغيير: مررنا الداتا للجدول */}
-        <ShowStudents students={students} />
+        <div className='space-y-4 flex flex-col items-center'>
+          {/* السيرش input يفضل بره عشان اليوزر يقدر يكتب علطول */}
+          <StudentSearchInput />
 
-        {/* 🛑 وضفنا الباجينيشن عشان لو الجروب فيه 1000 طالب */}
-        <PaginationControl totalPages={metadata.totalPages} currentPage={metadata.currentPage} />
+          {/* الجدول والباجينيشن جوه الـ Suspense */}
+          {/* الـ Key مهم عشان لما تعمل بحث او تغير الصفحة، الـ Skeleton يظهر تاني */}
+          <Suspense key={queryStr + page} fallback={<StudentsSkeleton />}>
+            <StudentsList groupId={groupId} page={page} query={queryStr} />
+          </Suspense>
+        </div>
       </div>
     </div>
   )

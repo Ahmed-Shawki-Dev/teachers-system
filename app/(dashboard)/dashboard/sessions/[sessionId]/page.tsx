@@ -1,28 +1,20 @@
-import { getSessionAttendance } from '@/actions/Session/getSessionAttendance'
-import AttendanceSheet from './AttendanceSheet'
+import { Suspense } from 'react'
+import AttendanceContainer from './AttendanceContainer'
+import AttendanceSkeleton from './AttendanceSkeleton'
 
-export default async function SessionDetailsPage({
-  params,
-}: {
+type PageProps = {
   params: Promise<{ sessionId: string }>
-}) {
-  const { sessionId } = await params
+}
 
-  // بنجيب الداتا من الأكشن اللي عملناه المرة اللي فاتت
-  const data = await getSessionAttendance(sessionId)
+export default async function SessionDetailsPage({ params }: PageProps) {
+  const { sessionId } = await params
 
   return (
     <div className='container mx-auto py-6 max-w-4xl'>
-      <AttendanceSheet
-        sessionId={sessionId}
-        initialData={data.students}
-        sessionInfo={{
-          groupName: data.groupName,
-          date: data.sessionDate,
-          price: data.price,
-          paymentType: data.paymentType,
-        }}
-      />
+      {/* هنا السحر كله: الصفحة بتفتح والـ Skeleton شغال لحد ما الـ Container يخلص */}
+      <Suspense fallback={<AttendanceSkeleton />}>
+        <AttendanceContainer sessionId={sessionId} />
+      </Suspense>
     </div>
   )
 }

@@ -20,7 +20,7 @@ type ExamRecord = {
 
 export default function StudentExamsTable({ exams }: { exams: ExamRecord[] }) {
   return (
-    <Card className='bg-transparent'>
+    <Card >
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <FileBarChart2 className='w-5 h-5 text-primary' />

@@ -93,7 +93,7 @@ export const upsertAttendanceAction = async (
     revalidatePath(`/dashboard/sessions/${sessionId}`)
     revalidatePath('/dashboard/sessions')
 
-    return { success: true, message: 'تم الحفظ بنجاح (Bulk Mode) 🚀' }
+    return { success: true, message: 'تم الحفظ بنجاح' }
   } catch (error) {
     console.error('❌ Error in Bulk Action:', error)
     return { success: false, message: 'حدث خطأ، حاول تقليل العدد أو المحاولة لاحقاً' }

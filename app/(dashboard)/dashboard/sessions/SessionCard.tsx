@@ -4,24 +4,27 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
-import { getDailyClasses } from '../../../../actions/Session/getDailyClasses'
+// اتأكد ان المسار ده مظبوط عندك
+import { SessionCardData } from '../../../../actions/Session/getDailyClasses'
 import { formatTo12Hour } from '../../../../utils/formatTime'
 import CancelButton from './CancelButton'
 import StartButton from './StartButton'
 
-type SessionCardData = Awaited<ReturnType<typeof getDailyClasses>>[number]
-
 export default function SessionCard({
   session,
   currentDate,
-  onUpdate,
-}: {
+}: // شيلنا onUpdate من هنا خلاص
+{
   session: SessionCardData
   currentDate: string
-  onUpdate: () => void
 }) {
   const router = useRouter()
   const { groupName, startTime, endTime, studentCount, isCreated, status, sessionId } = session
+
+  // دي الفانكشن اللي هتخبط السيرفر تقوله "هات داتا جديدة"
+  const onUpdate = () => {
+    router.refresh()
+  }
 
   // 1. حالة الحصة لسه ماتفعلتش (شبح)
   if (!isCreated) {
@@ -31,15 +34,14 @@ export default function SessionCard({
           <CardTitle className='text-lg text-muted-foreground'>{groupName}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='text-sm  text-muted-foreground mb-2 text-right' dir='ltr'>
+          <div className='text-sm text-muted-foreground mb-2 text-right' dir='ltr'>
             {formatTo12Hour(startTime)} - {formatTo12Hour(endTime)}
           </div>
           <div className='text-xs text-muted-foreground'>عدد الطلاب: {studentCount}</div>
         </CardContent>
         <CardFooter className='flex gap-2'>
-          {/* زرار الإلغاء */}
+          {/* بنباصي onUpdate اللي عرفناها جوه للزراير */}
           <CancelButton currentDate={currentDate} session={session} onUpdate={onUpdate} />
-          {/* زرار البدء */}
           <StartButton
             currentDate={currentDate}
             session={session}
@@ -66,7 +68,6 @@ export default function SessionCard({
       <CardHeader className='pb-2 flex flex-row justify-between items-start'>
         <CardTitle className='text-lg'>{groupName}</CardTitle>
 
-        {/* بادج الحالة */}
         <span
           className={cn(
             'text-[10px] px-2 py-1 rounded-full font-bold',
@@ -82,7 +83,7 @@ export default function SessionCard({
       </CardHeader>
 
       <CardContent>
-        <div className='text-2xl font-bold  mb-1 text-right '>
+        <div className='text-2xl font-bold mb-1 text-right '>
           {formatTo12Hour(startTime)}
           <span className='text-sm text-muted-foreground font-sans'> حتى </span>
           {formatTo12Hour(endTime)}
@@ -91,8 +92,7 @@ export default function SessionCard({
       </CardContent>
 
       <CardFooter>
-        {/* إخفاء زرار الغياب لو الحصة ملغية */}
-        {status !== 'CANCELED' && (
+        {status !== 'CANCELED' && sessionId && (
           <Button
             className='w-full'
             onClick={() => router.push(`/dashboard/sessions/${sessionId}`)}

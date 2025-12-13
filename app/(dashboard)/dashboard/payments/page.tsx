@@ -1,13 +1,12 @@
 import { getAllGroupsAction } from '@/actions/Group/getGroups'
-import { getMonthlySheet } from '@/actions/Payment/getMonthlySheet'
-import { getUnpaidSessions } from '@/actions/Payment/getUnpaidSessions'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { AlertCircle, Ban, Wallet } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertCircle, Wallet } from 'lucide-react'
+import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import FilterSelect from './FilterSelect'
-import MonthlyTable from './MonthlyTable'
-import UnpaidTable from './UnpaidTable'
-import { redirect } from 'next/navigation' // 👈 استيراد مهم
+import PaymentsList from './PaymentsList'
+import PaymentsSkeleton from './PaymentsSkeleton'
 
 export default async function PaymentsPage({
   searchParams,
@@ -22,17 +21,15 @@ export default async function PaymentsPage({
   const currentMonth = (now.getMonth() + 1).toString()
   const currentYear = now.getFullYear()
 
-  // 🛡️ SECURITY CHECK: URL Validation
-  // لو السنة مبعوثة وتكون أكبر من السنة الجاية أو أقل من اللي فاتت، اطرده
+  // 🛡️ Validation
   if (params.year) {
     const yearNum = parseInt(params.year)
     if (isNaN(yearNum) || yearNum > currentYear + 1 || yearNum < currentYear - 1) {
-      // رجعه لنفس الصفحة بس شيل السنة من اللينك عشان ياخد الديفولت
       redirect(`/dashboard/payments?groupId=${params.groupId || ''}`)
     }
   }
 
-  // 2. القائمة
+  // 2. إعدادات الفلتر
   const yearOptions = [
     { value: (currentYear - 1).toString(), label: (currentYear - 1).toString() },
     { value: currentYear.toString(), label: currentYear.toString() },
@@ -43,23 +40,13 @@ export default async function PaymentsPage({
   const selectedMonth = params.month || currentMonth
   const selectedYear = params.year || currentYear.toString()
 
+  // تحديد المجموعة المختارة ونوعها (ده سريع جداً لانه من الذاكرة)
   const selectedGroup = groups.find((g) => g.id === selectedGroupId)
   const isMonthly = selectedGroup?.paymentType === 'MONTHLY'
 
-  let monthlyData = null
-  let unpaidData = null
-
-  if (selectedGroupId) {
-    if (isMonthly) {
-      monthlyData = await getMonthlySheet(selectedGroupId, `${selectedMonth}-${selectedYear}`)
-    } else {
-      unpaidData = await getUnpaidSessions(selectedGroupId)
-    }
-  }
-
   return (
     <div className='container mx-auto p-4 space-y-6'>
-      {/* نفس الـ JSX بتاعك بالظبط بدون تغيير */}
+      {/* Header Section (بيظهر فوراً) */}
       <div className='flex flex-col md:flex-row justify-between items-center gap-4 bg-card p-4 rounded-lg border shadow-sm'>
         <div className='flex items-center gap-2'>
           <div className='bg-primary/10 p-2 rounded-full text-primary'>
@@ -96,6 +83,7 @@ export default async function PaymentsPage({
         </div>
       </div>
 
+      {/* Card Container */}
       <Card>
         <CardHeader>
           <CardTitle className='flex justify-between items-center'>
@@ -119,26 +107,18 @@ export default async function PaymentsPage({
         </CardHeader>
 
         <CardContent>
-          {!selectedGroupId ? (
-            <div className='text-center py-10 text-muted-foreground'>اختر مجموعة لعرض البيانات</div>
-          ) : isMonthly && monthlyData ? (
-            <MonthlyTable
-              data={monthlyData.sheet}
+          {/* هنا السحر: الجدول بيحمل لوحده */}
+          <Suspense
+            key={selectedGroupId + selectedMonth + selectedYear}
+            fallback={<PaymentsSkeleton />}
+          >
+            <PaymentsList
               groupId={selectedGroupId}
-              monthKey={`${selectedMonth}-${selectedYear}`}
-              amount={monthlyData.price}
+              isMonthly={!!isMonthly}
+              month={selectedMonth}
+              year={selectedYear}
             />
-          ) : unpaidData ? (
-            <UnpaidTable
-              data={unpaidData.debtList}
-              price={unpaidData.price}
-              groupId={selectedGroupId}
-            />
-          ) : (
-            <div className='text-center py-10'>
-              <Ban className='mx-auto mb-2 opacity-20' /> لا توجد بيانات
-            </div>
-          )}
+          </Suspense>
         </CardContent>
       </Card>
     </div>

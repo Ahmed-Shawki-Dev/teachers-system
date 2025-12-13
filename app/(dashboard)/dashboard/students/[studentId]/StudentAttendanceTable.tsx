@@ -32,7 +32,7 @@ export default function StudentAttendanceTable({
   const isPerSession = paymentType === 'PER_SESSION'
 
   return (
-    <Card className='bg-transparent'>
+    <Card>
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <CalendarCheck2 className='w-5 h-5 text-primary' />

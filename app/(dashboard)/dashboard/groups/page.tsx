@@ -1,10 +1,13 @@
 import { Clock10 } from 'lucide-react'
+import { Suspense } from 'react'
 import AddGroupModal from './AddGroupModal'
+import GroupsSkeleton from './GroupsSkeleton'
 import ShowGroups from './ShowGroups'
 
-const page = () => {
+const GroupsPage = () => {
   return (
     <div className='flex flex-col gap-6 p-4 container mx-auto'>
+      {/* Header Section */}
       <div className='flex flex-col md:flex-row justify-between items-center gap-4 bg-card p-4 rounded-lg border shadow-sm'>
         <div className='flex items-center gap-2'>
           <div className='bg-primary/10 p-2 rounded-full text-primary'>
@@ -21,9 +24,12 @@ const page = () => {
         </div>
       </div>
 
-      <ShowGroups />
+      {/* Streaming Section */}
+      <Suspense fallback={<GroupsSkeleton />}>
+        <ShowGroups />
+      </Suspense>
     </div>
   )
 }
 
-export default page
+export default GroupsPage
