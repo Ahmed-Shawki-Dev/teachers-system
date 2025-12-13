@@ -30,13 +30,13 @@ interface UnpaidTableProps {
   groupId: string
 }
 
-export default function UnpaidTable({ data, price, groupId }: UnpaidTableProps) {
+export default function UnpaidTable({ data, price }: UnpaidTableProps) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
 
   const handleSettle = async (studentId: string) => {
     setLoadingId(studentId)
     try {
-      const res = await settleStudentDebt(studentId, groupId)
+      const res = await settleStudentDebt(studentId)
       if (res.success) toast.success(res.message)
       else toast.error(res.message)
     } catch {

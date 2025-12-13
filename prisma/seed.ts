@@ -4,9 +4,9 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 // 🛑 بيانات ثابتة لازم تكون موجودة في الداتابيز عندك
-const TEACHER_ID = '6939db0df1675fd6a421b365'
-const GROUP_ID = '693ab0f470ef115d7b38dc56' // 👈 هات ID جروب حقيقي وحطه هنا
-const FIXED_PHONE = '01000000003'
+const TEACHER_ID = '693d7a76708bf60d72747198'
+const GROUP_ID = '693d7ae2708bf60d7274719b' // 👈 هات ID جروب حقيقي وحطه هنا
+const FIXED_PHONE = '01000000000'
 
 async function main() {
   console.log('🌱 Starting seed with enrollment...')

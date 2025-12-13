@@ -11,16 +11,17 @@ export const getSessionAttendance = async (sessionId: string) => {
 
   if (!session) throw new Error('Session not found')
 
-  // 2. هات كل طلاب الجروب ده
+  // 2. هات كل طلاب الجروب ده (بشرط ميكونوش محذوفين/أرشيف)
   const students = await Prisma.student.findMany({
     where: {
       enrollments: { some: { groupId: session.groupId } },
+      isArchived: false, // 👈👈👈 دي الإضافة السحرية: اخفي المحذوفين من القائمة
     },
     select: {
       id: true,
       name: true,
       parentPhone: true,
-      studentCode: true, // 🛑 1. زودنا دي هنا عشان تيجي من الداتابيز
+      studentCode: true,
     },
     orderBy: { name: 'asc' },
   })
@@ -43,14 +44,12 @@ export const getSessionAttendance = async (sessionId: string) => {
   const formattedStudents = students.map((student) => {
     const record = attendanceMap.get(student.id)
 
-    // لو ملوش سجل حضور، بنعتبره "غياب" افتراضياً أو null حسب رغبتك
-    // بس هنا هنرجعه null عشان يبان في الفرونت إنه لسه ماتخدش
     return {
       studentId: student.id,
       name: student.name,
-      studentCode: student.studentCode, // 🛑 2. وزودنا دي هنا عشان تروح للفرونت
+      studentCode: student.studentCode,
       parentPhone: student.parentPhone,
-      status: record ? record.status : null,
+      status: record ? record.status : null, // لو مفيش، رجع null عشان الفرونت يفهم إن لسه ماتخدش
       note: record?.note || '',
       hasPaid: paymentMap.has(student.id),
     }

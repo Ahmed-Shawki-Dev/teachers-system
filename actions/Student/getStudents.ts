@@ -21,9 +21,10 @@ export const getAllStudentsAction = async (
   // بنبدأ بالشرط الأساسي: الطالب تبع المدرس
   const whereCondition: PrismaClient.StudentWhereInput = {
     teacherId: teacher.id,
+    isArchived: false,
   }
 
-  // 1. لو فيه فلتر جروب، زود الشرط ده
+// 1. لو فيه فلتر جروب، زود الشرط ده
   if (groupId && groupId !== 'all') {
     whereCondition.enrollments = {
       some: { groupId: groupId },

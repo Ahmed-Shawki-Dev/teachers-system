@@ -7,9 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      {/* SidebarInset: ده كومبوننت من shadcn بيظبط العرض والارتفاع 
-          عشان المحتوى مايدخلش تحت السايدبار 
-      */}
+
       <main className='flex flex-col w-full min-h-screen'>
         <Navbar showSidebarTrigger />
         <div className='flex-1 p-4 md:p-6'>{children}</div>

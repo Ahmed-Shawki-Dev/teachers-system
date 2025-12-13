@@ -19,7 +19,11 @@ export const getExamDetails = async (examId: string) => {
 
   // 2. هات طلاب المجموعة + نتايجهم
   const enrollments = await Prisma.enrollment.findMany({
-    where: { groupId: exam.groupId },
+    where: {
+      groupId: exam.groupId,
+
+      student: { isArchived: false },
+    },
     include: {
       student: {
         include: {

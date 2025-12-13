@@ -13,36 +13,41 @@ export const toggleMonthlyPayment = async (
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('Unauthorized')
 
-  // 🛡️ SECURITY GUARD: Backend Validation
-  // لازم نفك الـ Key ونشوف السنة
-  const parts = monthKey.split('-') // ["10", "2031"]
+  // ... (نفس كود التأكد من التاريخ) ...
+  const parts = monthKey.split('-')
   if (parts.length !== 2) throw new Error('Invalid format')
-
   const year = parseInt(parts[1])
   const currentYear = new Date().getFullYear()
 
-  // لو السنة أكبر من السنة الجاية أو أقل من اللي فاتت -> بلوك
   if (year > currentYear + 1 || year < currentYear - 1) {
     throw new Error('محاولة تلاعب بالتاريخ مرفوضة')
   }
 
+  // 👇👇👇 التعديل هنا 👇👇👇
+  // دور على دفع للشهر ده للطالب ده "عند المدرس ده"، بغض النظر عن الجروب
   const existing = await Prisma.payment.findFirst({
-    where: { studentId, groupId, monthKey },
+    where: {
+      studentId,
+      monthKey,
+      group: { teacherId: teacher.id }, // السر هنا
+    },
   })
 
   if (existing) {
+    // لو لقيت دفع (سواء في الجروب ده أو القديم) امسحه
     await Prisma.payment.delete({ where: { id: existing.id } })
     revalidatePath('/dashboard/payments')
     return { status: 'unpaid', message: 'تم إلغاء الدفع ❌' }
   } else {
+    // لو ملقيتش، سجل دفع جديد "في الجروب الحالي"
     await Prisma.payment.create({
       data: {
         amount,
         type: 'MONTHLY',
-        date: new Date(), // تاريخ الدفع الحقيقي هو "الآن"
+        date: new Date(),
         studentId,
-        groupId,
-        monthKey, // الشهر اللي بيدفع عشانه (بعد ما اتأكدنا إنه سليم)
+        groupId, // هنسجل الدفع باسم الجروب الجديد بقى خلاص
+        monthKey,
       },
     })
     revalidatePath('/dashboard/payments', 'page')

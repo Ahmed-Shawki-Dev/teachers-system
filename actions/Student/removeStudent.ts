@@ -7,10 +7,15 @@ export const removeStudentAction = async (id: string) => {
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('Not authenticated')
 
-  const student = await Prisma.student.findUnique({ where: { id } })
-  if (!student) throw new Error('Student not found')
-  if (student.teacherId !== teacher.id) throw new Error('Unauthorized')
+  // التعديل: شلنا سطر enrollments: { deleteMany: {} }
+  // كده الطالب هيفضل مربوط بالمجموعة، وحساباته هتفضل ظاهرة
+  await Prisma.student.update({
+    where: { id },
+    data: {
+      isArchived: true,
+    },
+  })
 
-  await Prisma.student.delete({ where: { id } })
   revalidatePath('/dashboard/students')
+  revalidatePath('/dashboard/payments') // مهم عشان يحدث الفلوس
 }
