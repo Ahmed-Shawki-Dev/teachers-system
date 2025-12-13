@@ -8,7 +8,7 @@ export const removeGroupAction = async (id: string) => {
   if (!teacher) throw new Error('Not authenticated')
 
   const group = await Prisma.group.findUnique({ where: { id } })
-  if (!group) throw new Error('Student not found')
+  if (!group) throw new Error('Group not found')
   if (group.teacherId !== teacher.id) throw new Error('Unauthorized')
 
   await Prisma.group.delete({ where: { id } })
