@@ -9,11 +9,17 @@ import { useTeacherStore } from '../../store/useAuthStore'
 import Logo from '../Logo'
 import { ModeToggle } from '../toggle-theme'
 import { Button } from '../ui/button'
-import { SidebarTrigger } from '../ui/sidebar'
 import { Separator } from '../ui/separator'
+import { SidebarTrigger } from '../ui/sidebar'
 import UserMenu from './UserMenu'
 
-const Navbar = ({ className }: { className?: string }) => {
+const Navbar = ({
+  className,
+  showSidebarTrigger = false,
+}: {
+  className?: string
+  showSidebarTrigger?: boolean
+}) => {
   const router = useRouter()
   const { teacher, setTeacher } = useTeacherStore()
   const [loading, setLoading] = useState(true)
@@ -52,7 +58,7 @@ const Navbar = ({ className }: { className?: string }) => {
         {/* 1. المنطقة اليمنى: التريجر (بشرط) + اللوجو */}
         <div className='flex items-center gap-2'>
           {/* 🛑 التعديل الأهم: الزرار والفاصل يظهروا بس لو المدرس موجود (يعني جوا الداشبورد) */}
-          {teacher?.id && (
+          {showSidebarTrigger && (
             <>
               <SidebarTrigger className='h-9 w-9' />
               <Separator orientation='vertical' className='h-6 mx-1 hidden sm:block' />
