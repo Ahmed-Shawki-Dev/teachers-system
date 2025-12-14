@@ -50,9 +50,12 @@ export const getDailyClasses = async (dateString: string) => {
     },
   })
 
-  // 5. الخلاط (زي ما هو)
+  // 5. الخلاط (تعديل: دمج اسم الجروب)
   const dailyClasses = scheduledGroups.flatMap((group) => {
     const todaysSchedules = group.schedule.filter((s) => s.dayOfWeek === dayName)
+
+    // 🛑 بناء الاسم المدمج
+    const fullGroupName = group.name ? `${group.grade} - ${group.name}` : group.grade
 
     return todaysSchedules.map((scheduleItem) => {
       // بما إننا فلترنا فوق، السيشن اللي هتيجي أكيد بتاعة المدرس ده
@@ -60,7 +63,7 @@ export const getDailyClasses = async (dateString: string) => {
 
       return {
         groupId: group.id,
-        groupName: group.name,
+        groupName: fullGroupName, // <-- استخدام الاسم المدمج
         studentCount: group._count.enrollments,
         startTime: scheduleItem.startTime,
         endTime: scheduleItem.endTime,

@@ -22,7 +22,8 @@ export async function settleStudentDebt(studentId: string) {
         },
         include: {
           session: {
-            include: { group: true }, // عشان نجيب سعر الحصة وتفاصيل الجروب بتاعها
+            // ✅ include: { group: true } بتجيب كل حقول الجروب بما فيها grade
+            include: { group: true },
           },
         },
       },

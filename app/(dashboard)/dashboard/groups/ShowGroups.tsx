@@ -11,6 +11,7 @@ import { formatTo12Hour } from '@/utils/formatTime'
 import { Ban, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '../../../../components/ui/button'
+import { getFullGroupName } from '../../../../utils/groupName'
 import RemoveGroup from './RemoveGroup'
 import UpdateGroupModal from './UpdateGroupModal'
 
@@ -44,6 +45,7 @@ export default async function ShowGroups() {
             {groups.length > 0 ? (
               groups.map((group) => {
                 const schedules = group.schedule || []
+                const { grade, name } = group
 
                 return (
                   <TableRow key={group.id} className='hover:bg-muted/5 transition-colors'>
@@ -53,7 +55,7 @@ export default async function ShowGroups() {
                         href={`/dashboard/groups/${group.id}`}
                         className='text-primary hover:underline underline-offset-4'
                       >
-                        {group.name}
+                        {getFullGroupName({ name, grade })}
                       </Link>
                     </TableCell>
 

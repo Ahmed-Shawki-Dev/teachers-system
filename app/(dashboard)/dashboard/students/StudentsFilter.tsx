@@ -7,53 +7,40 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { IGroupDB } from '@/interfaces/groups' // 1. استيراد الانترفيس الصح
+import { getFullGroupName } from '@/utils/groupName' // 2. استيراد دالة الاسم
 import { useRouter, useSearchParams } from 'next/navigation'
 
-// تعريف نوع الجروب
-type GroupOption = {
-  id: string
-  name: string
-}
-
-export default function StudentsFilter({ groups }: { groups: GroupOption[] }) {
+// 3. تعديل الـ Props عشان تستقبل IGroupDB[]
+export default function StudentsFilter({ groups }: { groups: IGroupDB[] }) {
+  const router = useRouter()
   const searchParams = useSearchParams()
-  const { replace } = useRouter()
+  const currentGroup = searchParams.get('groupId') || 'all'
 
-  // بنقرا القيمة الحالية من الرابط عشان تفضل مختارة بعد الريفريش
-  const currentGroupId = searchParams.get('groupId') || 'all'
+  const handleFilter = (val: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (val && val !== 'all') params.set('groupId', val)
+    else params.delete('groupId')
 
-  const handleFilter = (groupId: string) => {
-    const params = new URLSearchParams(searchParams)
+    // بنرجع للصفحة الأولى مع الفلتر الجديد
+    params.set('page', '1')
 
-    if (groupId && groupId !== 'all') {
-      params.set('groupId', groupId)
-    } else {
-      params.delete('groupId')
-    }
-
-    replace(`?${params.toString()}`)
+    router.push(`?${params.toString()}`)
   }
 
   return (
-    <Select value={currentGroupId} onValueChange={handleFilter}>
-      <SelectTrigger className='w-[200px] bg-background'>
+    <Select value={currentGroup} onValueChange={handleFilter}>
+      <SelectTrigger className='w-[180px]'>
         <SelectValue placeholder='كل المجموعات' />
       </SelectTrigger>
-
       <SelectContent>
-        <SelectItem value='all' className='font-bold text-primary'>
-          عرض الكل
-        </SelectItem>
-
-        {groups.length > 0 ? (
-          groups.map((group) => (
-            <SelectItem key={group.id} value={group.id}>
-              {group.name}
-            </SelectItem>
-          ))
-        ) : (
-          <div className='p-2 text-sm text-muted-foreground text-center'>لا توجد مجموعات</div>
-        )}
+        <SelectItem value='all'>كل المجموعات</SelectItem>
+        {groups.map((group) => (
+          <SelectItem key={group.id} value={group.id}>
+            {/* 4. استخدام الدالة لعرض الاسم المدمج */}
+            {getFullGroupName({ grade: group.grade, name: group.name })}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   )

@@ -36,6 +36,7 @@ import {
 } from '../../../../components/ui/select'
 import { IGroupDB } from '../../../../interfaces/groups'
 import { IStudent, studentSchema } from '../../../../validation/studentSchema'
+import { getFullGroupName } from '../../../../utils/groupName'
 
 export default function UpdateStudentModal({
   studentId,
@@ -139,8 +140,10 @@ export default function UpdateStudentModal({
 
                         <SelectContent className='max-h-60 overflow-auto'>
                           {groups.map((group) => (
-                            <div key={group.name} className='py-2'>
-                              <SelectItem value={group.id}>{group.name}</SelectItem>
+                            <div key={group.id} className='py-2'>
+                              <SelectItem value={group.id}>
+                                {getFullGroupName({ grade: group.grade, name: group.name })}
+                              </SelectItem>
                             </div>
                           ))}
                         </SelectContent>

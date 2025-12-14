@@ -40,8 +40,6 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { IGroupDB } from '../../../../interfaces/groups'
 
-
-
 export default function UpdateGroupModal({ group }: { group: IGroupDB }) {
   const [open, setOpen] = useState(false)
 
@@ -49,10 +47,10 @@ export default function UpdateGroupModal({ group }: { group: IGroupDB }) {
   const form = useForm({
     resolver: zodResolver(groupSchema),
     defaultValues: {
-      name: group.name,
+      grade: group.grade,
+      name: group.name || '',
       price: group.price,
       paymentType: group.paymentType,
-      // لازم نتأكد إن المواعيد جاية مصفوفة حتى لو فاضية
       schedule: group.schedule || [],
     },
   })
@@ -78,9 +76,7 @@ export default function UpdateGroupModal({ group }: { group: IGroupDB }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant='secondary'
-        >
+        <Button variant='secondary'>
           <Edit className='w-4 h-4' />
         </Button>
       </DialogTrigger>
@@ -96,12 +92,12 @@ export default function UpdateGroupModal({ group }: { group: IGroupDB }) {
             {/* 1. اختيار الصف (Select) */}
             <FormField
               control={form.control}
-              name='name'
+              name='grade'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>الصف الدراسي</FormLabel>
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select value={field.value!} onValueChange={field.onChange}>
                       <SelectTrigger>
                         <SelectValue placeholder='اختر الصف الدراسي' />
                       </SelectTrigger>
@@ -120,6 +116,26 @@ export default function UpdateGroupModal({ group }: { group: IGroupDB }) {
                         ))}
                       </SelectContent>
                     </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* 2. Name (Input) */}
+            <FormField
+              control={form.control}
+              name='name'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>اسم المجموعة الفرعي (اختياري)</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder='توضيح اسم المجموعة (بنات - بنين) أو أي أسم'
+                      value={field.value || ''}
+                      className='max-w-xs'
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

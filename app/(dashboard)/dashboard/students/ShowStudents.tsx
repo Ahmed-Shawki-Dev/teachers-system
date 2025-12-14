@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client' // 👈 استورد Prisma Namespace
 import {
   Table,
   TableBody,
@@ -7,11 +6,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Prisma } from '@prisma/client' // 👈 استورد Prisma Namespace
 import { Ban, Eye } from 'lucide-react'
 import Link from 'next/link'
+import { Button } from '../../../../components/ui/button'
+import { getFullGroupName } from '../../../../utils/groupName'
 import RemoveStudent from './RemoveStudent'
 import UpdateStudentModal from './UpdateStudentModal'
-import { Button } from '../../../../components/ui/button'
 
 // 🛑 تعريف الـ Type السحري:
 // ده بيقول: أنا عايز نوع "طالب" بس كمان معاه الـ enrollments والجروب اللي جواها
@@ -20,7 +21,7 @@ type StudentWithGroup = Prisma.StudentGetPayload<{
     enrollments: {
       include: {
         group: {
-          select: { name: true; id: true } // حددنا الحقول اللي بنختارها في الأكشن
+          select: { name: true; id: true; grade: true } // حددنا الحقول اللي بنختارها في الأكشن
         }
       }
     }
@@ -40,7 +41,6 @@ function ShowStudents({ students }: ShowStudentsProps) {
             <TableRow className='bg-muted/50 hover:bg-muted/50'>
               <TableHead className='w-[100px]'>الكود</TableHead>
               <TableHead>الإسم</TableHead>
-              <TableHead>رقم ولي الأمر</TableHead>
               <TableHead>الصف</TableHead>
               <TableHead className='text-center'>الإجراءات</TableHead>
             </TableRow>
@@ -67,10 +67,11 @@ function ShowStudents({ students }: ShowStudentsProps) {
                       {student.name}
                     </Link>
                   </TableCell>
-                  <TableCell>{student.parentPhone}</TableCell>
                   <TableCell>
                     {/* وفاهم إن currentGroup ممكن يكون null أو فيه name */}
-                    {currentGroup ? currentGroup.name : 'بدون جروب'}
+                    {currentGroup
+                      ? getFullGroupName({ grade: currentGroup.grade, name: currentGroup.name })
+                      : 'بدون مجموعة'}
                   </TableCell>
                   <TableCell>
                     <div className='flex gap-2 justify-center'>

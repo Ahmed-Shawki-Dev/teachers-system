@@ -7,6 +7,7 @@ import { Suspense } from 'react'
 import StudentSearchInput from '../../../../../components/StudentSearchInput'
 import StudentsList from './StudentsList'
 import StudentsSkeleton from './StudentsSkeleton'
+import { getFullGroupName } from '../../../../../utils/groupName'
 
 const translateDay = (day: DayOfWeek) => {
   const days: Record<string, string> = {
@@ -36,6 +37,7 @@ export default async function GroupDetailsPage({
 
   // 1. بيانات المجموعة (سريعة ومهمة للعنوان، مش محتاجة Suspense)
   const group = await getGroupDetails(groupId)
+  const {name,grade} = group
 
   return (
     <div className='flex flex-col gap-8 p-4 container mx-auto'>
@@ -44,7 +46,9 @@ export default async function GroupDetailsPage({
         <Card className='md:col-span-2 border-t-4 border-t-primary shadow-sm'>
           <CardHeader>
             <CardTitle className='flex justify-between items-center'>
-              <span className='text-2xl font-bold text-primary'>{group.name}</span>
+              <span className='text-2xl font-bold text-primary'>
+                {getFullGroupName({ name, grade })}
+              </span>
               <Badge variant='secondary' className='text-sm px-3'>
                 <Users className='w-4 h-4 ml-1 inline' />
                 {group._count.enrollments} طالب

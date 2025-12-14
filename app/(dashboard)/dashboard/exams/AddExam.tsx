@@ -31,23 +31,26 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { createExamAction } from '../../../../actions/Exam/createExam'
+// 👇 1. استورد الانترفيس واليوتيلتي
+import { IGroupDB } from '@/interfaces/groups'
+import { getFullGroupName } from '@/utils/groupName'
 
-// تعريف نوع الجروب عشان التايب سكريبت
-type GroupOption = {
-  id: string
-  name: string
-}
+// ❌ امسح التايب ده ملوش لازمة وهيسبب مشاكل
+// type GroupOption = {
+//   id: string
+//   name: string
+// }
 
-export default function AddExamModal({ groups }: { groups: GroupOption[] }) {
+// 👇 2. استخدم IGroupDB هنا
+export default function AddExamModal({ groups }: { groups: IGroupDB[] }) {
   const [open, setOpen] = useState(false)
-
   const form = useForm({
     resolver: zodResolver(examSchema),
     defaultValues: {
       title: '',
       date: new Date(),
       maxScore: 20,
-      groupId: '', // بنبدأ فاضي والمستر يختار
+      groupId: '',
     },
   })
 
@@ -86,7 +89,7 @@ export default function AddExamModal({ groups }: { groups: GroupOption[] }) {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-            {/* اختيار المجموعة (الجديد) */}
+            {/* اختيار المجموعة */}
             <FormField
               control={form.control}
               name='groupId'
@@ -100,11 +103,15 @@ export default function AddExamModal({ groups }: { groups: GroupOption[] }) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {groups.map((group) => (
-                        <SelectItem key={group.id} value={group.id}>
-                          {group.name}
-                        </SelectItem>
-                      ))}
+                      {groups.map((group) => {
+                        const { grade, name } = group
+
+                        return (
+                          <SelectItem key={group.id} value={group.id}>
+                            {getFullGroupName({ grade, name })}
+                          </SelectItem>
+                        )
+                      })}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -112,7 +119,7 @@ export default function AddExamModal({ groups }: { groups: GroupOption[] }) {
               )}
             />
 
-            {/* اسم الامتحان */}
+            {/* باقي الفورم زي ما هو... */}
             <FormField
               control={form.control}
               name='title'
@@ -127,7 +134,6 @@ export default function AddExamModal({ groups }: { groups: GroupOption[] }) {
               )}
             />
 
-            {/* التاريخ والدرجة */}
             <div className='flex gap-4'>
               <FormField
                 control={form.control}

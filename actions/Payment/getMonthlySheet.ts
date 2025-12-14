@@ -2,12 +2,12 @@
 
 import { Prisma } from '@/lib/prisma'
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
+import { getFullGroupName } from '@/utils/groupName'
 
 export const getMonthlySheet = async (groupId: string, monthKey: string) => {
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('Unauthorized')
 
-  // ... (نفس كود التأكد من السنة والجروب زي ما هو) ...
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, yearStr] = monthKey.split('-')
   const year = parseInt(yearStr)
@@ -29,16 +29,12 @@ export const getMonthlySheet = async (groupId: string, monthKey: string) => {
 
   if (!group || group.teacherId !== teacher.id) throw new Error('غير مصرح')
 
-  // 👇👇👇 التعديل الخطير هنا 👇👇👇
-  // 1. هات قائمة بكل الـ IDs بتوع الطلاب اللي في المجموعة دي
   const studentIds = group.enrollments.map((e) => e.studentId)
 
-  // 2. هات المدفوعات بتاعة الطلاب دول للشهر ده، في "أي مجموعة" تخص المدرس ده
   const payments = await Prisma.payment.findMany({
     where: {
       monthKey,
-      studentId: { in: studentIds }, // دور على الطلاب دول بس
-      // التريك: دور في أي مجموعة يكون صاحبها هو المدرس ده
+      studentId: { in: studentIds },
       group: {
         teacherId: teacher.id,
       },
@@ -46,17 +42,17 @@ export const getMonthlySheet = async (groupId: string, monthKey: string) => {
   })
 
   const sheet = group.enrollments.map((e) => {
-    // دور لو الطالب ده ليه أي عملية دفع رجعت في الـ Array
     const payment = payments.find((p) => p.studentId === e.studentId)
 
     return {
       studentId: e.student.id,
       name: e.student.name,
+      studentCode: e.student.studentCode, // 👈👈👈 ضيف ده ضروري
       phone: e.student.parentPhone,
-      isPaid: !!payment, // لو لقينا دفع يبقى تمام
-      amount: payment ? payment.amount : group.price, // اعرض المبلغ اللي دفعه فعلياً (حتى لو كان سعر الجروب القديم)
+      isPaid: !!payment,
+      amount: payment ? payment.amount : group.price,
     }
   })
 
-  return { sheet, groupName: group.name, price: group.price }
+  return { sheet, groupName: getFullGroupName(group), price: group.price }
 }

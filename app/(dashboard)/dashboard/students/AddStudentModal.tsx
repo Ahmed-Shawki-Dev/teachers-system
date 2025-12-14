@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from '../../../../components/ui/select'
 import { IGroupDB } from '../../../../interfaces/groups'
+import { getFullGroupName } from '../../../../utils/groupName'
 import { IStudent, studentSchema } from '../../../../validation/studentSchema'
 
 export default function AddStudentModal() {
@@ -79,7 +80,7 @@ export default function AddStudentModal() {
       <Form {...form}>
         <form id='form-add-student' onSubmit={form.handleSubmit(onSubmit)}>
           <DialogTrigger asChild>
-            <Button >
+            <Button>
               <PlusCircle />
               أضف طالب
             </Button>
@@ -133,8 +134,10 @@ export default function AddStudentModal() {
 
                         <SelectContent className='max-h-60 overflow-auto'>
                           {groups.map((group) => (
-                            <div key={group.name} className='py-2'>
-                              <SelectItem value={group.id}>{group.name}</SelectItem>
+                            <div key={group.id} className='py-2'>
+                              <SelectItem value={group.id}>
+                                {getFullGroupName({ grade: group.grade, name: group.name })}
+                              </SelectItem>
                             </div>
                           ))}
                         </SelectContent>

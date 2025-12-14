@@ -2,7 +2,10 @@ import { z } from 'zod'
 
 export const groupSchema = z.object({
   // 1. اسم المجموعة
-  name: z.string().min(2, 'اختار الصف الدراسي'),
+  grade: z.string().min(1, 'اختار الصف الدراسي'), // NEW: الصف الدراسي هو المطلوب أساساً
+
+  // 2. اسم المجموعة التفصيلي (اختياري)
+  name: z.string().nullish(), // MODIFIED: اختياري وممكن يكون null
 
   // 2. السعر (بنستخدم coerce عشان يحول النص لرقم)
   price: z.coerce.number().min(0, 'السعر مطلوب'),

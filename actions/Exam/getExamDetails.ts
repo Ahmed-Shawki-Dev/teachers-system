@@ -10,7 +10,8 @@ export const getExamDetails = async (examId: string) => {
   const exam = await Prisma.exam.findUnique({
     where: { id: examId },
     include: {
-      group: { select: { id: true, name: true, teacherId: true } },
+      // ✅ ممتاز، ضفت grade هنا
+      group: { select: { id: true, name: true, teacherId: true, grade: true } },
     },
   })
 
@@ -57,6 +58,7 @@ export const getExamDetails = async (examId: string) => {
     maxScore: exam.maxScore,
     date: exam.date,
     groupName: exam.group.name,
+    groupGrade: exam.group.grade, 
     students,
   }
 }

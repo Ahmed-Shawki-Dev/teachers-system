@@ -1,6 +1,7 @@
 import { getAllGroupsAction } from '@/actions/Group/getGroups'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getFullGroupName } from '@/utils/groupName' // 💡 استيراد الدالة
 import { AlertCircle, Wallet } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
@@ -31,9 +32,15 @@ export default async function PaymentsPage({
 
   // 2. إعدادات الفلتر
   const yearOptions = [
-    { value: (currentYear - 1).toString(), label: (currentYear - 1).toString() },
+    {
+      value: (currentYear - 1).toString(),
+      label: (currentYear - 1).toString(),
+    },
     { value: currentYear.toString(), label: currentYear.toString() },
-    { value: (currentYear + 1).toString(), label: (currentYear + 1).toString() },
+    {
+      value: (currentYear + 1).toString(),
+      label: (currentYear + 1).toString(),
+    },
   ]
 
   const selectedGroupId = params.groupId || (groups.length > 0 ? groups[0].id : '')
@@ -43,7 +50,6 @@ export default async function PaymentsPage({
   // تحديد المجموعة المختارة ونوعها (ده سريع جداً لانه من الذاكرة)
   const selectedGroup = groups.find((g) => g.id === selectedGroupId)
   const isMonthly = selectedGroup?.paymentType === 'MONTHLY'
-
   return (
     <div className='container mx-auto p-4 space-y-6'>
       {/* Header Section (بيظهر فوراً) */}
@@ -55,7 +61,12 @@ export default async function PaymentsPage({
           <div>
             <h1 className='text-2xl font-bold text-primary'>الماليات والتحصيل</h1>
             <p className='text-sm text-muted-foreground'>
-              {selectedGroup ? `عرض ماليات مجموعة: ${selectedGroup.name}` : 'اختر مجموعة'}
+              {selectedGroup
+                ? `عرض ماليات مجموعة: ${getFullGroupName({
+                    grade: selectedGroup.grade,
+                    name: selectedGroup.name,
+                  })}`
+                : 'اختر مجموعة'}
             </p>
           </div>
         </div>
@@ -76,7 +87,15 @@ export default async function PaymentsPage({
           )}
           <FilterSelect
             paramKey='groupId'
-            options={groups.map((g) => ({ value: g.id, label: g.name }))}
+            // 🛑 الخطأ هنا: يجب استخدام g (المجموعة الحالية في الـ loop) وليس selectedGroup
+            options={groups.map((g) => ({
+              value: g.id,
+              // 💡 التصحيح المنطقي والنوعي
+              label: getFullGroupName({
+                grade: g.grade, 
+                name: g.name, 
+              }),
+            }))}
             defaultValue={selectedGroupId}
             placeholder='اختر المجموعة'
           />

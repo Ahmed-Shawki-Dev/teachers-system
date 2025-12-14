@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/select'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { IGroupDB } from '../../../../interfaces/groups'
+// 👇 استيراد الدالة
+import { getFullGroupName } from '@/utils/groupName'
 
 export default function ExamsFilter({ groups }: { groups: IGroupDB[] }) {
   const router = useRouter()
@@ -30,11 +32,15 @@ export default function ExamsFilter({ groups }: { groups: IGroupDB[] }) {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value='all'>كل المجموعات</SelectItem>
-        {groups.map((g) => (
-          <SelectItem key={g.id} value={g.id}>
-            {g.name}
-          </SelectItem>
-        ))}
+        {groups.map((g) => {
+          const {grade,name} = g
+return (
+  <SelectItem key={g.id} value={g.id}>
+    {getFullGroupName({grade,name})}
+  </SelectItem>
+)
+        }
+        )}
       </SelectContent>
     </Select>
   )

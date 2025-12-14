@@ -21,12 +21,14 @@ export default function LoginPage() {
         }}
       />
 
-      {/* زرار العودة */}
-      <div className='absolute top-4 right-4 sm:top-8 sm:right-8 z-10'>
+      {/* 🛑 التعديل الجذري هنا: */}
+      {/* 1. حولنا absolute لـ fixed عشان يخرج برا حسابات الـ Flexbox خالص */}
+      {/* 2. خلينا z-50 عشان يبقى فوق أي حاجة */}
+      <div className='fixed top-4 right-4 sm:top-8 sm:right-8 z-50'>
         <Button
           variant='ghost'
           asChild
-          className='gap-2 backdrop-blur-sm bg-background/50 hover:bg-background/80 border border-primary/20'
+          className='gap-2 backdrop-blur-md bg-background/60 hover:bg-background/90 border border-primary/20 shadow-sm'
         >
           <Link href='/'>
             <ArrowRight className='w-4 h-4' />

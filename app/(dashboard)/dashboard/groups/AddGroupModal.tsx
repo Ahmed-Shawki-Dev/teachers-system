@@ -47,6 +47,7 @@ export default function AddGroupModal() {
     resolver: zodResolver(groupSchema),
     defaultValues: {
       name: '',
+      grade:'',
       price: 0,
       paymentType: 'PER_SESSION',
       schedule: [], // دلوقتي التايب سكريبت عارف إن دي موجودة
@@ -100,7 +101,7 @@ export default function AddGroupModal() {
             {/* اختيار الصف */}
             <FormField
               control={form.control}
-              name='name'
+              name='grade'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>الصف الدراسي</FormLabel>
@@ -124,6 +125,25 @@ export default function AddGroupModal() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='name'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>اسم المجموعة الفرعي (اختياري)</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder='توضيح اسم المجموعة (بنات - بنين) أو أي أسم'
+                      value={field.value || ''}
+                      className='max-w-xs'
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -167,7 +187,7 @@ export default function AddGroupModal() {
                 control={form.control}
                 name='price'
                 render={({ field }) => (
-                  <FormItem >
+                  <FormItem>
                     <FormLabel>قيمة الاشتراك / الحصة</FormLabel>
                     <FormControl>
                       <div className='relative'>

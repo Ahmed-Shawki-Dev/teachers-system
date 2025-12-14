@@ -14,7 +14,8 @@ export const addGroupAction = async (data: IGroupInput) => {
     // إنشاء المجموعة + المواعيد في خطوة واحدة
     await Prisma.group.create({
       data: {
-        name: data.name,
+        grade: data.grade, // NEW: أضفنا الصف الدراسي
+        name: data.name, // MODIFIED: الاسم التفصيلي (هيجي null/undefined لو مش موجود وده طبيعي)
         price: data.price,
         paymentType: data.paymentType as PaymentType,
         teacherId: teacher.id,

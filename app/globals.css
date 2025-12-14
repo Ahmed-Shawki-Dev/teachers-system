@@ -4,35 +4,38 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* --- ☀️ وضع النهار (Super Crisp & Depth) --- */
+  /* --- ☀️ وضع النهار (Modern, Light, Crisp) --- */
   
-  --background: oklch(98.5% 0 0); /* خلفية نقية جداً */
+  /* خلفية نقية جداً */
+  --background: #f9f9f9; 
   --foreground: oklch(14% 0.02 250);
 
+  /* الكارد أبيض نقي مع شادو واضح */
   --card: oklch(100% 0 0);
   --card-foreground: oklch(14% 0.02 250);
 
   --popover: oklch(100% 0 0);
   --popover-foreground: oklch(14% 0.02 250);
 
-  --primary: oklch(52% 0.16 200);
+  /* Primary: لون حيوي (Teal/Cyan) */
+  --primary: oklch(50% 0.18 200); 
   --primary-foreground: oklch(98% 0 0);
 
-  --secondary: oklch(96% 0.01 240);
+  --secondary: oklch(94% 0.01 240);
   --secondary-foreground: oklch(25% 0.02 250);
 
-  --muted: oklch(95% 0.01 240);
+  --muted: oklch(92% 0.01 240);
   --muted-foreground: oklch(45% 0.02 250);
 
-  --accent: oklch(95% 0.01 200);
+  --accent: oklch(92% 0.01 200);
   --accent-foreground: oklch(25% 0.02 250);
 
   --destructive: oklch(60% 0.18 25);
   --destructive-foreground: oklch(98% 0 0);
 
-  /* البوردر: رجعته ناعم (88%) لأن الشادو هو اللي هيقوم بالواجب */
-  --border: oklch(88% 0.01 240);
-  --input: oklch(100% 0 0);
+  /* البوردر: أنعم عشان ميزاحمش الشادو */
+  --border: oklch(90% 0.01 240);
+  --input: oklch(99% 0 0);
   --ring: var(--primary);
 
   --chart-1: oklch(60% 0.15 200);
@@ -43,9 +46,9 @@
 
   --sidebar: oklch(99% 0.001 240);
   --sidebar-foreground: oklch(14% 0.02 250);
-  --sidebar-primary: oklch(52% 0.16 200);
+  --sidebar-primary: oklch(50% 0.18 200);
   --sidebar-primary-foreground: oklch(98% 0 0);
-  --sidebar-accent: oklch(95% 0.01 240);
+  --sidebar-accent: oklch(92% 0.01 240);
   --sidebar-accent-foreground: oklch(25% 0.02 250);
   --sidebar-border: oklch(90% 0.01 240);
   --sidebar-ring: var(--primary);
@@ -54,32 +57,32 @@
   --font-serif: Amiri, Georgia, serif;
   --font-mono: Geist Mono, Courier New, monospace;
 
-  --radius: 0.7rem;
+  /* 💡 زيادة Radius شوية للنعومة */
+  --radius: 0.8rem;
 
-  /* 🛑 السحر كله هنا (Shadows for Light Mode) 🛑 */
-  /* استبدلت اللون الرمادي بالأسود مع شفافية (Alpha) */
-  --shadow-2xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-xs: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-sm: 0 2px 5px 0 rgb(0 0 0 / 0.08), 0 1px 1px -1px rgb(0 0 0 / 0.03);
+  /* 🛑 Shadows Light Mode: ألوان ناعمة وقوية قليلاً */
+  --shadow-2xs: 0 1px 2px 0 rgb(0 0 0 / 0.08);
+  --shadow-xs: 0 1px 4px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.08);
+  --shadow-sm: 0 4px 8px 0 rgb(0 0 0 / 0.1), 0 1px 3px -1px rgb(0 0 0 / 0.05);
   
-  /* الشادو الأساسي للكروت: قوي ومفصول */
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  /* الشادو الأساسي للكروت: أنظف وأقوى من القديم */
+  --shadow: 0 6px 12px 0 rgb(0 0 0 / 0.12), 0 3px 6px -2px rgb(0 0 0 / 0.08);
   
-  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  --shadow-2xl: 0 35px 60px -15px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 12px 20px -3px rgb(0 0 0 / 0.15);
+  --shadow-lg: 0 20px 30px -5px rgb(0 0 0 / 0.2);
+  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.3);
+  --shadow-2xl: 0 35px 60px -15px rgb(0 0 0 / 0.4);
 }
 
 .dark {
-  /* --- 🌑 وضع الليل (Shadows for Glow) --- */
-  --background: oklch(21% 0.02 260);
+  /* --- 🌑 وضع الليل (Shadows for Glow and Depth) --- */
+  --background: oklch(20% 0.02 260); /* أغمق شوية لعمق أكبر */
   --foreground: oklch(95% 0.01 240);
 
-  --card: oklch(26% 0.02 260);
+  --card: oklch(25% 0.02 260);
   --card-foreground: oklch(95% 0.01 240);
 
-  --popover: oklch(26% 0.02 260);
+  --popover: oklch(25% 0.02 260);
   --popover-foreground: oklch(95% 0.01 240);
 
   --primary: oklch(60% 0.14 200); 
@@ -97,8 +100,8 @@
   --destructive: oklch(60% 0.18 25);
   --destructive-foreground: oklch(98% 0 0);
 
-  /* البوردر في الدارك يفضل واضح */
-  --border: oklch(32% 0.02 260);
+  /* البوردر في الدارك: تباين خفيف */
+  --border: oklch(30% 0.02 260); 
   --input: oklch(28% 0.02 260);
   --ring: var(--primary);
 
@@ -108,24 +111,24 @@
   --chart-4: oklch(65% 0.12 280);
   --chart-5: oklch(60% 0.1 140);
 
-  --sidebar: oklch(23% 0.02 260);
+  --sidebar: oklch(22% 0.02 260);
   --sidebar-foreground: oklch(95% 0.01 240);
   --sidebar-primary: oklch(60% 0.14 200);
   --sidebar-primary-foreground: oklch(98% 0 0);
   --sidebar-accent: oklch(28% 0.02 260);
   --sidebar-accent-foreground: oklch(95% 0.01 240);
-  --sidebar-border: oklch(32% 0.02 260);
+  --sidebar-border: oklch(30% 0.02 260);
   --sidebar-ring: var(--primary);
 
-  /* 🛑 ظلال الدارك: أتقل عشان تبان كـ Glow خفيف أو عمق في السواد */
-  --shadow-2xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-xs: 0 1px 3px 0 rgb(0 0 0 / 0.4);
-  --shadow-sm: 0 2px 5px 0 rgb(0 0 0 / 0.4);
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
-  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.5);
-  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.6);
-  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.7);
-  --shadow-2xl: 0 35px 60px -15px rgb(0 0 0 / 0.8);
+  /* 🛑 ظلال الدارك: خفيفة جدًا عشان تديك إحساس "الجلو" أو "العمق" */
+  --shadow-2xs: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+  --shadow-xs: 0 1px 3px 0 rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 2px 5px 0 rgb(0 0 0 / 0.35);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.6);
+  --shadow-2xl: 0 35px 60px -15px rgb(0 0 0 / 0.7);
 }
 
 @theme inline {
@@ -190,22 +193,3 @@
   }
 }
 
-/* globals.css */
-@layer utilities {
-  /* تأثير الضل الصلب العصري */
-  .hard-shadow {
-    box-shadow: 4px 4px 0px 0px rgb(var(--foreground) / 0.8);
-  }
-  .hard-shadow-sm {
-    box-shadow: 2px 2px 0px 0px rgb(var(--foreground) / 0.8);
-  }
-  .hard-shadow-lg {
-    box-shadow: 6px 6px 0px 0px rgb(var(--foreground) / 0.8);
-  }
-  
-  /* تأثير عند الضغط */
-  .hard-shadow:active, .hard-shadow-sm:active, .hard-shadow-lg:active {
-    box-shadow: 0px 0px 0px 0px transparent;
-    transform: translate(2px, 2px);
-  }
-}

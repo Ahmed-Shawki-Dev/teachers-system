@@ -101,7 +101,8 @@ isArchived Boolean @default(false)
 model Group {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
 
-  name      String   
+  grade      String   
+  name      String?
   price     Float    @default(0)
   paymentType PaymentType @default(PER_SESSION)
   createdAt   DateTime? @default(now()) 
@@ -117,7 +118,7 @@ model Group {
   exams Exam[]
 
 
-  @@unique([name, teacherId])
+  @@unique([grade, name, teacherId])
 }
 
 model Session {

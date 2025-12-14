@@ -55,8 +55,13 @@ export const getSessionAttendance = async (sessionId: string) => {
     }
   })
 
+  // 🛑 بناء الاسم المدمج
+  const fullGroupName = session.group.name
+    ? `${session.group.grade} - ${session.group.name}`
+    : session.group.grade
+
   return {
-    groupName: session.group.name,
+    groupName: fullGroupName, // <-- تم التعديل
     sessionDate: session.sessionDate,
     price: session.group.price,
     paymentType: session.group.paymentType,

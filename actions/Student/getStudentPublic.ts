@@ -11,7 +11,8 @@ export const getStudentPublicAction = async (studentCode: string) => {
     include: {
       enrollments: {
         include: {
-          group: { select: { name: true, price: true, paymentType: true } },
+          // 🛑 التعديل: لازم نجيب grade هنا
+          group: { select: { name: true, price: true, paymentType: true, grade: true } },
         },
         take: 1,
       },
@@ -52,6 +53,13 @@ export const getStudentPublicAction = async (studentCode: string) => {
   const activeEnrollment = student.enrollments[0]
   const groupInfo = activeEnrollment?.group
 
+  // 🛑 التعديل: حساب الاسم المدمج
+  const fullGroupName = groupInfo
+    ? groupInfo.name
+      ? `${groupInfo.grade} - ${groupInfo.name}`
+      : groupInfo.grade
+    : 'بدون مجموعة'
+
   // الإحصائيات
   const total = student.attendances.length
   const present = student.attendances.filter((a) => a.status === 'PRESENT').length
@@ -64,7 +72,7 @@ export const getStudentPublicAction = async (studentCode: string) => {
       studentCode: student.studentCode,
       name: student.name,
       phone: student.parentPhone,
-      groupName: groupInfo?.name || 'بدون مجموعة',
+      groupName: fullGroupName, // <-- استخدام الاسم المدمج
       price: groupInfo?.price || 0,
       paymentType: groupInfo?.paymentType || 'PER_SESSION',
     },

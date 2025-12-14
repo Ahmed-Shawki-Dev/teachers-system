@@ -1,5 +1,6 @@
 'use server'
 import { Prisma } from '@/lib/prisma'
+import { getFullGroupName } from '../../utils/groupName'
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
 
 export const getStudentHistory = async (studentId: string) => {
@@ -11,7 +12,8 @@ export const getStudentHistory = async (studentId: string) => {
     include: {
       enrollments: {
         include: {
-          group: { select: { name: true, price: true, paymentType: true } },
+          // 🛑 التعديل الأول: لازم نجيب grade هنا
+          group: { select: { name: true, price: true, paymentType: true, grade: true } },
         },
         take: 1,
       },
@@ -29,17 +31,16 @@ export const getStudentHistory = async (studentId: string) => {
         },
         orderBy: { exam: { date: 'desc' } },
       },
-      // 3. سجل المدفوعات (التعديل هنا 👇)
+      // 3. سجل المدفوعات
       payments: {
         select: {
-          id: true, // 👈 ضفنا الـ ID
+          id: true,
           sessionId: true,
           amount: true,
           date: true,
           type: true,
           monthKey: true,
           session: {
-            // 👈 ضفنا العلاقة عشان نعرف نجيب التاريخ تحت
             select: { sessionDate: true },
           },
         },
@@ -55,6 +56,13 @@ export const getStudentHistory = async (studentId: string) => {
   const activeEnrollment = student.enrollments[0]
   const groupInfo = activeEnrollment?.group
 
+  // 🛑 التعديل الثاني: حساب الاسم المدمج
+  const fullGroupName = groupInfo
+    ? groupInfo.name
+      ? getFullGroupName({ grade: groupInfo.grade, name: groupInfo.name })
+      : groupInfo.grade
+    : 'بدون مجموعة'
+
   // الإحصائيات
   const total = student.attendances.length
   const present = student.attendances.filter((a) => a.status === 'PRESENT').length
@@ -66,7 +74,7 @@ export const getStudentHistory = async (studentId: string) => {
       studentCode: student.studentCode,
       name: student.name,
       phone: student.parentPhone,
-      groupName: groupInfo?.name || 'بدون مجموعة',
+      groupName: fullGroupName, // <-- استخدام الاسم المدمج
       price: groupInfo?.price || 0,
       paymentType: groupInfo?.paymentType || 'PER_SESSION',
     },
@@ -79,7 +87,6 @@ export const getStudentHistory = async (studentId: string) => {
 
     // سجل الغياب + حالة الدفع
     attendanceHistory: student.attendances.map((record) => {
-      // دلوقتي payments فيها sessionId لأننا اخترناه فوق
       const payment = student.payments.find((p) => p.sessionId === record.session.id)
 
       return {
@@ -102,12 +109,12 @@ export const getStudentHistory = async (studentId: string) => {
 
     // سجل المدفوعات
     paymentsHistory: student.payments.map((p) => ({
-      id: p.id, // دلوقتي بقت موجودة ومش هتضرب إيرور
+      id: p.id,
       amount: p.amount,
       date: p.date,
       type: p.type,
       details:
-        p.type === 'PER_SESSION' && p.session // و p.session بقت موجودة
+        p.type === 'PER_SESSION' && p.session
           ? `حصة ${new Date(p.session.sessionDate).toLocaleDateString('ar-EG')}`
           : p.monthKey || 'مدفوعات عامة',
     })),

@@ -13,7 +13,7 @@ export const getExamsAction = async (groupId?: string) => {
         groupId: groupId && groupId !== 'all' ? groupId : undefined,
       },
       include: {
-        group: { select: { name: true } },
+        group: { select: { name: true,grade:true } },
         _count: { select: { results: true } },
       },
       orderBy: { date: 'desc' },
