@@ -59,7 +59,7 @@ export default async function PortalStudentProfile({ params }: PageProps) {
       </Link>
 
       {/* 1. كارت البيانات (كودك مع تعديل بسيط) */}
-      <Card className='border-t-4 border-t-primary shadow-md bg-background'>
+      <Card className='border-t-4 border-t-primary shadow-md'>
         <CardHeader>
           <CardTitle className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
             <div>
@@ -141,7 +141,7 @@ function StatsCard({
   color = 'text-primary bg-primary/10',
 }: StatsCardProps) {
   return (
-    <Card className='border shadow-sm bg-background'>
+    <Card className='border shadow-sm '>
       <CardContent className='flex flex-col items-center justify-center p-6 gap-2'>
         <div className={`p-3 rounded-full ${color} mb-1`}>
           <Icon className='w-6 h-6' />

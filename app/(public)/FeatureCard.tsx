@@ -9,7 +9,7 @@ interface FeatureCardProps {
 
 export default function FeatureCard({ icon: Icon, title, desc, gradient }: FeatureCardProps) {
   return (
-    <div className='group relative p-0.5 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300'>
+    <div className='group relative p-0.5 rounded-2xl overflow-hidden  hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300'>
       {/* Border Gradient on Hover */}
       <div className='absolute inset-0 bg-linear-to-br from-border to-transparent group-hover:from-primary/50 group-hover:to-purple-500/50 transition-all duration-500 opacity-50 group-hover:opacity-100' />
 
