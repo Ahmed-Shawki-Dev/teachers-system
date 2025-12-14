@@ -1,10 +1,12 @@
 'use server'
 
 import { Prisma } from '@/lib/prisma'
+import { Prisma as PrismaClient } from '@prisma/client' 
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
 import { getFullGroupName } from '@/utils/groupName'
 
-export const getUnpaidSessions = async (groupId: string) => {
+// 👇 1. ضفنا الباراميتر هنا
+export const getUnpaidSessions = async (groupId: string, includeArchived: boolean = false) => {
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('Unauthorized')
 
@@ -15,13 +17,25 @@ export const getUnpaidSessions = async (groupId: string) => {
 
   if (!group || group.teacherId !== teacher.id) throw new Error('Unauthorized')
 
+  // 👇 2. شرط الأرشفة
+  const studentWhereClause: PrismaClient.StudentWhereInput = {
+    enrollments: { some: { groupId } },
+  }
+
+  // لو مش عايز الأرشيف، ضيف الشرط ده. لو عايزه، سيبها مفتوحة
+  if (!includeArchived) {
+    studentWhereClause.isArchived = false
+  }
+
   const students = await Prisma.student.findMany({
-    where: { enrollments: { some: { groupId } } },
+    where: studentWhereClause, // 👈 طبقنا الشرط
     select: {
       id: true,
       name: true,
-      studentCode: true, // 👈👈👈 1. ضيف ده في الـ Select
+      studentCode: true,
       parentPhone: true,
+      // 👇 ضيفنا ده عشان نعرف الطالب مأرشف ولا لأ لو حبيت تستخدمه
+      isArchived: true,
       attendances: {
         where: {
           status: 'PRESENT',
@@ -52,9 +66,7 @@ export const getUnpaidSessions = async (groupId: string) => {
   const debtList = students
     .map((student) => {
       const allAttendedSessions = student.attendances
-
       const paidSessionIds = student.payments.filter((p) => p.sessionId).map((p) => p.sessionId)
-
       const unpaidSessions = allAttendedSessions.filter(
         (attendance) => !paidSessionIds.includes(attendance.session.id),
       )
@@ -66,8 +78,9 @@ export const getUnpaidSessions = async (groupId: string) => {
       return {
         studentId: student.id,
         name: student.name,
-        studentCode: student.studentCode, // 👈👈👈 2. وضيف ده في الـ Return
+        studentCode: student.studentCode,
         phone: student.parentPhone,
+        isArchived: student.isArchived, // 👈 رجعنا المعلومة دي
         unpaidCount: unpaidSessions.length,
         totalDebt: totalDebt,
         details: unpaidSessions.map((a) => ({

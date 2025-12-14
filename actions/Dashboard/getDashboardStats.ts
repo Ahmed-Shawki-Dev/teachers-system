@@ -1,35 +1,32 @@
-// actions/Dashboard/getDashboardStats.ts
-
 'use server'
 
 import { Prisma } from '@/lib/prisma'
 import { getTeacherByTokenAction } from '../Teacher/getTeacherByToken'
-// 🛑 لازم نستدعي الأكشنز المسؤولة عن تجميع الديون
 import { PaymentType } from '@prisma/client'
-import { unstable_noStore } from 'next/cache' // 👑 لإصلاح مشكلة الـ Vercel Latency
+import { unstable_noStore } from 'next/cache'
 import { getMonthlySheet } from '../Payment/getMonthlySheet'
 import { getUnpaidSessions } from '../Payment/getUnpaidSessions'
 
 export const getDashboardStats = async () => {
-  unstable_noStore() // 🛑 منع الـ Caching على الداتا الحية
+  unstable_noStore() // 🛑 منع الكاش عشان الأرقام تكون لحظية
 
   const teacher = await getTeacherByTokenAction()
   if (!teacher) throw new Error('Unauthorized')
 
   const today = new Date()
   const monthKey = `${today.getMonth() + 1}-${today.getFullYear()}`
-  const currentMonth = today.getMonth() // استخدمه في تحديد بداية ونهاية الشهر الحالي
+  const currentMonth = today.getMonth()
 
-  // 1. الأعداد (طلاب ومجموعات) - بدون تغيير
+  // 1. أعداد الطلاب والمجموعات (النشطين فقط)
   const studentsCount = await Prisma.student.count({
-    where: { teacherId: teacher.id ,isArchived:false},
+    where: { teacherId: teacher.id, isArchived: false },
   })
 
   const groupsCount = await Prisma.group.count({
     where: { teacherId: teacher.id },
   })
 
-  // 2. حصص اليوم - بدون تغيير
+  // 2. حصص اليوم
   const startOfDay = new Date(today.setHours(0, 0, 0, 0))
   const endOfDay = new Date(today.setHours(23, 59, 59, 999))
 
@@ -43,7 +40,7 @@ export const getDashboardStats = async () => {
     orderBy: { sessionDate: 'asc' },
   })
 
-  // 3. التحصيل الفعلي للشهر الحالي - (إعادة تعيين اليوم عشان الحسابات اللي فوق تكون سليمة)
+  // 3. التحصيل الفعلي للشهر الحالي
   const startOfMonth = new Date(today.getFullYear(), currentMonth, 1)
   const endOfMonth = new Date(today.getFullYear(), currentMonth + 1, 0)
 
@@ -55,7 +52,7 @@ export const getDashboardStats = async () => {
     _sum: { amount: true },
   })
 
-  // 4. داتا الرسم البياني - بدون تغيير
+  // 4. داتا الرسم البياني (آخر 6 شهور)
   const sixMonthsAgo = new Date()
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5)
 
@@ -84,25 +81,23 @@ export const getDashboardStats = async () => {
     total,
   }))
 
-  // 👑 5. تجميع المستحقات المتأخرة (الـ Financial Killer Feature)
-
+  // 👑 5. تجميع المستحقات المتأخرة (بدون المأرشفين)
   const allTeacherGroups = await Prisma.group.findMany({
     where: { teacherId: teacher.id },
     select: { id: true, paymentType: true, price: true },
   })
 
-  // 👑 استخدام Promise.all لقتل الـ Waterfall و تنفيذ الـ Queries بالتوازي
   const debtPromises = allTeacherGroups.map(async (group) => {
     if (group.paymentType === PaymentType.PER_SESSION) {
-      // لوجيك الدفع بالحصة (تراكمي)
-      const debtSummary = await getUnpaidSessions(group.id)
+      // 👇👇👇 هنا التعديل: false عشان يتجاهل المأرشفين
+      const debtSummary = await getUnpaidSessions(group.id, false)
       return {
         pendingAmount: debtSummary.debtList.reduce((sum, s) => sum + s.totalDebt, 0),
         laggardsCount: debtSummary.debtList.length,
       }
     } else if (group.paymentType === PaymentType.MONTHLY) {
-      // لوجيك الدفع الشهري (للشهر الحالي فقط)
-      const monthlySheet = await getMonthlySheet(group.id, monthKey)
+      // 👇👇👇 وهنا كمان: false لنفس السبب
+      const monthlySheet = await getMonthlySheet(group.id, monthKey, false)
       const unpaidMonthlyStudents = monthlySheet.sheet.filter((s) => !s.isPaid)
 
       return {
@@ -118,7 +113,7 @@ export const getDashboardStats = async () => {
   const totalPendingAmount = allDebts.reduce((sum, debt) => sum + debt.pendingAmount, 0)
   const totalLaggardStudents = allDebts.reduce((sum, debt) => sum + debt.laggardsCount, 0)
 
-  // 👑 6. الـ Return Statement النهائي (هنا ضفنا الحقول الجديدة)
+  // 6. الإرجاع النهائي
   return {
     studentsCount,
     groupsCount,
@@ -126,7 +121,7 @@ export const getDashboardStats = async () => {
     todayClasses,
     currentMonthIncome: currentMonthIncome._sum.amount || 0,
     chartData,
-    totalPendingAmount, // 🛑 ده اللي كان ناقص
-    totalLaggardStudents, // 🛑 وده كمان
+    totalPendingAmount,
+    totalLaggardStudents,
   }
 }
