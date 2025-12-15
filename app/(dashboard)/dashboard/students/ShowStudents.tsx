@@ -13,6 +13,7 @@ import { Button } from '../../../../components/ui/button'
 import { getFullGroupName } from '../../../../utils/groupName'
 import RemoveStudent from './RemoveStudent'
 import UpdateStudentModal from './UpdateStudentModal'
+import { WhatsAppDialog } from './WhatsAppModal'
 
 // 🛑 تعريف الـ Type السحري:
 // ده بيقول: أنا عايز نوع "طالب" بس كمان معاه الـ enrollments والجروب اللي جواها
@@ -55,7 +56,7 @@ function ShowStudents({ students }: ShowStudentsProps) {
 
               return (
                 <TableRow key={student.id}>
-                  <TableCell className='font-mono font-bold text-sm text-primary/80'>
+                  <TableCell className='font-bold text-sm text-primary/80'>
                     {student.studentCode}
                   </TableCell>
 
@@ -75,11 +76,13 @@ function ShowStudents({ students }: ShowStudentsProps) {
                   </TableCell>
                   <TableCell>
                     <div className='flex gap-2 justify-center'>
+                      <WhatsAppDialog student={student} />
+
                       <Link
                         href={`/dashboard/students/${student.id}`}
                         className='text-primary hover:underline underline-offset-4'
                       >
-                        <Button size='icon' variant='ghost'>
+                        <Button size='icon'>
                           <Eye className='w-4 h-4' />
                         </Button>
                       </Link>

@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
-import { DollarSign, Loader2, Save, Search } from 'lucide-react'
+import { DollarSign, Loader2, Save, Search, MessageSquareWarning } from 'lucide-react' // 1. ✅ زودنا ايقونة الرسالة
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { upsertAttendanceAction } from '../../../../../actions/Attendance/upsertAttendance'
@@ -20,7 +20,7 @@ import { upsertAttendanceAction } from '../../../../../actions/Attendance/upsert
 type StudentRecord = {
   studentId: string
   name: string
-  studentCode: string // 1. ✅ زودنا الكود هنا
+  studentCode: string
   parentPhone: string
   status: 'PRESENT' | 'ABSENT' | 'EXCUSED' | null
   note: string
@@ -44,8 +44,13 @@ export default function AttendanceSheet({
   const [students, setStudents] = useState(initialData)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  // 2. ✅ حالة جديدة عشان نعرف إننا حفظنا خلاص ونظهر زراير الغياب
+  const [isSaved, setIsSaved] = useState(false)
 
   const toggleAttendance = (studentId: string) => {
+    // لو عدلت في الغياب بعد الحفظ، بنخفي زراير الرسايل عشان متبعتش لحد غلط
+    if (isSaved) setIsSaved(false)
+
     setStudents((prev) =>
       prev.map((s) => {
         if (s.studentId === studentId) {
@@ -65,12 +70,38 @@ export default function AttendanceSheet({
     )
   }
 
-  // 2. ✅ تعديل الفلتر عشان يشمل الكود والاسم والرقم
+  // 3. ✅ دالة إرسال رسالة الغياب
+  const sendAbsenceMessage = (student: StudentRecord) => {
+    if (!student.parentPhone) {
+      toast.error('لا يوجد رقم هاتف لولي الأمر')
+      return
+    }
+
+    let phone = student.parentPhone
+    if (phone.startsWith('0')) phone = phone.substring(1)
+    const finalPhone = `20${phone}`
+
+    // تنسيق التاريخ بالعربي
+    const dateStr = new Date(sessionInfo.date).toLocaleDateString('ar-EG', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    })
+
+    const message = `السلام عليكم،
+نلفت انتباه سيادتكم بأن الطالب: *${student.name}*
+تغيب عن حصة اليوم (${dateStr}).
+يرجى المتابعة للأهمية.`
+
+    const url = `https://wa.me/${finalPhone}?text=${encodeURIComponent(message)}`
+    window.open(url, '_blank')
+  }
+
   const filteredStudents = students.filter(
     (student) =>
       student.name.includes(searchTerm) ||
       student.parentPhone.includes(searchTerm) ||
-      student.studentCode.includes(searchTerm), // 👈 ضيفنا دي
+      student.studentCode.includes(searchTerm),
   )
 
   const handleSave = async () => {
@@ -92,6 +123,7 @@ export default function AttendanceSheet({
 
       if (res.success) {
         toast.success(res.message)
+        setIsSaved(true) // ✅ بنفعل وضع ظهور زراير الغياب
       } else {
         toast.error('حصلت مشكلة')
       }
@@ -132,7 +164,7 @@ export default function AttendanceSheet({
             </div>
             <Button onClick={handleSave} disabled={loading} className='gap-2'>
               {loading ? <Loader2 className='animate-spin' /> : <Save size={18} />}
-              حفظ
+              حفظ وتأكيد
             </Button>
           </div>
         </CardHeader>
@@ -151,6 +183,12 @@ export default function AttendanceSheet({
                       دفع ({sessionInfo.price}ج)
                     </TableHead>
                   )}
+                  {/* 4. ✅ عمود جديد بيظهر بس لما نعمل حفظ */}
+                  {isSaved && (
+                    <TableHead className='text-center font-bold text-red-600 w-[140px]'>
+                      تنبيه الغياب
+                    </TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -167,9 +205,12 @@ export default function AttendanceSheet({
                             ? 'bg-green-50/50 hover:bg-green-100/50 dark:bg-green-900/10 dark:hover:bg-green-900/20'
                             : 'hover:bg-muted/50',
                         )}
-                        onClick={() => toggleAttendance(student.studentId)}
+                        // بنوقف الـ click لو داس على زرار الواتس عشان ميعلمش حضور بالغلط
+                        onClick={(e) => {
+                          if ((e.target as HTMLElement).closest('button')) return
+                          toggleAttendance(student.studentId)
+                        }}
                       >
-                        {/* 3. ✅ عرضنا الكود تحت الاسم عشان يبقى واضح */}
                         <TableCell className='font-medium py-3'>
                           <div className='text-base'>{student.name}</div>
                           <div className='flex gap-2 text-xs text-muted-foreground'>
@@ -182,7 +223,7 @@ export default function AttendanceSheet({
 
                         <TableCell className='text-center'>
                           <div className='flex items-center justify-center'>
-                            <input
+                            <Input
                               type='checkbox'
                               checked={isPresent}
                               onChange={() => {}}
@@ -212,13 +253,33 @@ export default function AttendanceSheet({
                             </Button>
                           </TableCell>
                         )}
+
+                        {/* 5. ✅ زرار الواتس بيظهر بس لو الطالب غايب + تم الحفظ */}
+                        {isSaved && (
+                          <TableCell className='text-center'>
+                            {!isPresent && (
+                              <Button
+                                size='sm'
+                                variant='destructive'
+                                className='h-8 gap-1 bg-red-100 text-red-700 hover:bg-red-200 border-red-200'
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  sendAbsenceMessage(student)
+                                }}
+                              >
+                                <MessageSquareWarning size={16} />
+                                إبلاغ
+                              </Button>
+                            )}
+                          </TableCell>
+                        )}
                       </TableRow>
                     )
                   })
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={isPerSession ? 3 : 2}
+                      colSpan={isPerSession ? (isSaved ? 4 : 3) : isSaved ? 3 : 2}
                       className='h-24 text-center text-muted-foreground'
                     >
                       لا يوجد طالب بهذا البحث

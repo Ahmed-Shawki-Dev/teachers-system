@@ -93,7 +93,6 @@ export default async function Home() {
                 <StudentSearchCode />
               </div>
 
-              {/* Separator */}
               <div className='flex items-center gap-6 mb-10 opacity-40'>
                 <div className='h-px bg-border flex-1' />
                 <span className='text-sm font-semibold text-muted-foreground tracking-widest uppercase'>
@@ -102,7 +101,6 @@ export default async function Home() {
                 <div className='h-px bg-border flex-1' />
               </div>
 
-              {/* B. Stats Grid */}
               <div className='grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12'>
                 <StatItem
                   value={stats.teachers || 0}
