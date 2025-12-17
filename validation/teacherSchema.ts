@@ -1,17 +1,21 @@
 import * as z from 'zod'
 
 export const teacherSchema = z.object({
-  name: z.string().min(2, 'الأسم لازم عالأقل حرفين'),
-  email: z.string().email('الإيميل مش صح'),
-  password: z.string().min(8, 'كلمة السر لازم تكون أكتر من 8 حروف'),
-  phone: z
-    .string()
-    .regex(/^01[0125][0-9]{8}$/, {
-      message: 'رقم الموبايل لازم يكون مصري صحيح (مثلاً 01012345678)',
-    })
-    .min(11, 'الرقم لازم يكون 11 رقم')
-    .max(11, 'الرقم لازم يكون 11 رقم'),
-  bio: z.string().min(10, 'لازم تكتب عالأقل 10 حروف').max(500, 'البايو ما يعديش 500 حرف'),
+  name: z.string().min(3, 'الاسم يجب أن يكون 3 أحرف على الأقل'),
+  email: z.string().email('بريد إلكتروني غير صالح'),
+  password: z.string().min(6, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'),
+  bio: z.string().optional(),
+  phone: z.string().min(10, 'رقم الهاتف غير صالح'),
+  avatarUrl: z.string().optional(),
+
+  // ✅ هنا الحل: coerce بتحول أي حاجة لرقم غصب عنها
+  maxStudents: z.coerce.number().min(1, 'يجب أن يكون هناك طالب واحد على الأقل').default(200),
+
+  // ✅ التأكد من الباقة
+  tier: z.enum(['BASIC', 'PRO']).default('BASIC'),
+
+  // ✅ التأكد من الباركود
+  hasBarcodeScanner: z.boolean().default(false).optional(),
 })
 
 export type ITeacher = z.infer<typeof teacherSchema>

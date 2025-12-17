@@ -21,11 +21,10 @@ export async function addStudentAndEnrollAction(data: {
   if (!group) throw new Error('الجروب مش موجود أو مش بتاعك')
 
   return await Prisma.$transaction(async (tx) => {
-    // 🔍 👈 Logic التوليد الآمن الجديد
+    // Logic التوليد الآمن للكود
     let nextCode: string
     let isCodeUnique = false
 
-    // Loop للتأكد من أن الكود فريد عالمياً
     do {
       nextCode = generateRandomCode()
       const existingStudent = await tx.student.findFirst({
@@ -33,13 +32,10 @@ export async function addStudentAndEnrollAction(data: {
         select: { id: true },
       })
 
-      if (!existingStudent) {
-        isCodeUnique = true
-      }
+      if (!existingStudent) isCodeUnique = true
     } while (!isCodeUnique)
-    // 👆 انتهى Logic التوليد الآمن
 
-    // 1. أضف الطالب بالكود الجديد
+    // 1. إضافة الطالب
     const student = await tx.student.create({
       data: {
         ...studentData,
@@ -48,7 +44,7 @@ export async function addStudentAndEnrollAction(data: {
       },
     })
 
-    // 2. سجله في الجروب فورًا
+    // 2. تسجيله في الجروب
     await tx.enrollment.create({
       data: {
         studentId: student.id,
@@ -57,6 +53,13 @@ export async function addStudentAndEnrollAction(data: {
     })
 
     revalidatePath('/dashboard/students')
-    return { student, studentCode: nextCode }
+
+    // ✅ التعديل هنا: بنرجع صلاحية المدرس في الطباعة
+    // بنشوف لو هو مفعل خاصية الباركود (اللي ضفناها في السكيما قبل كدة)
+    return {
+      student,
+      studentCode: nextCode,
+      allowPrinting: teacher.hasBarcodeScanner, 
+    }
   })
 }

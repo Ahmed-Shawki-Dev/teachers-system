@@ -3,19 +3,27 @@
 import { Prisma } from '@/lib/prisma'
 
 export const getSessionAttendance = async (sessionId: string) => {
-  // 1. هات بيانات الحصة والجروب عشان نعرف الطلاب
+  // 1. هات بيانات الحصة والجروب ومعاهم "المدرس"
   const session = await Prisma.session.findUnique({
     where: { id: sessionId },
-    include: { group: true },
+    include: {
+      group: {
+        include: {
+          teacher: {
+            select: { hasBarcodeScanner: true }, // ✅ هات الخاصية دي بس
+          },
+        },
+      },
+    },
   })
 
   if (!session) throw new Error('Session not found')
 
-  // 2. هات كل طلاب الجروب ده (بشرط ميكونوش محذوفين/أرشيف)
+  // 2. هات كل طلاب الجروب ده (بشرط ميكونوش محذوفين)
   const students = await Prisma.student.findMany({
     where: {
       enrollments: { some: { groupId: session.groupId } },
-      isArchived: false, // 👈👈👈 دي الإضافة السحرية: اخفي المحذوفين من القائمة
+      isArchived: false,
     },
     select: {
       id: true,
@@ -26,15 +34,14 @@ export const getSessionAttendance = async (sessionId: string) => {
     orderBy: { name: 'asc' },
   })
 
-  // 3. هات سجل الحضور القديم (لو اتخد قبل كده)
+  // 3. هات سجل الحضور القديم
   const existingAttendance = await Prisma.attendance.findMany({
     where: { sessionId },
   })
 
-  // خريطة سريعة عشان نعرف حالة كل طالب
   const attendanceMap = new Map(existingAttendance.map((a) => [a.studentId, a]))
 
-  // 4. هات المدفوعات للحصة دي
+  // 4. هات المدفوعات
   const payments = await Prisma.payment.findMany({
     where: { sessionId },
   })
@@ -49,22 +56,23 @@ export const getSessionAttendance = async (sessionId: string) => {
       name: student.name,
       studentCode: student.studentCode,
       parentPhone: student.parentPhone,
-      status: record ? record.status : null, // لو مفيش، رجع null عشان الفرونت يفهم إن لسه ماتخدش
+      status: record ? record.status : null,
       note: record?.note || '',
       hasPaid: paymentMap.has(student.id),
     }
   })
 
-  // 🛑 بناء الاسم المدمج
   const fullGroupName = session.group.name
     ? `${session.group.grade} - ${session.group.name}`
     : session.group.grade
 
   return {
-    groupName: fullGroupName, // <-- تم التعديل
+    groupName: fullGroupName,
     sessionDate: session.sessionDate,
     price: session.group.price,
     paymentType: session.group.paymentType,
     students: formattedStudents,
+    // ✅ بنرجع القيمة هنا (لو مش موجودة بنفترض false)
+    enableBarcode: session.group.teacher.hasBarcodeScanner ?? false,
   }
 }

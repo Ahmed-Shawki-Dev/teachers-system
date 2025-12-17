@@ -12,8 +12,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
-import { DollarSign, Loader2, Save, Search, MessageSquareWarning } from 'lucide-react' // 1. ✅ زودنا ايقونة الرسالة
-import { useState } from 'react'
+import { DollarSign, Loader2, MessageSquareWarning, Save, ScanBarcode, Search } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react' // 2. ✅ Hooks ضرورية
 import { toast } from 'sonner'
 import { upsertAttendanceAction } from '../../../../../actions/Attendance/upsertAttendance'
 
@@ -31,6 +31,7 @@ export default function AttendanceSheet({
   sessionId,
   initialData,
   sessionInfo,
+  enableBarcode = false,
 }: {
   sessionId: string
   initialData: StudentRecord[]
@@ -40,15 +41,23 @@ export default function AttendanceSheet({
     paymentType: 'PER_SESSION' | 'MONTHLY'
     price: number
   }
+  enableBarcode?: boolean // اختياري
 }) {
   const [students, setStudents] = useState(initialData)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  // 2. ✅ حالة جديدة عشان نعرف إننا حفظنا خلاص ونظهر زراير الغياب
   const [isSaved, setIsSaved] = useState(false)
 
+  // 4. ✅ State عشان نعلم على الطالب اللي لسه مسحوب
+  const [lastScannedCode, setLastScannedCode] = useState<string | null>(null)
+
+  // 5. ✅ Refs للتعامل مع الـ Hardware Scanner
+  const barcodeBuffer = useRef('')
+  const lastKeyTime = useRef(Date.now())
+
+  // --- دوال المعالجة (Logic) ---
+
   const toggleAttendance = (studentId: string) => {
-    // لو عدلت في الغياب بعد الحفظ، بنخفي زراير الرسايل عشان متبعتش لحد غلط
     if (isSaved) setIsSaved(false)
 
     setStudents((prev) =>
@@ -56,6 +65,7 @@ export default function AttendanceSheet({
         if (s.studentId === studentId) {
           const newStatus = s.status === 'PRESENT' ? 'ABSENT' : 'PRESENT'
           const shouldPay = sessionInfo.paymentType === 'PER_SESSION'
+          // لو حضر وهو بيحاسب بالحصة، نعلم انه دفع، ولو غاب نشيل الدفع
           const newHasPaid = shouldPay && newStatus === 'PRESENT' ? true : false
           return { ...s, status: newStatus, hasPaid: newHasPaid }
         }
@@ -70,7 +80,82 @@ export default function AttendanceSheet({
     )
   }
 
-  // 3. ✅ دالة إرسال رسالة الغياب
+  // 6. ✅ دالة التعامل مع المسح الضوئي
+  const handleBarcodeScan = useCallback(
+    (code: string) => {
+      // 1. ندور على الطالب بالكود
+      const targetStudent = students.find((s) => s.studentCode === code)
+
+      if (targetStudent) {
+        // 2. نحدث حالته
+        setStudents((prev) =>
+          prev.map((s) => {
+            if (s.studentCode === code) {
+              // الباركود دايماً بيحضر الطالب (مش toggle)
+              const newStatus = 'PRESENT'
+              const shouldPay = sessionInfo.paymentType === 'PER_SESSION'
+              // لو لسه محضرينه حالاً، نعلم إنه دفع (لو الدفع بالحصة)
+              // لو هو دافع أصلاً من الأول، نسيبها زي ما هي
+              const newHasPaid = shouldPay ? true : s.hasPaid
+
+              return { ...s, status: newStatus, hasPaid: newHasPaid }
+            }
+            return s
+          }),
+        )
+
+        // 3. Feedback للمستخدم
+        setLastScannedCode(code)
+        toast.success(`تم تسجيل: ${targetStudent.name}`)
+
+        // نشيل العلامة بعد ثانتين
+        setTimeout(() => setLastScannedCode(null), 2000)
+      } else {
+        toast.error(`كود غير موجود: ${code}`)
+      }
+    },
+    [students, sessionInfo.paymentType],
+  )
+
+  // 7. ✅ الـ Listener بتاع الكيبورد (Scanner)
+  useEffect(() => {
+    if (!enableBarcode) return // لو مش مفعلة للمدرس ده، نخرج
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // لو المؤشر جوه Input Search أو أي Input تاني، منتدخلش
+      if (
+        (e.target as HTMLElement).tagName === 'INPUT' ||
+        (e.target as HTMLElement).tagName === 'TEXTAREA'
+      )
+        return
+
+      const currentTime = Date.now()
+
+      // لو الفرق بين الضغطات كبير (أكتر من 50ms) يبقى ده بني آدم بيكتب ببطء، بنصفر المخزن
+      if (currentTime - lastKeyTime.current > 100) {
+        barcodeBuffer.current = ''
+      }
+
+      lastKeyTime.current = currentTime
+
+      if (e.key === 'Enter') {
+        // السكانر بيبعت Enter في الآخر
+        if (barcodeBuffer.current.length > 0) {
+          handleBarcodeScan(barcodeBuffer.current)
+          barcodeBuffer.current = '' // فضي المخزن
+        }
+      } else if (e.key.length === 1) {
+        // جمع الحروف/الأرقام
+        barcodeBuffer.current += e.key
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [enableBarcode, handleBarcodeScan])
+
+  // --- باقي الدوال (Save, WhatsApp) ---
+
   const sendAbsenceMessage = (student: StudentRecord) => {
     if (!student.parentPhone) {
       toast.error('لا يوجد رقم هاتف لولي الأمر')
@@ -81,7 +166,6 @@ export default function AttendanceSheet({
     if (phone.startsWith('0')) phone = phone.substring(1)
     const finalPhone = `20${phone}`
 
-    // تنسيق التاريخ بالعربي
     const dateStr = new Date(sessionInfo.date).toLocaleDateString('ar-EG', {
       weekday: 'long',
       day: 'numeric',
@@ -123,7 +207,7 @@ export default function AttendanceSheet({
 
       if (res.success) {
         toast.success(res.message)
-        setIsSaved(true) // ✅ بنفعل وضع ظهور زراير الغياب
+        setIsSaved(true)
       } else {
         toast.error('حصلت مشكلة')
       }
@@ -152,8 +236,16 @@ export default function AttendanceSheet({
             </p>
           </div>
 
-          <div className='flex gap-2 w-full md:w-auto'>
-            <div className='relative flex-1 md:w-[250px]'>
+          <div className='flex flex-col md:flex-row gap-2 w-full md:w-auto items-center'>
+            {/* 8. ✅ مؤشر حالة السكانر */}
+            {enableBarcode && (
+              <div className='flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-md border border-blue-200 animate-in fade-in zoom-in duration-300'>
+                <ScanBarcode size={20} />
+                <span className='text-sm font-bold whitespace-nowrap'>الماسح جاهز</span>
+              </div>
+            )}
+
+            <div className='relative flex-1 md:w-[250px] w-full'>
               <Search className='absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
               <Input
                 placeholder='بحث بالاسم، الكود، أو الهاتف...'
@@ -162,7 +254,7 @@ export default function AttendanceSheet({
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button onClick={handleSave} disabled={loading} className='gap-2'>
+            <Button onClick={handleSave} disabled={loading} className='gap-2 w-full md:w-auto'>
               {loading ? <Loader2 className='animate-spin' /> : <Save size={18} />}
               حفظ وتأكيد
             </Button>
@@ -183,7 +275,6 @@ export default function AttendanceSheet({
                       دفع ({sessionInfo.price}ج)
                     </TableHead>
                   )}
-                  {/* 4. ✅ عمود جديد بيظهر بس لما نعمل حفظ */}
                   {isSaved && (
                     <TableHead className='text-center font-bold text-red-600 w-[140px]'>
                       تنبيه الغياب
@@ -195,26 +286,36 @@ export default function AttendanceSheet({
                 {filteredStudents.length > 0 ? (
                   filteredStudents.map((student) => {
                     const isPresent = student.status === 'PRESENT'
+                    // 9. ✅ هل ده الطالب اللي لسه مسحوب؟
+                    const isScannedNow = student.studentCode === lastScannedCode
 
                     return (
                       <TableRow
                         key={student.studentId}
                         className={cn(
-                          'cursor-pointer transition-colors',
-                          isPresent
+                          'cursor-pointer transition-all duration-300', // added duration
+                          // Highlighting logic
+                          isScannedNow
+                            ? 'bg-blue-100 dark:bg-blue-900/40 ring-2 ring-inset ring-blue-500 z-10 scale-[1.01]'
+                            : isPresent
                             ? 'bg-green-50/50 hover:bg-green-100/50 dark:bg-green-900/10 dark:hover:bg-green-900/20'
                             : 'hover:bg-muted/50',
                         )}
-                        // بنوقف الـ click لو داس على زرار الواتس عشان ميعلمش حضور بالغلط
                         onClick={(e) => {
                           if ((e.target as HTMLElement).closest('button')) return
+                          // لو بتدوس في أي حتة تانية غير الزراير، بيغير الحضور
                           toggleAttendance(student.studentId)
                         }}
                       >
                         <TableCell className='font-medium py-3'>
                           <div className='text-base'>{student.name}</div>
                           <div className='flex gap-2 text-xs text-muted-foreground'>
-                            <span className='font-mono bg-muted px-1 rounded'>
+                            <span
+                              className={cn(
+                                'font-mono bg-muted px-1 rounded transition-colors',
+                                isScannedNow && 'bg-blue-200 text-blue-800 font-bold',
+                              )}
+                            >
                               {student.studentCode}
                             </span>
                             <span>{student.parentPhone}</span>
@@ -226,7 +327,7 @@ export default function AttendanceSheet({
                             <Input
                               type='checkbox'
                               checked={isPresent}
-                              onChange={() => {}}
+                              onChange={() => {}} // Controlled by Row Click
                               className='w-5 h-5 accent-primary cursor-pointer rounded border-gray-300 focus:ring-primary'
                             />
                           </div>
@@ -254,7 +355,6 @@ export default function AttendanceSheet({
                           </TableCell>
                         )}
 
-                        {/* 5. ✅ زرار الواتس بيظهر بس لو الطالب غايب + تم الحفظ */}
                         {isSaved && (
                           <TableCell className='text-center'>
                             {!isPresent && (

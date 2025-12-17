@@ -2,11 +2,11 @@ import { getAllGroupsAction } from '@/actions/Group/getGroups'
 import StudentSearchInput from '@/components/StudentSearchInput'
 import { GraduationCap } from 'lucide-react'
 import { Suspense } from 'react'
+import { getSubscriptionStats } from '../../../../actions/Teacher/getSubscriptionStats'
 import AddStudentModal from './AddStudentModal'
 import StudentsFilter from './StudentsFilter'
 import StudentsList from './StudentsList'
 import StudentsSkeleton from './StudentsSkeleton'
-
 export default async function StudentsPage({
   searchParams,
 }: {
@@ -17,12 +17,14 @@ export default async function StudentsPage({
   const groupId = params.groupId || ''
   const page = Number(params.page) || 1
 
-  // 1. بنجيب المجموعات للفلتر (سريعة ومش هتأثر قوي)
   const groups = await getAllGroupsAction()
+  // ✅ 1. جبنا الإحصائيات
+  const stats = await getSubscriptionStats()
 
   return (
     <div className='flex flex-col gap-6 p-4 container mx-auto'>
-      {/* الهيدر الثابت */}
+      {/* (اختياري) ممكن تعرض كارت الاستهلاك هنا لو حابب */}
+
       <div className='flex flex-col md:flex-row justify-between items-center gap-4 bg-card p-4 rounded-lg border shadow-sm'>
         <div className='flex items-center gap-2'>
           <div className='bg-primary/10 p-2 rounded-full text-primary'>
@@ -35,11 +37,11 @@ export default async function StudentsPage({
         </div>
 
         <div className='w-full sm:w-auto'>
-          <AddStudentModal />
+          {/* ✅ 2. بنمرر هل وصل للحد الأقصى ولا لأ */}
+          <AddStudentModal isLimitReached={stats?.isLimitReached ?? false} />
         </div>
       </div>
 
-      {/* منطقة الفلتر والبحث (بتظهر علطول) */}
       <div className='flex flex-col sm:flex-row gap-4 bg-muted/20 p-4 rounded-lg border border-dashed items-center'>
         <div className='flex-1 w-full'>
           <StudentSearchInput />
@@ -49,8 +51,6 @@ export default async function StudentsPage({
         </div>
       </div>
 
-      {/* منطقة الطلاب (Streaming) */}
-      {/* الـ key بيضمن ان الـ Skeleton يظهر لما تغير الفلتر او الصفحة */}
       <Suspense key={query + groupId + page} fallback={<StudentsSkeleton />}>
         <StudentsList page={page} query={query} groupId={groupId} />
       </Suspense>

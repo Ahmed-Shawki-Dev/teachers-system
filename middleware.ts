@@ -58,6 +58,7 @@ export const config = {
     '/logout',
     '/profile/:path*',
     '/dashboard/:path*',
-    '/student/:path*', 
+    '/student/:path*',
+    '/print/:path*',
   ],
 }

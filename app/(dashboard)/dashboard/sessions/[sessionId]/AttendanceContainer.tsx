@@ -9,6 +9,7 @@ export default async function AttendanceContainer({ sessionId }: { sessionId: st
     <AttendanceSheet
       sessionId={sessionId}
       initialData={data.students}
+      enableBarcode={data.enableBarcode}
       sessionInfo={{
         groupName: data.groupName,
         date: data.sessionDate,

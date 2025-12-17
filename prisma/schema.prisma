@@ -35,6 +35,11 @@ enum PaymentType {
   MONTHLY
 }
 
+enum SubscriptionTier {
+  BASIC
+  PRO
+}
+
 // 2. Models
 model Teacher {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -44,6 +49,10 @@ model Teacher {
   avatarUrl String?
   phone     String?
   bio       String?
+  tier        SubscriptionTier? @default(BASIC)
+  maxStudents Int?              @default(50)
+  hasBarcodeScanner Boolean? @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

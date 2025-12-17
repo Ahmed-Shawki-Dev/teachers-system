@@ -26,7 +26,7 @@ export default function StudentSearchInput() {
     <span className='relative'>
       <Input
         placeholder='ابحث باسم الطالب...'
-        className='max-w-md w-xs bg-background'
+        className='max-w-md w-full bg-background'
         onChange={(e) => handleSearch(e.target.value)}
         defaultValue={searchParams.get('query')?.toString()}
       />
