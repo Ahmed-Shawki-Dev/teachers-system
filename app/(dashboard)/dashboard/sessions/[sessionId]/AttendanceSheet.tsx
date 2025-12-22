@@ -12,10 +12,21 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
-import { DollarSign, Loader2, MessageSquareWarning, Save, ScanBarcode, Search } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react' // 2. ✅ Hooks ضرورية
+import {
+  Camera,
+  CameraOff,
+  DollarSign,
+  Loader2,
+  MessageSquareWarning,
+  Save,
+  ScanBarcode,
+  Search,
+} from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { upsertAttendanceAction } from '../../../../../actions/Attendance/upsertAttendance'
+// تأكد إن المسار ده صح حسب مكان ملف الـ CameraScanner عندك
+import CameraScanner from '../../../../../components/CameraScanner'
 
 type StudentRecord = {
   studentId: string
@@ -41,31 +52,29 @@ export default function AttendanceSheet({
     paymentType: 'PER_SESSION' | 'MONTHLY'
     price: number
   }
-  enableBarcode?: boolean // اختياري
+  enableBarcode?: boolean
 }) {
+  // 1. تعريف الـ State في الأول
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [showCamera, setShowCamera] = useState(false)
   const [students, setStudents] = useState(initialData)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [isSaved, setIsSaved] = useState(false)
-
-  // 4. ✅ State عشان نعلم على الطالب اللي لسه مسحوب
   const [lastScannedCode, setLastScannedCode] = useState<string | null>(null)
 
-  // 5. ✅ Refs للتعامل مع الـ Hardware Scanner
   const barcodeBuffer = useRef('')
   const lastKeyTime = useRef(Date.now())
 
-  // --- دوال المعالجة (Logic) ---
-
+  // 2. الدوال (Logic)
   const toggleAttendance = (studentId: string) => {
     if (isSaved) setIsSaved(false)
-
+    setHasUnsavedChanges(true) // ✅ بنعلم إن فيه تغيير
     setStudents((prev) =>
       prev.map((s) => {
         if (s.studentId === studentId) {
           const newStatus = s.status === 'PRESENT' ? 'ABSENT' : 'PRESENT'
           const shouldPay = sessionInfo.paymentType === 'PER_SESSION'
-          // لو حضر وهو بيحاسب بالحصة، نعلم انه دفع، ولو غاب نشيل الدفع
           const newHasPaid = shouldPay && newStatus === 'PRESENT' ? true : false
           return { ...s, status: newStatus, hasPaid: newHasPaid }
         }
@@ -75,40 +84,32 @@ export default function AttendanceSheet({
   }
 
   const togglePayment = (studentId: string) => {
+    setHasUnsavedChanges(true) // ✅ بنعلم إن فيه تغيير
     setStudents((prev) =>
       prev.map((s) => (s.studentId === studentId ? { ...s, hasPaid: !s.hasPaid } : s)),
     )
   }
 
-  // 6. ✅ دالة التعامل مع المسح الضوئي
   const handleBarcodeScan = useCallback(
     (code: string) => {
-      // 1. ندور على الطالب بالكود
       const targetStudent = students.find((s) => s.studentCode === code)
 
       if (targetStudent) {
-        // 2. نحدث حالته
+        setHasUnsavedChanges(true) // ✅ بنعلم إن فيه تغيير
         setStudents((prev) =>
           prev.map((s) => {
             if (s.studentCode === code) {
-              // الباركود دايماً بيحضر الطالب (مش toggle)
               const newStatus = 'PRESENT'
               const shouldPay = sessionInfo.paymentType === 'PER_SESSION'
-              // لو لسه محضرينه حالاً، نعلم إنه دفع (لو الدفع بالحصة)
-              // لو هو دافع أصلاً من الأول، نسيبها زي ما هي
               const newHasPaid = shouldPay ? true : s.hasPaid
-
               return { ...s, status: newStatus, hasPaid: newHasPaid }
             }
             return s
           }),
         )
 
-        // 3. Feedback للمستخدم
         setLastScannedCode(code)
         toast.success(`تم تسجيل: ${targetStudent.name}`)
-
-        // نشيل العلامة بعد ثانتين
         setTimeout(() => setLastScannedCode(null), 2000)
       } else {
         toast.error(`كود غير موجود: ${code}`)
@@ -117,12 +118,13 @@ export default function AttendanceSheet({
     [students, sessionInfo.paymentType],
   )
 
-  // 7. ✅ الـ Listener بتاع الكيبورد (Scanner)
+  // 3. الـ Effects
+
+  // Effect 1: التعامل مع الكيبورد (Hardware Scanner)
   useEffect(() => {
-    if (!enableBarcode) return // لو مش مفعلة للمدرس ده، نخرج
+    if (!enableBarcode) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // لو المؤشر جوه Input Search أو أي Input تاني، منتدخلش
       if (
         (e.target as HTMLElement).tagName === 'INPUT' ||
         (e.target as HTMLElement).tagName === 'TEXTAREA'
@@ -130,22 +132,17 @@ export default function AttendanceSheet({
         return
 
       const currentTime = Date.now()
-
-      // لو الفرق بين الضغطات كبير (أكتر من 50ms) يبقى ده بني آدم بيكتب ببطء، بنصفر المخزن
       if (currentTime - lastKeyTime.current > 100) {
         barcodeBuffer.current = ''
       }
-
       lastKeyTime.current = currentTime
 
       if (e.key === 'Enter') {
-        // السكانر بيبعت Enter في الآخر
         if (barcodeBuffer.current.length > 0) {
           handleBarcodeScan(barcodeBuffer.current)
-          barcodeBuffer.current = '' // فضي المخزن
+          barcodeBuffer.current = ''
         }
       } else if (e.key.length === 1) {
-        // جمع الحروف/الأرقام
         barcodeBuffer.current += e.key
       }
     }
@@ -154,29 +151,33 @@ export default function AttendanceSheet({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [enableBarcode, handleBarcodeScan])
 
-  // --- باقي الدوال (Save, WhatsApp) ---
+  // Effect 2: حماية الخروج بدون حفظ (Unsaved Changes)
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+      }
+    }
 
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [hasUnsavedChanges])
+
+  // 4. باقي الدوال (Save & WhatsApp)
   const sendAbsenceMessage = (student: StudentRecord) => {
     if (!student.parentPhone) {
       toast.error('لا يوجد رقم هاتف لولي الأمر')
       return
     }
-
     let phone = student.parentPhone
     if (phone.startsWith('0')) phone = phone.substring(1)
     const finalPhone = `20${phone}`
-
     const dateStr = new Date(sessionInfo.date).toLocaleDateString('ar-EG', {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
     })
-
-    const message = `السلام عليكم،
-نلفت انتباه سيادتكم بأن الطالب: *${student.name}*
-تغيب عن حصة اليوم (${dateStr}).
-يرجى المتابعة للأهمية.`
-
+    const message = `السلام عليكم،\nنلفت انتباه سيادتكم بأن الطالب: *${student.name}*\nتغيب عن حصة اليوم (${dateStr}).\nيرجى المتابعة للأهمية.`
     const url = `https://wa.me/${finalPhone}?text=${encodeURIComponent(message)}`
     window.open(url, '_blank')
   }
@@ -208,6 +209,7 @@ export default function AttendanceSheet({
       if (res.success) {
         toast.success(res.message)
         setIsSaved(true)
+        setHasUnsavedChanges(false) // ✅ بنصفر التغييرات بعد الحفظ
       } else {
         toast.error('حصلت مشكلة')
       }
@@ -220,13 +222,14 @@ export default function AttendanceSheet({
 
   const isPerSession = sessionInfo.paymentType === 'PER_SESSION'
 
+  // 5. الـ JSX
   return (
     <div className='space-y-6'>
       <Card className='border-t-4 border-t-primary shadow-md'>
-        <CardHeader className='flex flex-col md:flex-row gap-4 items-center justify-between'>
+        <CardHeader className='flex flex-col items-center justify-between gap-4 md:flex-row'>
           <div>
             <CardTitle>{sessionInfo.groupName}</CardTitle>
-            <p className='text-muted-foreground text-sm mt-1'>
+            <p className='mt-1 text-sm text-muted-foreground'>
               {new Date(sessionInfo.date).toLocaleDateString('ar-EG', {
                 weekday: 'long',
                 year: 'numeric',
@@ -236,17 +239,29 @@ export default function AttendanceSheet({
             </p>
           </div>
 
-          <div className='flex flex-col md:flex-row gap-2 w-full md:w-auto items-center'>
-            {/* 8. ✅ مؤشر حالة السكانر */}
+          <div className='flex w-full flex-col items-center gap-2 md:w-auto md:flex-row'>
             {enableBarcode && (
-              <div className='flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-md border border-blue-200 animate-in fade-in zoom-in duration-300'>
-                <ScanBarcode size={20} />
-                <span className='text-sm font-bold whitespace-nowrap'>الماسح جاهز</span>
-              </div>
+              <>
+                <Button
+                  variant={showCamera ? 'destructive' : 'outline'}
+                  onClick={() => setShowCamera(!showCamera)}
+                  className='gap-2'
+                >
+                  {showCamera ? <CameraOff size={18} /> : <Camera size={18} />}
+                  {showCamera ? 'إغلاق الكاميرا' : 'سكان بالكاميرا'}
+                </Button>
+
+                {!showCamera && (
+                  <div className='animate-in fade-in zoom-in duration-300 flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-blue-700'>
+                    <ScanBarcode size={20} />
+                    <span className='whitespace-nowrap text-sm font-bold'>الماسح جاهز</span>
+                  </div>
+                )}
+              </>
             )}
 
-            <div className='relative flex-1 md:w-[250px] w-full'>
-              <Search className='absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
+            <div className='relative w-full flex-1 md:w-[250px]'>
+              <Search className='text-muted-foreground absolute top-2.5 right-2.5 h-4 w-4' />
               <Input
                 placeholder='بحث بالاسم، الكود، أو الهاتف...'
                 className='pr-9'
@@ -254,7 +269,7 @@ export default function AttendanceSheet({
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button onClick={handleSave} disabled={loading} className='gap-2 w-full md:w-auto'>
+            <Button onClick={handleSave} disabled={loading} className='w-full gap-2 md:w-auto'>
               {loading ? <Loader2 className='animate-spin' /> : <Save size={18} />}
               حفظ وتأكيد
             </Button>
@@ -262,21 +277,30 @@ export default function AttendanceSheet({
         </CardHeader>
 
         <CardContent>
+          {showCamera && (
+            <div className='animate-in fade-in zoom-in duration-300 mb-6'>
+              <CameraScanner onScan={handleBarcodeScan} />
+              <p className='text-muted-foreground mt-2 text-center text-sm'>
+                وجه كاميرا الموبايل لكود الطالب ليتم تحضيره تلقائياً
+              </p>
+            </div>
+          )}
+
           <div className='rounded-md border'>
             <Table>
               <TableHeader className='bg-muted/50 h-14'>
                 <TableRow>
-                  <TableHead className='text-right font-bold text-primary'>بيانات الطالب</TableHead>
-                  <TableHead className='text-center font-bold text-primary w-[100px]'>
+                  <TableHead className='text-primary text-right font-bold'>بيانات الطالب</TableHead>
+                  <TableHead className='text-primary w-[100px] text-center font-bold'>
                     حضور
                   </TableHead>
                   {isPerSession && (
-                    <TableHead className='text-center font-bold text-primary w-[100px]'>
+                    <TableHead className='text-primary w-[100px] text-center font-bold'>
                       دفع ({sessionInfo.price}ج)
                     </TableHead>
                   )}
                   {isSaved && (
-                    <TableHead className='text-center font-bold text-red-600 w-[140px]'>
+                    <TableHead className='text-red-600 w-[140px] text-center font-bold'>
                       تنبيه الغياب
                     </TableHead>
                   )}
@@ -286,15 +310,13 @@ export default function AttendanceSheet({
                 {filteredStudents.length > 0 ? (
                   filteredStudents.map((student) => {
                     const isPresent = student.status === 'PRESENT'
-                    // 9. ✅ هل ده الطالب اللي لسه مسحوب؟
                     const isScannedNow = student.studentCode === lastScannedCode
 
                     return (
                       <TableRow
                         key={student.studentId}
                         className={cn(
-                          'cursor-pointer transition-all duration-300', // added duration
-                          // Highlighting logic
+                          'cursor-pointer transition-all duration-300',
                           isScannedNow
                             ? 'bg-blue-100 dark:bg-blue-900/40 ring-2 ring-inset ring-blue-500 z-10 scale-[1.01]'
                             : isPresent
@@ -303,16 +325,15 @@ export default function AttendanceSheet({
                         )}
                         onClick={(e) => {
                           if ((e.target as HTMLElement).closest('button')) return
-                          // لو بتدوس في أي حتة تانية غير الزراير، بيغير الحضور
                           toggleAttendance(student.studentId)
                         }}
                       >
-                        <TableCell className='font-medium py-3'>
+                        <TableCell className='py-3 font-medium'>
                           <div className='text-base'>{student.name}</div>
-                          <div className='flex gap-2 text-xs text-muted-foreground'>
+                          <div className='text-muted-foreground flex gap-2 text-xs'>
                             <span
                               className={cn(
-                                'font-mono bg-muted px-1 rounded transition-colors',
+                                'bg-muted rounded px-1 font-mono transition-colors',
                                 isScannedNow && 'bg-blue-200 text-blue-800 font-bold',
                               )}
                             >
@@ -327,8 +348,8 @@ export default function AttendanceSheet({
                             <Input
                               type='checkbox'
                               checked={isPresent}
-                              onChange={() => {}} // Controlled by Row Click
-                              className='w-5 h-5 accent-primary cursor-pointer rounded border-gray-300 focus:ring-primary'
+                              onChange={() => {}}
+                              className='accent-primary focus:ring-primary h-5 w-5 cursor-pointer rounded border-gray-300'
                             />
                           </div>
                         </TableCell>
@@ -343,14 +364,14 @@ export default function AttendanceSheet({
                                 togglePayment(student.studentId)
                               }}
                               className={cn(
-                                'rounded-full h-8 w-8 transition-all hover:scale-110',
+                                'h-8 w-8 rounded-full transition-all hover:scale-110',
                                 student.hasPaid
                                   ? 'bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 hover:text-white'
-                                  : 'bg-transparent text-muted-foreground hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30',
+                                  : 'text-muted-foreground bg-transparent hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30',
                               )}
                               title={student.hasPaid ? 'تم الدفع' : 'لم يدفع'}
                             >
-                              <DollarSign className='w-4 h-4' />
+                              <DollarSign className='h-4 w-4' />
                             </Button>
                           </TableCell>
                         )}
@@ -361,7 +382,7 @@ export default function AttendanceSheet({
                               <Button
                                 size='sm'
                                 variant='destructive'
-                                className='h-8 gap-1 bg-red-100 text-red-700 hover:bg-red-200 border-red-200'
+                                className='h-8 gap-1 border-red-200 bg-red-100 text-red-700 hover:bg-red-200'
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   sendAbsenceMessage(student)
@@ -380,7 +401,7 @@ export default function AttendanceSheet({
                   <TableRow>
                     <TableCell
                       colSpan={isPerSession ? (isSaved ? 4 : 3) : isSaved ? 3 : 2}
-                      className='h-24 text-center text-muted-foreground'
+                      className='text-muted-foreground h-24 text-center'
                     >
                       لا يوجد طالب بهذا البحث
                     </TableCell>

@@ -4,8 +4,8 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 // 🛑 بيانات ثابتة لازم تكون موجودة في الداتابيز عندك
-const TEACHER_ID = '69431edcdc5243a6bc135f09'
-const GROUP_ID = '69431f25dc5243a6bc135f0a' // 👈 هات ID جروب حقيقي وحطه هنا
+const TEACHER_ID = '69433cca0d54014a0e58dd8e'
+const GROUP_ID = '694871c0b73f3e84bea57c77' // 👈 هات ID جروب حقيقي وحطه هنا
 const FIXED_PHONE = '01098786468'
 
 async function main() {
@@ -15,7 +15,7 @@ async function main() {
   const usedCodes = new Set()
 
   // 1. تجهيز بيانات 1000 طالب
-  for (let i = 0; i < 45; i++) {
+  for (let i = 0; i < 10000; i++) {
     let studentCode
     do {
       studentCode = Math.floor(100000 + Math.random() * 900000).toString()
