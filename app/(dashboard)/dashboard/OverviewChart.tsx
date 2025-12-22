@@ -11,7 +11,8 @@ interface OverviewChartProps {
 
 export function OverviewChart({ data }: OverviewChartProps) {
   return (
-    <div className='md:h-[500px] h-[350px] w-full'>
+    // 👇 التعديل هنا: ضيفنا min-w-0 عشان يمنع الانهيار جوه الـ Grid
+    <div className='md:h-[500px] h-[350px] w-full min-w-0'>
       <ResponsiveContainer width='100%' height='100%'>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray='3 3' vertical={false} stroke='#E5E7EB' />

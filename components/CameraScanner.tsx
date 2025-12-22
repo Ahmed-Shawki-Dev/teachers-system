@@ -4,40 +4,55 @@ import { Html5Qrcode, Html5QrcodeScannerState, Html5QrcodeSupportedFormats } fro
 import { useEffect, useRef } from 'react'
 
 export default function CameraScanner({ onScan }: { onScan: (code: string) => void }) {
-  // بنستخدم Ref عشان نحتفظ بنسخة السكانر ونعرف نتحكم فيها
   const scannerRef = useRef<Html5Qrcode | null>(null)
   const scannerContainerId = 'reader'
-
-  // Ref عشان نمنع تكرار القراءة لنفس الكود في وقت قصير (Debounce)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const lastScannedCode = useRef<string | null>(null)
   const lastScannedTime = useRef<number>(0)
+  const isMounted = useRef(true) // ✅ تتبع هل المكون موجود ولا لأ
 
   useEffect(() => {
-    // 1. تعريف دالة الصوت
-    const playBeep = () => {
-      const audio = new Audio(
+    isMounted.current = true
+    if (typeof window !== 'undefined' && !audioRef.current) {
+      audioRef.current = new Audio(
         'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/pop.mp3',
       )
-      audio.volume = 0.5
-      audio.play().catch(() => {})
+      audioRef.current.volume = 0.5
     }
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
 
-    // دالة لبدء السكانر
+  const playBeep = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.currentTime = 0
+    const playPromise = audio.play()
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {})
+    }
+  }
+
+  useEffect(() => {
     const startScanner = async () => {
       try {
-        // لو مفيش instance، نعمل واحدة جديدة
         if (!scannerRef.current) {
           scannerRef.current = new Html5Qrcode(scannerContainerId)
         }
 
         const scanner = scannerRef.current
 
-        // لو السكانر شغال أو بيحمل، منعملش حاجة
-        if (
-          scanner.getState() === Html5QrcodeScannerState.SCANNING ||
-          scanner.getState() === Html5QrcodeScannerState.PAUSED
-        ) {
-          return
+        // ✅ تجنب البدء لو الحالة مش مناسبة
+        try {
+          if (
+            scanner.getState() === Html5QrcodeScannerState.SCANNING ||
+            scanner.getState() === Html5QrcodeScannerState.PAUSED
+          ) {
+            return
+          }
+        } catch (e) {
+          // getState might throw if not initialized yet, safe to ignore here
         }
 
         const config = {
@@ -51,54 +66,54 @@ export default function CameraScanner({ onScan }: { onScan: (code: string) => vo
           ],
         }
 
-        await scanner.start(
-          { facingMode: 'environment' },
-          config,
-          (decodedText) => {
-            const now = Date.now()
-            // Debounce Logic: 2.5 ثانية لنفس الكود
-            if (decodedText === lastScannedCode.current && now - lastScannedTime.current < 2500) {
-              return
-            }
-
-            lastScannedCode.current = decodedText
-            lastScannedTime.current = now
-
-            playBeep()
-            onScan(decodedText)
-          },
-          (errorMessage) => {
-            // ignore errors
-          },
-        )
+        if (isMounted.current) {
+          await scanner.start(
+            { facingMode: 'environment' },
+            config,
+            (decodedText) => {
+              const now = Date.now()
+              if (decodedText === lastScannedCode.current && now - lastScannedTime.current < 2500) {
+                return
+              }
+              lastScannedCode.current = decodedText
+              lastScannedTime.current = now
+              playBeep()
+              onScan(decodedText)
+            },
+            (errorMessage) => {},
+          )
+        }
       } catch (err) {
         console.warn('Scanner start warning:', err)
-        // منتطلعش ايرور لليوزر لو المشكلة بس في الترانزيشن
       }
     }
 
-    // تأخير بسيط عشان نضمن ان الـ DOM جاهز والـ Strict Mode هدي
     const timer = setTimeout(() => {
       startScanner()
     }, 100)
 
-    // Cleanup Function (أهم حتة)
+    // 👇👇👇 التنظيف الآمن جداً 👇👇👇
     return () => {
       clearTimeout(timer)
       if (scannerRef.current) {
-        // بنحاول نوقف السكانر وننضف الذاكرة
-        scannerRef.current
-          .stop()
-          .then(() => {
-            return scannerRef.current?.clear()
-          })
-          .catch((err) => {
-            console.warn('Error stopping scanner:', err)
-          })
-          .finally(() => {
-            // تفريغ المتغير تماماً
+        try {
+          const scanner = scannerRef.current
+          // ✅ أهم سطر: ممنوع تعمل stop إلا لو هو شغال فعلاً
+          // المكتبة بتضرب إيرور لو عملت stop وهو مش running
+          if (scanner.getState() === Html5QrcodeScannerState.SCANNING) {
+            scanner
+              .stop()
+              .catch((err) => console.warn('Stop failed:', err))
+              .finally(() => {
+                scannerRef.current = null
+              })
+          } else {
+            // لو مش شغال، بس فضي الرف
             scannerRef.current = null
-          })
+          }
+        } catch (e) {
+          console.warn('Cleanup warning')
+        }
       }
     }
   }, [onScan])
